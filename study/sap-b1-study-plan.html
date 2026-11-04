@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAP Business One Study Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a single column work sheet. Summary tiles, phase strip, a week-by-day calendar grid, then a per-week checklist with expandable day steps. */
+:root{
+  --bg:#f2f5f7; --surface:#ffffff; --ink:#14212b; --muted:#566673; --line:#d3dce3;
+  --accent:#0b6e8a; --accent-soft:#dcedf3; --done:#2b7a4b; --done-soft:#dff1e6; --today:#c2570c;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1a22; --surface:#14252e; --ink:#e5edf1; --muted:#93a7b3; --line:#27404c;
+    --accent:#5cc0dc; --accent-soft:#153a47; --done:#63c78e; --done-soft:#17382a; --today:#f0944f;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1a22; --surface:#14252e; --ink:#e5edf1; --muted:#93a7b3; --line:#27404c;
+  --accent:#5cc0dc; --accent-soft:#153a47; --done:#63c78e; --done-soft:#17382a; --today:#f0944f;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding:32px 16px 72px;display:flex;flex-direction:column;gap:36px}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:0 0 8px;font-weight:600;text-wrap:balance}
+h2{font-size:20px;margin:0 0 4px;font-weight:600;text-wrap:balance}
+p{margin:0}
+.lede{color:var(--muted);max-width:65ch}
+.sub{color:var(--muted);font-size:14px;margin-bottom:14px;max-width:65ch}
+a{color:var(--accent)}
+.startrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:16px;font-size:14px;color:var(--muted)}
+.startrow input{font:inherit;font-family:var(--font-mono);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.tile .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tile .v{font-size:26px;font-weight:600;font-family:var(--font-mono);font-variant-numeric:tabular-nums;line-height:1.2;margin-top:2px}
+.tile .n{font-size:13px;color:var(--muted);margin-top:2px}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:var(--done);width:0}
+.next{background:var(--accent-soft);border:1px solid var(--accent);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.next .k{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.phase{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.phase .wk{font-family:var(--font-mono);font-size:12px;color:var(--accent)}
+.phase h3{margin:0;font-size:16px;font-weight:600}
+.phase p{font-size:14px;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:14px;font-size:14px}
+.cal{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:820px;table-layout:fixed}
+th,td{border-bottom:1px solid var(--line);padding:0;text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-size:12px;color:var(--muted);font-weight:500;padding:10px 8px;text-transform:uppercase;letter-spacing:.06em;background:var(--bg)}
+th.wkh,td.wkh{width:118px;padding:10px 12px;border-right:1px solid var(--line)}
+td.wkh{font-size:13px}
+td.wkh b{display:block;font-weight:600;font-size:14px}
+td.wkh span{color:var(--muted);font-size:12px}
+.cell{display:flex;flex-direction:column;gap:2px;width:100%;min-height:68px;padding:8px;border:0;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer;border-left:1px solid var(--line)}
+.cell:hover{background:var(--accent-soft)}
+.cell:focus-visible,.day>summary:focus-visible,.week>summary:focus-visible,.chk input:focus-visible,.startrow input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cell .d{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.cell .l{font-size:13px;line-height:1.3}
+.cell.done{background:var(--done-soft)}
+.cell.done .l{text-decoration:line-through;text-decoration-color:var(--done);color:var(--muted)}
+.cell.done .d::after{content:" \2713";color:var(--done);font-weight:600}
+.cell.today{box-shadow:inset 0 0 0 2px var(--today)}
+.cell.wknd{font-weight:500}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted);margin-top:10px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1px solid var(--line)}
+summary{list-style:none}
+summary::-webkit-details-marker{display:none}
+details.week{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+details.week+details.week{margin-top:10px}
+.week>summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;padding:12px 16px}
+.week>summary::before{content:"\25B8";color:var(--accent);margin-right:-6px}
+.week[open]>summary::before{content:"\25BE"}
+.week>summary .t{font-weight:600}
+.week>summary .r{font-size:13px;color:var(--muted);font-family:var(--font-mono)}
+.week>summary .c{margin-left:auto;font-size:13px;font-family:var(--font-mono);color:var(--accent)}
+.wbody{padding:0 16px 14px;display:flex;flex-direction:column}
+.wintro{font-size:14px;color:var(--muted);margin-bottom:6px}
+.day{border-top:1px solid var(--line)}
+.day>summary,.chk{display:flex;gap:10px;align-items:flex-start;padding:8px 0}
+.day>summary{cursor:pointer;flex-wrap:wrap}
+.chk{border-top:1px solid var(--line);cursor:pointer}
+.chk input{margin-top:5px;width:18px;height:18px;flex:none;accent-color:var(--done)}
+.meta{font-family:var(--font-mono);font-size:12px;color:var(--muted);white-space:nowrap;min-width:116px;padding-top:3px}
+.txt{font-size:15px;flex:1 1 220px}
+.more{font-size:12px;color:var(--accent);font-family:var(--font-mono);padding-top:3px;white-space:nowrap}
+.more::before{content:"Show steps"}
+.day[open] .more::before{content:"Hide steps"}
+.day.on .txt{color:var(--muted);text-decoration:line-through}
+.chk.on .txt{color:var(--muted);text-decoration:line-through}
+.steps{margin:0 0 12px 28px;padding:10px 12px 10px 32px;background:var(--bg);border-radius:6px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.steps li::marker{color:var(--accent);font-family:var(--font-mono);font-size:12px}
+.chk.ms .meta{color:var(--accent)}
+.after{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.after ol{margin:4px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.foot{font-size:13px;color:var(--muted);max-width:70ch}
+@media (max-width:520px){.meta{min-width:0;white-space:normal}.steps{margin-left:0}}
+@media (prefers-reduced-motion:no-preference){.bar>i{transition:width .3s}.cell{transition:background .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>SAP Business One certification plan</h1>
+  <p class="lede">Fourteen weeks to the SAP Certified Associate exam for Business One 10.0, built around one hour a day on weekdays, a longer hands-on session on Saturday, and a short review on Sunday. Tick days off on the calendar or in the checklist; both stay in sync on this device.</p>
+  <div class="startrow">
+    <label for="start">Week 1 starts on</label>
+    <input type="date" id="start" value="2026-11-09">
+    <span>Any date you pick snaps back to that week's Monday.</span>
+  </div>
+</header>
+
+<section aria-labelledby="h-sum">
+  <h2 id="h-sum">Where you are</h2>
+  <p class="sub">Summary first. Every number is counted from the days you have ticked.</p>
+  <div class="tiles" id="tiles"></div>
+  <div class="next" id="next" style="margin-top:12px"></div>
+</section>
+
+<section aria-labelledby="h-road">
+  <h2 id="h-road">Roadmap</h2>
+  <p class="sub">Five phases. The exam topics reported for the 10.0 certification are implementation, logistics, financials and support, and third-party prep sites add the Web client. Confirm the current list on SAP's exam page before you book.</p>
+  <div class="phases" id="phases"></div>
+  <div class="links">
+    <a href="https://learning.sap.com/learning-journeys/implementing-sap-business-one" target="_blank" rel="noopener">Implementing SAP Business One journey</a>
+    <a href="https://groups.community.sap.com:443/t5/sap-learning-blog-posts/where-can-i-find-learning-materials-to-effectively-use-sap-business-one-web/ba-p/13662310" target="_blank" rel="noopener">Exploring the Web Client journey</a>
+    <a href="https://learning.sap.com/certifications/sap-certified-associate-sap-business-one" target="_blank" rel="noopener">Exam page</a>
+    <a href="https://learning.sap.com/products/business-one" target="_blank" rel="noopener">SAP Business One training hub</a>
+  </div>
+</section>
+
+<section aria-labelledby="h-cal">
+  <h2 id="h-cal">Study calendar</h2>
+  <p class="sub">Click a day to mark it done. Weeks 7 and 8 fall over the holidays and are the lightest on new material.</p>
+  <div class="cal"><table id="cal"></table></div>
+  <div class="legend">
+    <span><i class="sw" style="background:var(--done-soft)"></i>Done</span>
+    <span><i class="sw" style="box-shadow:inset 0 0 0 2px var(--today);border:0"></i>Today</span>
+    <span>Mon to Fri: 60 min &nbsp; Sat: 120 min &nbsp; Sun: 45 min</span>
+  </div>
+</section>
+
+<section aria-labelledby="h-list">
+  <h2 id="h-list">Checklist</h2>
+  <p class="sub">Click a day's title to open its steps, and tick the box when the day is done. Do the steps in order and pace yourself to the time shown. "Journey" means the SAP learning journey for that phase. Menu and lesson names can differ slightly by version and by what your user is allowed to see, so go by what you find on screen. Milestones and bonus tasks sit at the bottom of each week, and bonus tasks are not counted in your progress.</p>
+  <div id="list"></div>
+</section>
+
+<section class="after" aria-labelledby="h-after">
+  <h2 id="h-after">After the exam</h2>
+  <ol>
+    <li>Take the free <a href="https://learning.sap.com/courses/leveraging-the-sap-business-one-service-layer" target="_blank" rel="noopener">Leveraging the SAP Business One Service Layer</a> course, with Postman.</li>
+    <li>Ask your admin for a limited API user and a test database.</li>
+    <li>Turn your "how B1 does it vs how we do it" list into one small, read-only report or time-saver, with ChatGPT writing the code and your admin reviewing it.</li>
+    <li>Only then try write operations, and only on the test database.</li>
+  </ol>
+</section>
+
+<p class="foot">Study time is about 108 hours in total. Lesson names are described by topic, because SAP's journey page order may change, so follow the journey's own sequence. Exam price, format and subscription terms were not confirmed from SAP, so check them on the exam page before you pay.</p>
+</div>
+
+<script>
+function S(s){ return s.split("|"); }
+function W(title, phase, intro, days, miles, bonus){ return {title:title, phase:phase, intro:intro, days:days, miles:miles, bonus:bonus}; }
+var WEEKS = [
+ W("Setup and orientation",0,"Get access, learn the layout of the training, and decide what you are aiming at.",[
+  ["Account","Create your SAP Learning account and open the Implementing SAP Business One learning journey. Skim every unit title.",
+   S("Go to learning.sap.com and sign in, or create a free SAP account.|Open the Implementing SAP Business One learning journey from the link on this page.|Scroll through the whole journey without starting any lesson and count the units.|Copy the unit titles into a notes file, one per line.|Mark the units that sound like your daily work: receiving, shipping, inventory.")],
+  ["Exam page","Read the certification page. Write the topic areas in a notes file.",
+   S("Open the exam page linked on this page.|Write down the exam name and code exactly as shown.|Copy every listed topic area into your notes, with its weighting if shown.|Write the exam format, number of questions and time limit as shown today.|Note anything that differs from what this plan assumes, and adjust your schedule if needed.")],
+  ["Ask for access","Email your B1 admin for a demo or test company database. Ask your manager about sponsoring the exam.",
+   S("Draft a short email to your B1 admin asking for a demo or test company database for training.|Ask whether read access is enough or whether you may create test documents there.|Ask which B1 version and patch level you run, so you can confirm it matches 10.0.|Draft a second short note to your manager asking whether the company would sponsor the exam.|Send both, and put a reminder in your calendar to follow up in one week.")],
+  ["Intro lessons","Journey: the introduction lessons. Note any term you do not know.",
+   S("Start the journey at its first unit and work in order.|Watch or read each introduction lesson without skipping.|After each lesson, write two sentences summarizing it in your own words.|List every term you do not know and look each one up.|Stop at the end of the introduction units.")],
+  ["Navigation","Journey: navigation and user interface lessons.",
+   S("Open the navigation and user interface lessons.|Follow along on the demo or test system if you have access, otherwise watch the demonstrations.|Learn where the main menu, toolbar and shortcuts are.|Practice finding a document, a business partner and an item using search.|Write a cheat sheet of five navigation tips you did not know.")],
+  ["Explore the DB","Hands-on: click through every menu in the demo or test database. Find where your daily receiving documents live.",
+   S("Log in to the demo or test database, not the live one.|Open each main menu and look at what is inside it, one menu at a time.|Find the documents your team touches daily, such as goods receipts, deliveries and transfers.|Open an example of each and read its header and rows.|Note anything that looks different from how your team does it.|Close without saving changes to anything.")],
+  ["Review","Review your notes. Start a running list called How B1 does it vs how we do it.",
+   S("Re-read all of this week's notes.|Turn the notes into five questions and answer them from memory.|Start your list called How B1 does it vs how we do it, with at least three entries.|Check your sent emails for replies and follow up if needed.|Look ahead at next week's topic, master data.")]
+ ],["Demo or test database access confirmed","Exam sponsorship question asked"],"Rate each exam topic area as strong, okay or weak."),
+
+ W("Master data",1,"The records every document depends on.",[
+  ["Business partners","Journey: business partner master data (customers, vendors, leads).",
+   S("Open the business partner lessons in the journey.|Learn the difference between customers, vendors and leads.|Note what the main tabs hold, such as general, contact persons, payment terms and accounting.|Write down which fields your company would need for a vendor you receive from.|Summarize in your notes what a business partner record controls.")],
+  ["Items","Journey: item master data and its inventory settings.",
+   S("Open the item master data lessons.|Note the key item tabs: general, purchasing, sales and inventory.|Learn what the management options (none, batch, serial) mean.|Write down how an item's warehouse settings affect stock tracking.|List the item fields your team relies on at work.")],
+  ["Warehouses","Journey: warehouses and how stock is organised.",
+   S("Open the warehouse lessons.|Learn what a warehouse record contains and how stock is held per warehouse.|Note any bin location feature the lessons mention, and what it adds.|Write how your site's physical layout maps to B1 warehouses.|Summarize warehouse setup in three lines.")],
+  ["Prices and units","Journey: price lists and units of measure.",
+   S("Open the price list and unit of measure lessons.|Learn how price lists feed into documents.|Learn how units of measure and unit groups work, such as purchasing, sales and inventory units.|Write an example of an item bought by the case and sold by the each.|Note what could go wrong if units are set up incorrectly.")],
+  ["Self-test","Without notes, explain each master record, then check the lessons.",
+   S("Close your notes and write a one-paragraph explanation of each master record type.|Draw how business partner, item and warehouse come together on a document.|Compare your answers with the lesson content.|Mark any gaps and re-read those lessons.|Make three flashcards for the gaps.")],
+  ["Hands-on","Create a business partner, an item and a warehouse in the demo database.",
+   S("Log in to the demo or test database.|Create a new business partner as a vendor and fill in the main tabs.|Create a new item and set its inventory and purchasing details.|Create a new warehouse if your permissions allow, otherwise open an existing one to inspect it.|Search for each record to confirm it saved.|Write down every field you were unsure about.")],
+  ["Review","Review notes. Add anything that differs from how your company sets up master data.",
+   S("Review this week's notes.|Go through your flashcards.|Add anything about how your company sets up master data to your how-B1-does-it list.|Preview next week's topic, marketing documents.|Plan your hours for the week in your calendar.")]
+ ],["Created one of each master record"],"Open three real item records at work (view only) and compare their settings to the lessons."),
+
+ W("Marketing documents",1,"Quotes, orders, deliveries and invoices all follow the same pattern.",[
+  ["Document basics","Journey: structure of a marketing document, header and rows.",
+   S("Open the marketing document lessons.|Learn the layout: header, rows and footer.|Note which fields are shared by all document types.|Open a sample document in the demo database and point out each section.|Summarize the structure in your notes.")],
+  ["Document flow","Journey: copying from base documents to target documents.",
+   S("Open the lessons on copying from base documents to target documents.|Learn what copy from and copy to do.|Note how quantities and prices carry across.|Learn what happens to the base document's status after copying.|Sketch the typical chain from quotation to order to delivery.")],
+  ["Drafts","Journey: draft documents and when to use them.",
+   S("Open the draft document lessons.|Learn how to save a document as a draft.|Learn how a draft becomes a real document.|Note what a draft does and does not affect, as the lesson states.|List one case where drafts would help your team.")],
+  ["Numbering and status","Journey: document numbering and open or closed status.",
+   S("Open the lessons on document numbering and status.|Learn how document numbers are assigned and what series are.|Learn the difference between open and closed documents.|Learn what canceling does compared with closing, as the lesson explains.|Write one example of when each applies.")],
+  ["Self-test","Draw the base to target chain from memory.",
+   S("Draw the base to target chain from memory.|Write what each document type is for.|Check your drawing against the lessons.|Note any gaps.|Re-read one weak lesson.")],
+  ["Hands-on","Create a document and follow it through a copy to the next document. Open the document flow view.",
+   S("Log in to the demo or test database.|Create a sales quotation for a sample customer.|Copy it to a sales order, then copy that to a delivery.|Open the document flow view on the delivery.|Open each document in the chain and check its status.|Write what changed on each document after copying.")],
+  ["Review","Review notes and update your how-B1-does-it list.",
+   S("Review this week's notes.|Answer your own document flow questions from memory.|Update your how-B1-does-it list.|Preview next week's topic, purchasing.|Check that you are on track against the calendar.")]
+ ],["Followed a document through at least two stages"],"Trace one real delivery at work back through its documents (view only)."),
+
+ W("Purchasing",2,"The receiving side of your job, the way B1 designs it.",[
+  ["Request and quote","Journey: purchase request and purchase quotation.",
+   S("Open the purchase request and purchase quotation lessons.|Learn what each document does and who normally creates it.|Note whether these documents affect stock or accounting, as the lessons state.|Write how your company starts a purchase today.|Compare that with B1's flow.")],
+  ["Purchase order","Journey: the purchase order.",
+   S("Open the purchase order lessons.|Learn the key fields: vendor, items, quantities, delivery date and warehouse.|Learn what the open quantity means.|Learn how to copy from a quotation or request.|Note which POs your team receives against.")],
+  ["Goods receipt PO","Journey: goods receipt PO. This is your daily work, so take extra notes.",
+   S("Open the goods receipt PO lessons.|Learn how it copies from a purchase order.|Learn what happens to stock when it is posted, as the lesson explains.|Learn how partial receipts affect the PO's open quantity.|Write the step-by-step receiving process in B1, then compare it with your actual daily steps.|Add the differences to your how-B1-does-it list.")],
+  ["A/P invoice","Journey: the A/P invoice.",
+   S("Open the A/P invoice lessons.|Learn how the invoice relates to the goods receipt PO.|Learn what goes to accounting when it is posted.|Note the options for invoicing without a receipt, if mentioned.|Write who posts invoices at your company.")],
+  ["Returns and credits","Journey: goods return and A/P credit memo.",
+   S("Open the goods return and A/P credit memo lessons.|Learn when to use a goods return versus a credit memo.|Learn how each affects stock and the vendor balance.|Write one return scenario from your own work.|Map it to the correct B1 document.")],
+  ["Full cycle","Hands-on: run a purchase order through goods receipt and invoice in the demo database.",
+   S("Log in to the demo or test database.|Create a purchase order for a sample vendor and item.|Copy it to a goods receipt PO and receive the full quantity.|Copy the receipt to an A/P invoice and post it.|Check the item's stock quantity before and after.|Open the document flow to verify the chain.|Write down any step that surprised you.")],
+  ["Review","Review notes. Compare your receiving steps with B1's intended flow.",
+   S("Review the week's notes.|Draw the purchase cycle from memory.|Compare B1's intended flow with your receiving steps.|Add three entries to your how-B1-does-it list.|Preview next week's topic, inventory.")]
+ ],["Completed a full purchase cycle"],"Redo the cycle with a partial receipt, then a return."),
+
+ W("Inventory",2,"Moving, counting and correcting stock.",[
+  ["Stock transfers","Journey: inventory transfers between warehouses and bins.",
+   S("Open the inventory transfer lessons.|Learn how to move stock between warehouses.|Note the transfer request versus transfer document, if covered.|Note how transfers show in stock reports.|Write a transfer your team does today and how B1 would record it.")],
+  ["Counting","Journey: inventory counting and posting.",
+   S("Open the inventory counting lessons.|Learn the counting steps: set up, count, post.|Learn what is posted when differences exist.|Note who should count and who should post.|Write a counting process for your site.")],
+  ["Adjustments","Journey: goods receipt and goods issue for adjustments.",
+   S("Open the goods receipt and goods issue lessons for adjustments.|Learn when to use them instead of a purchasing receipt.|Learn how they affect stock and accounting.|Note the risks of using them casually.|Write one valid use and one risky use.")],
+  ["Batches and serials","Journey: batch and serial number management.",
+   S("Open the batch and serial number lessons.|Learn how items are set to batch or serial management.|Learn how numbers are assigned on receipts and selected on issues.|Note how traceability works.|List which of your items would need this.")],
+  ["Inventory reports","Journey: stock and valuation reports.",
+   S("Open the stock and valuation report lessons.|Learn the main stock reports.|Note how to filter by warehouse and item.|Learn what valuation means in B1, as the lesson states.|Write which report would answer the question you are asked most often.")],
+  ["Hands-on","Transfer stock, run a count, post an adjustment and check the reports.",
+   S("Log in to the demo or test database.|Transfer stock of an item from one warehouse to another.|Create an inventory counting document and post a difference.|Post a goods receipt and a goods issue as adjustments.|Run the stock report before and after each step.|Write down how quantities changed each time.")],
+  ["Review","Review notes.",
+   S("Review this week's notes.|Answer which document should I use for this? for five situations from memory.|Add inventory notes to your how-B1-does-it list.|Preview next week's topic, sales and delivery.|Check your progress against the calendar.")]
+ ],["Ran a count and posted an adjustment"],"Compare B1's stock report with a spreadsheet you use at work."),
+
+ W("Sales and delivery",2,"The shipping side, from order to invoice.",[
+  ["Quote and order","Journey: sales quotation and sales order.",
+   S("Open the sales quotation and sales order lessons.|Learn the key fields and how pricing is picked.|Learn how an order affects stock availability, as the lesson states.|Note how to copy a quotation to an order.|Write how your customers' orders reach you today.")],
+  ["Delivery","Journey: the delivery document.",
+   S("Open the delivery lessons.|Learn how to copy an order to a delivery.|Learn what posting a delivery does to stock.|Learn how partial deliveries work.|Write the shipping steps in B1 and compare them with yours.")],
+  ["A/R invoice","Journey: the A/R invoice.",
+   S("Open the A/R invoice lessons.|Learn how the invoice follows the delivery.|Learn what goes to accounting.|Note other invoice types, such as reserve invoices, if covered.|Write who invoices at your company.")],
+  ["Returns and credits","Journey: return and A/R credit memo.",
+   S("Open the return and A/R credit memo lessons.|Learn how returns put stock back.|Learn when a credit memo is needed.|Write one customer return from your work.|Map it to the correct B1 documents.")],
+  ["Pick and pack","Journey: pick and pack manager.",
+   S("Open the pick and pack manager lessons.|Learn how pick lists are created from orders.|Learn how picked items become a delivery.|Note whether your site would use it.|Write the pros and cons for your site.")],
+  ["Full cycle","Hands-on: run a sales order through pick, delivery and invoice.",
+   S("Log in to the demo or test database.|Create a sales order for a sample customer.|Generate a pick list if the feature is available, then pick.|Copy the order to a delivery and post it.|Create the A/R invoice.|Check stock before and after.|Open the document flow to verify the chain.")],
+  ["Logistics review","Review every logistics note from weeks 4 to 6 and answer your own questions from memory.",
+   S("Gather all notes from weeks 4 to 6.|Write 15 questions across purchasing, inventory and sales.|Answer them from memory.|Mark the ones you missed.|Re-read those lessons in spare time next week.")]
+ ],["Completed a full sales cycle","Logistics self-test mostly right"],"Write a one-page summary of the purchase to sales flow in your own words."),
+
+ W("Web client, part 1",3,"Holiday-friendly week. Lighter reading, same hour.",[
+  ["Navigation","Journey: Web client navigation.",
+   S("Open the Web client learning journey and find its navigation lessons.|Learn the layout, menus and search.|Log in to the Web client if you have access, otherwise watch the demonstrations.|Compare it with the desktop client.|Write three differences.")],
+  ["Personalizing","Journey: personalizing the Web client.",
+   S("Open the personalization lessons.|Learn how to customize the home page and layouts.|Learn how to save personal settings.|Try them if you have access.|Write which settings would speed up your receiving work.")],
+  ["Daily tasks","Journey: daily tasks in the Web client.",
+   S("Open the daily tasks lessons.|Learn how to create and find common documents.|Note shortcuts for repeated tasks.|Write your top five daily tasks and how you would do them here.|Note anything that seems missing compared with the desktop client.")],
+  ["Lists and search","Journey: lists, search and filters.",
+   S("Open the lists, search and filter lessons.|Learn how to filter lists and save views.|Learn how to export or share lists, if covered.|Write a filtered view that would show today's expected receipts.|Check whether that view is possible.")],
+  ["Self-test","Explain what the Web client does well, then check the lessons.",
+   S("Write what the Web client does better than the desktop client, without notes.|Write what it does worse.|Check both against the lessons.|Note any gaps.|Re-read one weak lesson.")],
+  ["Hands-on","Repeat the purchase cycle from week 4 in the Web client.",
+   S("Log in to the Web client on the demo or test system.|Create a purchase order.|Receive it with a goods receipt PO.|Create the A/P invoice.|Note differences from the desktop client.|Try the search and filters.|Write what is faster or slower.")],
+  ["Review","Short review of notes.",
+   S("Review this week's notes.|List the Web client features your team could use.|Preview next week's topic, collaboration and analytics.|Keep this day light if you are busy with the holidays.")]
+ ],["Completed a purchase cycle in the Web client"],"Note which Web client features your team does not use yet."),
+
+ W("Web client, part 2",3,"Holiday-friendly week.",[
+  ["Collaboration","Journey: collaboration and communication tools.",
+   S("Open the collaboration lessons.|Learn the communication tools in the Web client.|Learn how documents can be shared or discussed.|Note any Microsoft 365 integration the lessons mention.|Write one use case for your team.")],
+  ["Productivity","Journey: productivity features.",
+   S("Open the productivity feature lessons.|Learn the features that save clicks, such as saved views and shortcuts.|Note which are personal and which are shared.|Write the two that would help you most.|Summarize in three lines.")],
+  ["Analytics","Journey: analytics and dashboards.",
+   S("Open the analytics and dashboard lessons.|Learn what analytical views are available.|Learn how to filter and drill down.|Note how current the data is, as the lessons state.|Write one question at your work an analytics view could answer.")],
+  ["KPIs and reports","Journey: KPIs and reporting views.",
+   S("Open the KPI and reporting lessons.|Learn the KPIs shown and what they measure.|Learn how to set up or change a view.|Write which KPIs matter for receiving and shipping.|Summarize.")],
+  ["Self-test","Explain each analytics feature from memory.",
+   S("Explain from memory what each analytics feature shows.|Write when you would use each.|Check against the lessons.|Note any gaps.|Re-read one weak lesson.")],
+  ["Hands-on","Open every analytics view in the demo database and note which would help your team.",
+   S("Log in to the Web client on the demo or test system.|Open every analytics view you can find.|Filter and drill down in at least three.|Note which would help your team and why.|Write what data would be missing from the demo database compared with real life.")],
+  ["Review","Review notes and add ideas to your how-B1-does-it list.",
+   S("Review this week's notes.|Add improvement ideas to your how-B1-does-it list.|Preview next week's topic, financials.|Keep this day light if you are busy with the holidays.")]
+ ],["Finished the Web client journey"],"Pick the single analytics view that would help your team most."),
+
+ W("Financials, part 1",3,"The accounting that sits under every logistics document.",[
+  ["Chart of accounts","Journey: the chart of accounts.",
+   S("Open the chart of accounts lessons.|Learn the account types: assets, liabilities, equity, revenue and expenses.|Learn how accounts are organized in levels.|Open the chart of accounts in the demo database and browse it.|Write which accounts you think receiving a purchase touches, to check on Friday.")],
+  ["Posting periods","Journey: posting periods and locking.",
+   S("Open the posting period lessons.|Learn what a posting period is and why periods get locked.|Learn the period statuses.|Note who is allowed to change them.|Write what you think happens if you post to a locked period, then check the lesson.")],
+  ["Journal entries","Journey: manual journal entries.",
+   S("Open the journal entry lessons.|Learn the parts of a journal entry: date, accounts, debit and credit.|Learn how automatic entries differ from manual ones.|Learn how to reverse an entry.|Write a simple balanced example.")],
+  ["Account determination","Journey: how documents pick their accounts.",
+   S("Open the account determination lessons.|Learn how the system decides which account to post to.|Note the levels where defaults are set, as the lessons explain.|Write why an item's settings matter to accounting.|Mark anything you do not understand to revisit on Friday.")],
+  ["Self-test","Explain what accounting a goods receipt PO creates, then check.",
+   S("Without notes, explain what accounting a goods receipt PO creates.|Compare it with Monday's guess and the lessons.|Explain period locking in two sentences.|Explain account determination in two sentences.|Re-read the weakest lesson.")],
+  ["Hands-on","Post a journal entry, then open the journal for a goods receipt PO.",
+   S("Log in to the demo or test database.|Post a manual journal entry between two accounts.|Open a goods receipt PO from week 4 and view its journal entry.|Compare the accounts used with what you expected.|Open an A/P invoice's journal entry.|Write what you learned.")],
+  ["Review","Review notes.",
+   S("Review this week's notes.|Answer five financials questions from memory.|Add anything to your how-B1-does-it list.|Preview next week's topic, payments and reporting.|Check your progress against the calendar.")]
+ ],["Posted a journal entry"],"Ask a coworker in accounting which account determination settings your company uses."),
+
+ W("Financials, part 2",3,"Payments, banking and reporting.",[
+  ["Incoming payments","Journey: incoming payments and allocation.",
+   S("Open the incoming payments lessons.|Learn how to apply a payment to invoices.|Learn partial payments and payments on account.|Note the payment means, such as cash, check and bank transfer.|Write the steps in your own words.")],
+  ["Outgoing payments","Journey: outgoing payments.",
+   S("Open the outgoing payments lessons.|Learn how to pay vendor invoices.|Learn partial payments and payments on account.|Note the payment means available.|Write the steps in your own words.")],
+  ["Banking","Journey: banking basics and reconciliation.",
+   S("Open the banking lessons.|Learn how bank statements are brought in.|Learn how reconciliation works.|Note who does this at your company.|Summarize in three lines.")],
+  ["Cost accounting","Journey: cost centers and dimensions.",
+   S("Open the cost accounting lessons.|Learn what cost centers and dimensions track.|Learn how they attach to documents.|Write one way your company could use them.|Summarize in three lines.")],
+  ["Financial reports","Journey: financial reports.",
+   S("Open the financial report lessons.|Learn the trial balance, balance sheet and profit and loss reports.|Learn how to run and filter each.|Learn how to drill down to documents.|Write what question each report answers.")],
+  ["Hands-on","Pay an A/P invoice and receive payment on an A/R invoice in the demo database.",
+   S("Log in to the demo or test database.|Create an A/P invoice and pay it with an outgoing payment.|Create an A/R invoice and record an incoming payment.|Run the trial balance.|Drill down from a balance to a document.|Write which accounts moved at each step.")],
+  ["Financials self-test","Answer your own questions on weeks 9 and 10 from memory. Mark weak spots.",
+   S("Gather your week 9 and 10 notes.|Write 15 questions.|Answer them from memory.|Mark the ones you missed.|Re-read the two weakest topics.")]
+ ],["Completed both payment flows","Financials weak spots listed"],"Re-read the weakest financials lesson."),
+
+ W("Implementation, part 1",4,"How a Business One project is set up.",[
+  ["Phases","Journey: implementation phases.",
+   S("Open the implementation lessons.|Learn the implementation phases by name.|Write each phase and its main outputs.|Note who is involved in each phase.|If you know how your company implemented B1, compare it with these phases.")],
+  ["Company setup","Journey: setting up a company.",
+   S("Open the company setup lessons.|Learn what is chosen when a company is created, such as chart of accounts, currencies and localization.|Learn what cannot easily be changed later, as the lesson says.|Write a list of the key choices.|Summarize in three lines.")],
+  ["Initial setup","Journey: initial system settings.",
+   S("Open the initial settings lessons.|Learn the general settings for documents, inventory and financials.|Learn how settings change behaviour across documents.|Write three settings relevant to receiving.|Look at them in the demo database, view only.")],
+  ["Data migration","Journey: data import and migration tools.",
+   S("Open the data import and migration lessons.|Learn what the import tools can load.|Learn the usual order for loading master data.|Learn common risks, such as duplicates.|Write a checklist for loading items.")],
+  ["Self-test","List the implementation phases and what happens in each.",
+   S("Without notes, list the implementation phases and what happens in each.|Explain what data is loaded first and why.|Check against the lessons.|Note any gaps.|Re-read one weak lesson.")],
+  ["Hands-on","Look through the administration and setup menus in the demo database. Change nothing important.",
+   S("Log in to the demo or test database.|Open the administration and setup menus.|Browse the settings from this week's lessons, view only.|Find the data import tool and read its options without running an import.|Close without saving changes.|Write down what you found.")],
+  ["Review","Review notes.",
+   S("Review this week's notes.|Answer five implementation questions from memory.|Add ideas to your how-B1-does-it list.|Preview next week's topic, user-defined fields, authorizations and support.|Check your progress against the calendar.")]
+ ],["Can list the implementation phases"],"Ask your admin how your company's B1 was first set up."),
+
+ W("Implementation, part 2 and support",4,"Customizing safely and supporting users.",[
+  ["User-defined fields","Journey: user-defined fields and tables.",
+   S("Open the lessons on user-defined fields and tables.|Learn what they are and where they appear.|Learn the field types.|Learn how they differ from code changes.|Write three fields your receiving team might want.")],
+  ["Authorizations","Journey: users and authorizations.",
+   S("Open the users and authorizations lessons.|Learn users, licenses and authorizations.|Learn how to limit a user to certain screens or documents.|Note the principle of giving users only the access they need.|Write which permissions a receiving clerk should have.")],
+  ["Alerts and approvals","Journey: alerts and approval procedures.",
+   S("Open the alerts and approval lessons.|Learn what alerts can notify on.|Learn how approval procedures stop a document until approved.|Write one approval rule for your site, such as large purchase orders.|Summarize in three lines.")],
+  ["Support","Journey: support and troubleshooting basics.",
+   S("Open the support and troubleshooting lessons.|Learn the typical support channels.|Learn where to find error messages or logs, as the lessons describe.|Write a troubleshooting checklist for a user who cannot post a document.|Summarize in three lines.")],
+  ["Self-test","Explain when a user-defined field is better than a code change.",
+   S("Without notes, explain when to use a user-defined field instead of a code change.|Explain the difference between licenses and authorizations.|Explain how approvals work.|Check against the lessons.|Re-read the weakest lesson.")],
+  ["Hands-on","Create a user-defined field in the demo database and add it to a document.",
+   S("Log in to the demo or test database.|Create a user-defined field on an item or document, if your permissions allow.|Make it visible on a document form.|Fill it in on a test document.|Search or report on it if possible.|Write down what happened.")],
+  ["Review","Review notes.",
+   S("Review this week's notes.|Answer five questions on customization and support from memory.|Add ideas to your how-B1-does-it list.|Preview next week's topic, exam review.|Check your progress against the calendar.")]
+ ],["Created a user-defined field"],"List three user-defined fields that would help your receiving team."),
+
+ W("Exam review",4,"Close the gaps.",[
+  ["Practice set 1","Do a set of sample questions. Record every miss.",
+   S("Find the sample questions linked from the exam page.|Set a timer and answer a set without notes.|Mark each question right, wrong or guessed.|Record every miss and its topic.|Do not look up answers until the set is complete.")],
+  ["Weak areas","Re-study the topics behind your misses.",
+   S("Group yesterday's misses by topic.|Re-read the lessons for your top two topics.|Redo the related steps in the demo database.|Write corrected answers in your own words.|Make a flashcard for each miss.")],
+  ["Case study","Redo a full case study in the demo database.",
+   S("Pick a case study from the journey, or invent one from your notes.|Work through it start to finish in the demo database.|Compare against the lesson's solution.|Note the steps you got wrong or skipped.|Repeat the weakest part.")],
+  ["Practice set 2","Do a second set of sample questions under time pressure.",
+   S("Find a second set of sample questions.|Set a stricter timer than last time.|Answer without notes.|Mark right, wrong or guessed.|Compare your result with set 1 and note the topics that improved.")],
+  ["Price and terms","Check the current exam price, format and subscription terms on SAP's exam page. Ask about sponsorship again.",
+   S("Open the exam page.|Write the current price, number of attempts and subscription length as shown.|Write the exam format, number of questions and time limit as shown.|Ask your employer again about sponsorship and note the answer.|Decide your target exam date.")],
+  ["Timed run","Hands-on: a timed practice session, then review the misses.",
+   S("Set aside two hours.|Do a full-length timed practice set.|Review every question afterward.|Redo the demo database steps for any miss.|Write a short list of last-minute reminders.")],
+  ["Final notes","Condense your notes to one or two pages.",
+   S("Condense your notes to one or two pages.|Include each process flow as a short list.|Include the key definitions you missed.|Include the exam logistics.|Save or print the page.")]
+ ],["Weak areas down to one or two","Sponsorship answer received"],"Ask a certified colleague or your partner consultant what surprised them on the exam."),
+
+ W("Exam week",4,"Keep it light, then sit the exam.",[
+  ["Light review","Reread your condensed notes.",
+   S("Read your condensed notes once.|Go through ten flashcards.|Stop after 60 minutes.|Do not start new topics.|Get a good night's sleep.")],
+  ["Light review","Redo one process you find hard in the demo database.",
+   S("Pick one process you find hard.|Redo it in the demo database.|Explain it aloud in your own words.|Check against your notes.|Stop on time.")],
+  ["Subscribe and book","Start the exam subscription if you have not, and schedule the exam. Check terms first.",
+   S("Reopen the exam page and re-check price and terms.|Confirm your employer's sponsorship.|Start the subscription if you have not already.|Schedule your exam date and time.|Put the date in your calendar with reminders.")],
+  ["Final review","Skim notes and the weak-area list. Stop early.",
+   S("Skim your condensed notes.|Review the weak-area list.|Go through a few flashcards.|Stop early.|Read the exam rules again.")],
+  ["System check","Run the exam's system check and prepare your space.",
+   S("Open the exam instructions.|Run the system check if one is offered.|Prepare your space, ID and anything else the instructions require.|Test your connection and equipment.|Go to bed early.")],
+  ["Exam target day","Your target exam day. You can move it if you are not ready; the plan keeps.",
+   S("Eat and drink something beforehand.|Log in early.|Read each question carefully.|Mark uncertain questions and return to them.|Submit, then write down the topics you remember.")],
+  ["Debrief","Note what was asked. If you need a retake, plan two weeks of focused review.",
+   S("Write down the topics you remember.|Record your result when you get it.|If you passed, update your resume and tell your manager.|If not, note your weak areas and plan two weeks of focused review before a retake.|Take a rest day.")]
+ ],["Exam passed"],"Update your resume and tell your manager.")
+];
+var PHASES = [
+ {n:"Setup",w:"Week 1",t:"Access to a test database and a clear picture of the exam."},
+ {n:"Foundations",w:"Weeks 2 to 3",t:"Master data and how documents flow into each other."},
+ {n:"Logistics",w:"Weeks 4 to 6",t:"Purchasing, inventory, sales and delivery. Your home turf."},
+ {n:"Web client and financials",w:"Weeks 7 to 10",t:"The modern interface, then the accounting under it."},
+ {n:"Implementation and exam",w:"Weeks 11 to 14",t:"Setup, support, review, then the exam."}
+];
+var MINS = [60,60,60,60,60,120,45];
+var DN = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+var MN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var KEY = "sap-b1-plan-v1";
+var store = {start:"2026-11-09", done:{}};
+try { var raw = localStorage.getItem(KEY); if (raw) { var p = JSON.parse(raw); if (p && p.start) store.start = p.start; if (p && p.done) store.done = p.done; } } catch (e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
+function parse(s){ var a = s.split("-").map(Number); return new Date(a[0], a[1]-1, a[2]); }
+function iso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function add(d,n){ var x = new Date(d); x.setDate(x.getDate()+n); return x; }
+function monday(d){ var x = new Date(d); x.setDate(x.getDate() - ((x.getDay()+6)%7)); return x; }
+function fmt(d){ return MN[d.getMonth()]+" "+d.getDate(); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+function $(id){ return document.getElementById(id); }
+
+var start = monday(parse(store.start));
+var todayIso = iso(new Date());
+var openWeeks = {};
+
+function dayDate(w,d){ return add(start, w*7+d); }
+function curWeek(){
+  var t = parse(todayIso), i;
+  for (i=0;i<WEEKS.length;i++){ if (t >= dayDate(i,0) && t <= dayDate(i,6)) return i; }
+  return t < start ? 0 : WEEKS.length-1;
+}
+
+function build(){
+  start = monday(parse(store.start));
+  $("start").value = iso(start);
+  var ph = "";
+  PHASES.forEach(function(p,i){ ph += '<div class="phase"><span class="wk">'+(i+1)+' · '+p.w+'</span><h3>'+esc(p.n)+'</h3><p>'+esc(p.t)+'</p></div>'; });
+  $("phases").innerHTML = ph;
+
+  var cal = '<thead><tr><th class="wkh">Week</th>'+DN.map(function(n){return "<th>"+n+"</th>";}).join("")+'</tr></thead><tbody>';
+  WEEKS.forEach(function(wk,w){
+    cal += '<tr><td class="wkh"><b>Week '+(w+1)+'</b><span>'+esc(wk.title)+'</span></td>';
+    wk.days.forEach(function(dy,d){
+      var dt = dayDate(w,d), k = w+"-"+d;
+      cal += '<td><button type="button" class="cell'+(d>4?" wknd":"")+'" data-k="'+k+'" data-date="'+iso(dt)+'" aria-pressed="false" title="'+esc(dy[1])+'"><span class="d">'+fmt(dt)+' · '+MINS[d]+'m</span><span class="l">'+esc(dy[0])+'</span></button></td>';
+    });
+    cal += "</tr>";
+  });
+  $("cal").innerHTML = cal + "</tbody>";
+
+  var cw = curWeek();
+  var list = "";
+  WEEKS.forEach(function(wk,w){
+    var isOpen = (w in openWeeks) ? openWeeks[w] : (w === cw);
+    list += '<details class="week" data-w="'+w+'"'+(isOpen?" open":"")+'><summary><span class="t">Week '+(w+1)+': '+esc(wk.title)+'</span><span class="r">'+fmt(dayDate(w,0))+' to '+fmt(dayDate(w,6))+'</span><span class="c" data-c="'+w+'"></span></summary><div class="wbody"><p class="wintro">'+esc(wk.intro)+'</p>';
+    wk.days.forEach(function(dy,d){
+      var k = w+"-"+d;
+      list += '<details class="day" data-row="'+k+'"><summary><input type="checkbox" data-k="'+k+'" aria-label="Mark '+DN[d]+' '+esc(dy[0])+' done"><span class="meta">'+DN[d]+' '+fmt(dayDate(w,d))+' · '+MINS[d]+'m</span><span class="txt">'+esc(dy[1])+'</span><span class="more"></span></summary><ol class="steps">'+dy[2].map(function(s){ return "<li>"+esc(s)+"</li>"; }).join("")+'</ol></details>';
+    });
+    wk.miles.forEach(function(m,i){
+      var k = "m"+w+"-"+i;
+      list += '<label class="chk ms" data-row="'+k+'"><input type="checkbox" data-k="'+k+'"><span class="meta">Milestone</span><span class="txt">'+esc(m)+'</span></label>';
+    });
+    var bk = "b"+w;
+    list += '<label class="chk" data-row="'+bk+'"><input type="checkbox" data-k="'+bk+'"><span class="meta">Bonus, optional</span><span class="txt">'+esc(wk.bonus)+'</span></label>';
+    list += "</div></details>";
+  });
+  $("list").innerHTML = list;
+  update();
+}
+
+function update(){
+  var total = WEEKS.length*7, done = 0, mins = 0, firstUndone = null;
+  WEEKS.forEach(function(wk,w){
+    var wd = 0;
+    for (var d=0; d<7; d++){
+      var k = w+"-"+d, on = !!store.done[k];
+      if (on){ done++; wd++; mins += MINS[d]; } else if (!firstUndone){ firstUndone = {w:w,d:d}; }
+    }
+    var c = document.querySelector('[data-c="'+w+'"]'); if (c) c.textContent = wd+" / 7 days";
+  });
+  document.querySelectorAll("[data-k]").forEach(function(el){
+    var k = el.getAttribute("data-k"), on = !!store.done[k];
+    if (el.tagName === "INPUT"){ el.checked = on; var row = el.closest("[data-row]"); if (row) row.classList.toggle("on", on); }
+    else { el.classList.toggle("done", on); el.setAttribute("aria-pressed", on ? "true" : "false"); el.classList.toggle("today", el.getAttribute("data-date") === todayIso); }
+  });
+  var pct = Math.round(done/total*100), cw = curWeek();
+  var t = parse(todayIso);
+  var wkLabel = t < start ? "Starts "+fmt(start) : (t > dayDate(WEEKS.length-1,6) ? "Plan window over" : "Week "+(cw+1)+" of "+WEEKS.length);
+  var examDate = dayDate(WEEKS.length-1,5);
+  $("tiles").innerHTML =
+    '<div class="tile"><div class="k">Progress</div><div class="v">'+pct+'%</div><div class="bar"><i style="width:'+pct+'%"></i></div><div class="n">'+done+' of '+total+' study days</div></div>'+
+    '<div class="tile"><div class="k">Hours studied</div><div class="v">'+(mins/60).toFixed(1)+'</div><div class="n">of about 108.5 planned</div></div>'+
+    '<div class="tile"><div class="k">Calendar</div><div class="v" style="font-size:20px;padding-top:4px">'+wkLabel+'</div><div class="n">'+fmt(start)+' to '+fmt(dayDate(WEEKS.length-1,6))+'</div></div>'+
+    '<div class="tile"><div class="k">Exam target</div><div class="v" style="font-size:20px;padding-top:4px">'+DN[5]+' '+fmt(examDate)+'</div><div class="n">Move it if you need to</div></div>';
+  if (firstUndone){
+    var fw = WEEKS[firstUndone.w], fd = fw.days[firstUndone.d];
+    $("next").innerHTML = '<span class="k">Next up</span><b>Week '+(firstUndone.w+1)+', '+DN[firstUndone.d]+' '+fmt(dayDate(firstUndone.w,firstUndone.d))+': '+esc(fd[0])+'</b><span>'+esc(fd[1])+' Open this day in the checklist for its steps.</span>';
+  } else {
+    $("next").innerHTML = '<span class="k">Plan complete</span><b>Every study day is ticked.</b><span>Book the exam if you have not, then move on to the after-the-exam steps below.</span>';
+  }
+}
+
+document.addEventListener("click", function(e){
+  var b = e.target.closest("button.cell");
+  if (b){ var k = b.getAttribute("data-k"); store.done[k] = !store.done[k]; save(); update(); }
+});
+document.addEventListener("change", function(e){
+  var el = e.target;
+  if (el.tagName === "INPUT" && el.type === "checkbox" && el.hasAttribute("data-k")){
+    store.done[el.getAttribute("data-k")] = el.checked; save(); update();
+  }
+  if (el.id === "start" && el.value){
+    store.start = iso(monday(parse(el.value))); save(); build();
+  }
+});
+document.addEventListener("toggle", function(e){
+  var d = e.target;
+  if (d.matches && d.matches("details.week")) openWeeks[d.getAttribute("data-w")] = d.open;
+}, true);
+build();
+</script>
+</body>
+</html>

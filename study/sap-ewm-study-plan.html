@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAP EWM Study Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a single column work sheet. Summary tiles, phase strip, a week-by-day calendar grid, then a per-week checklist with expandable day steps. */
+:root{
+  --bg:#f2f5f7; --surface:#ffffff; --ink:#14212b; --muted:#566673; --line:#d3dce3;
+  --accent:#0b6e8a; --accent-soft:#dcedf3; --done:#2b7a4b; --done-soft:#dff1e6; --today:#c2570c;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1a22; --surface:#14252e; --ink:#e5edf1; --muted:#93a7b3; --line:#27404c;
+    --accent:#5cc0dc; --accent-soft:#153a47; --done:#63c78e; --done-soft:#17382a; --today:#f0944f;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1a22; --surface:#14252e; --ink:#e5edf1; --muted:#93a7b3; --line:#27404c;
+  --accent:#5cc0dc; --accent-soft:#153a47; --done:#63c78e; --done-soft:#17382a; --today:#f0944f;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding:32px 16px 72px;display:flex;flex-direction:column;gap:36px}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:0 0 8px;font-weight:600;text-wrap:balance}
+h2{font-size:20px;margin:0 0 4px;font-weight:600;text-wrap:balance}
+p{margin:0}
+.lede{color:var(--muted);max-width:65ch}
+.sub{color:var(--muted);font-size:14px;margin-bottom:14px;max-width:65ch}
+a{color:var(--accent)}
+.startrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:16px;font-size:14px;color:var(--muted)}
+.startrow input{font:inherit;font-family:var(--font-mono);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.tile .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tile .v{font-size:26px;font-weight:600;font-family:var(--font-mono);font-variant-numeric:tabular-nums;line-height:1.2;margin-top:2px}
+.tile .n{font-size:13px;color:var(--muted);margin-top:2px}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:var(--done);width:0}
+.next{background:var(--accent-soft);border:1px solid var(--accent);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.next .k{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.phase{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.phase .wk{font-family:var(--font-mono);font-size:12px;color:var(--accent)}
+.phase h3{margin:0;font-size:16px;font-weight:600}
+.phase p{font-size:14px;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:14px;font-size:14px}
+.cal{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:820px;table-layout:fixed}
+th,td{border-bottom:1px solid var(--line);padding:0;text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-size:12px;color:var(--muted);font-weight:500;padding:10px 8px;text-transform:uppercase;letter-spacing:.06em;background:var(--bg)}
+th.wkh,td.wkh{width:118px;padding:10px 12px;border-right:1px solid var(--line)}
+td.wkh{font-size:13px}
+td.wkh b{display:block;font-weight:600;font-size:14px}
+td.wkh span{color:var(--muted);font-size:12px}
+.cell{display:flex;flex-direction:column;gap:2px;width:100%;min-height:68px;padding:8px;border:0;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer;border-left:1px solid var(--line)}
+.cell:hover{background:var(--accent-soft)}
+.cell:focus-visible,.day>summary:focus-visible,.week>summary:focus-visible,.chk input:focus-visible,.startrow input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cell .d{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.cell .l{font-size:13px;line-height:1.3}
+.cell.done{background:var(--done-soft)}
+.cell.done .l{text-decoration:line-through;text-decoration-color:var(--done);color:var(--muted)}
+.cell.done .d::after{content:" \2713";color:var(--done);font-weight:600}
+.cell.today{box-shadow:inset 0 0 0 2px var(--today)}
+.cell.wknd{font-weight:500}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted);margin-top:10px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1px solid var(--line)}
+summary{list-style:none}
+summary::-webkit-details-marker{display:none}
+details.week{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+details.week+details.week{margin-top:10px}
+.week>summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;padding:12px 16px}
+.week>summary::before{content:"\25B8";color:var(--accent);margin-right:-6px}
+.week[open]>summary::before{content:"\25BE"}
+.week>summary .t{font-weight:600}
+.week>summary .r{font-size:13px;color:var(--muted);font-family:var(--font-mono)}
+.week>summary .c{margin-left:auto;font-size:13px;font-family:var(--font-mono);color:var(--accent)}
+.wbody{padding:0 16px 14px;display:flex;flex-direction:column}
+.wintro{font-size:14px;color:var(--muted);margin-bottom:6px}
+.day{border-top:1px solid var(--line)}
+.day>summary,.chk{display:flex;gap:10px;align-items:flex-start;padding:8px 0}
+.day>summary{cursor:pointer;flex-wrap:wrap}
+.chk{border-top:1px solid var(--line);cursor:pointer}
+.chk input{margin-top:5px;width:18px;height:18px;flex:none;accent-color:var(--done)}
+.meta{font-family:var(--font-mono);font-size:12px;color:var(--muted);white-space:nowrap;min-width:116px;padding-top:3px}
+.txt{font-size:15px;flex:1 1 220px}
+.more{font-size:12px;color:var(--accent);font-family:var(--font-mono);padding-top:3px;white-space:nowrap}
+.more::before{content:"Show steps"}
+.day[open] .more::before{content:"Hide steps"}
+.day.on .txt{color:var(--muted);text-decoration:line-through}
+.chk.on .txt{color:var(--muted);text-decoration:line-through}
+.steps{margin:0 0 12px 28px;padding:10px 12px 10px 32px;background:var(--bg);border-radius:6px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.steps li::marker{color:var(--accent);font-family:var(--font-mono);font-size:12px}
+.chk.ms .meta{color:var(--accent)}
+.after{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.after ol{margin:4px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.foot{font-size:13px;color:var(--muted);max-width:70ch}
+@media (max-width:520px){.meta{min-width:0;white-space:normal}.steps{margin-left:0}}
+@media (prefers-reduced-motion:no-preference){.bar>i{transition:width .3s}.cell{transition:background .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>SAP Extended Warehouse Management plan</h1>
+  <p class="lede">Twelve weeks to the SAP Certified Associate exam for Extended Warehouse Management in SAP S/4HANA (C_S4EWM), a step to take after your Business One certification. Built around one hour a day on weekdays, a longer hands-on session on Saturday, and a short review on Sunday. Tick days off on the calendar or in the checklist; both stay in sync on this device.</p>
+  <div class="startrow">
+    <label for="start">Week 1 starts on</label>
+    <input type="date" id="start" value="2027-02-22">
+    <span>Any date you pick snaps back to that week's Monday.</span>
+  </div>
+</header>
+
+<section aria-labelledby="h-sum">
+  <h2 id="h-sum">Where you are</h2>
+  <p class="sub">Summary first. Every number is counted from the days you have ticked.</p>
+  <div class="tiles" id="tiles"></div>
+  <div class="next" id="next" style="margin-top:12px"></div>
+</section>
+
+<section aria-labelledby="h-road">
+  <h2 id="h-road">Roadmap</h2>
+  <p class="sub">Five phases. SAP's exam page lists four topic areas: goods receipt and issue (11 to 20%), EWM master data (31 to 40%), testing the end-to-end process from ERP to EWM (31 to 40%), and cross-process settings (11 to 20%). Confirm the current list before you book.</p>
+  <div class="phases" id="phases"></div>
+  <div class="links">
+    <a href="https://learning.sap.com/learning-journeys/implementing-extended-warehouse-management-in-sap-s-4hana-cloud" target="_blank" rel="noopener">Implementing EWM journey</a>
+    <a href="https://learning.sap.com/courses/processes-in-sap-s-4hana-ewm" target="_blank" rel="noopener">Processes in SAP S/4HANA EWM</a>
+    <a href="https://learning.sap.com/live-sessions/get-certified-sap-certified-associate-extended-warehouse-management-in-sap-s-4hana" target="_blank" rel="noopener">Get Certified live sessions</a>
+  </div>
+</section>
+
+<section aria-labelledby="h-cal">
+  <h2 id="h-cal">Study calendar</h2>
+  <p class="sub">Click a day to mark it done. Master data (weeks 2 to 4) and the ERP to EWM flow (week 5) cover the heaviest exam areas, so protect that time.</p>
+  <div class="cal"><table id="cal"></table></div>
+  <div class="legend">
+    <span><i class="sw" style="background:var(--done-soft)"></i>Done</span>
+    <span><i class="sw" style="box-shadow:inset 0 0 0 2px var(--today);border:0"></i>Today</span>
+    <span>Mon to Fri: 60 min &nbsp; Sat: 120 min &nbsp; Sun: 45 min</span>
+  </div>
+</section>
+
+<section aria-labelledby="h-list">
+  <h2 id="h-list">Checklist</h2>
+  <p class="sub">Click a day's title to open its steps, and tick the box when the day is done. Do the steps in order and pace yourself to the time shown. "Journey" means the SAP learning journey for that phase. Menu and lesson names can differ slightly by version and by what your user is allowed to see, so go by what you find on screen. Milestones and bonus tasks sit at the bottom of each week, and bonus tasks are not counted in your progress.</p>
+  <div id="list"></div>
+</section>
+
+<section class="after" aria-labelledby="h-after">
+  <h2 id="h-after">After the exam</h2>
+  <ol>
+    <li>Take the free <a href="https://learning.sap.com/courses/processes-in-sap-s-4hana-ewm" target="_blank" rel="noopener">Processes in SAP S/4HANA EWM</a> course for a second pass on the core flows.</li>
+    <li>Update your resume and LinkedIn with the EWM certification and your floor-to-system document's lessons, keeping claims honest.</li>
+    <li>Search for warehouse systems analyst and WM or EWM support roles, and note which ones mention classic WM, since many still do.</li>
+    <li>Look for chances to work with your company's SAP team, because most of these roles expect hands-on experience beyond the exam.</li>
+  </ol>
+</section>
+
+<p class="foot">Study time is about 93 hours in total. Lesson names are described by topic, because SAP's journey page order may change, so follow the journey's own sequence. The exam page lists C_S4EWM as 3 hours with a 65% cut score; price, question count and subscription terms were not confirmed, so check them before you pay. SAP's learning journey page could not be opened here, so lesson names are described by topic. Classic WM is being replaced by EWM in S/4HANA, so this plan teaches EWM.</p>
+</div>
+
+<script>
+function S(s){ return s.split("|"); }
+function W(title, phase, intro, days, miles, bonus){ return {title:title, phase:phase, intro:intro, days:days, miles:miles, bonus:bonus}; }
+var WEEKS = [
+ W("Orientation and foundations",0,"Understand what EWM is, how it differs from what you know, and confirm how to reach a practice system.",[
+  ["Plan and access","Open the Implementing EWM learning journey and find out how to reach its practice system. Write down your target role.",
+   S("Open the Implementing Extended Warehouse Management in SAP S/4HANA Cloud journey from the link on this page.|Find where the journey lists its practice system and note what you need to access it.|Make sure your SAP login works and note any requirements the page lists.|Write one sentence on the role you are aiming for, such as warehouse systems analyst.|Add the first study week to your calendar.")],
+  ["Discovering EWM","Start the Discovering Extended Warehouse Management with SAP S/4HANA journey.",
+   S("Open the Discovering Extended Warehouse Management with SAP S/4HANA learning journey.|Work through the first unit on identifying the need for a warehouse management solution.|After each lesson, write two sentences in your own words.|List every term you do not know and look each one up.|Stop at the end of the unit and note what you want to learn next.")],
+  ["WM vs EWM","Learn how classic warehouse management differs from EWM, and what embedded versus decentralized means.",
+   S("Find the lessons that compare warehouse management options in SAP S/4HANA.|Learn the difference between classic WM and EWM.|Learn what basic and advanced EWM functionality means.|Learn what embedded and decentralized deployment mean, as the lessons describe.|Write a short note on which one the job postings you care about ask for.")],
+  ["S/4HANA basics","Get comfortable with S/4HANA navigation and how logistics modules relate to the warehouse.",
+   S("Review how MM, SD and the warehouse connect in S/4HANA.|Learn how the Fiori launchpad is organized.|Find where EWM apps appear in the launchpad, as the lessons show.|Compare each idea with Business One, noting what is similar and what is different.|Write your comparison in a table in your notes.")],
+  ["Overview finish","Finish the overview journey and test yourself.",
+   S("Finish any remaining lessons in the Discovering EWM journey.|Without notes, explain EWM in five sentences.|Write a glossary of 10 terms you have met so far.|Check your explanation against the lessons.|Note anything that is still unclear.")],
+  ["Floor-to-system map","Write out your real receiving and shipping flows, step by step, then mark where EWM adds control.",
+   S("Write your receiving process as you do it today, from truck arrival to putaway.|Write your shipping process from pick request to truck departure.|Mark the points where a system could direct work, such as where to put an item or which item to pick.|Start a glossary mapping floor terms to EWM terms as you meet them.|Keep this document. You will add to it every week.")],
+  ["Review","Review notes and look ahead to warehouse structure.",
+   S("Re-read this week's notes.|Turn them into five questions and answer them from memory.|Add anything new to your floor-to-system document.|Look ahead at next week's topic, warehouse structure.|Plan the week's hours in your calendar.")]
+ ],["Practice system access confirmed","Floor-to-system document started"],"Read the full requirements of one EWM or WM job posting and highlight what you can already explain."),
+
+ W("Warehouse structure",1,"How a warehouse is represented in the system.",[
+  ["Warehouse number","Learn the warehouse number and how it connects to the ERP side.",
+   S("Open the lessons on warehouse structure.|Learn what a warehouse number is and why it is the top level.|Learn how it relates to the plant and storage location in the ERP system.|Write how your site's building and yards would map to one warehouse number.|Summarize in three lines.")],
+  ["Storage types","Learn storage types and what each represents.",
+   S("Open the storage type lessons.|Learn what a storage type is, such as a high rack, bulk area or staging area.|Note which storage types are physical and which are logical.|List the storage types your site would need.|Draw them on a rough site sketch.")],
+  ["Sections and bins","Learn storage sections and storage bins.",
+   S("Open the storage section and storage bin lessons.|Learn how bins are grouped into sections.|Learn what bin types and bin coordinates are for.|Compare with your real location labels.|Write what a good location naming scheme needs.")],
+  ["Activity areas and work centers","Learn activity areas and work centers.",
+   S("Open the activity area and work center lessons.|Learn how activity areas group bins for work.|Learn what a work center represents, such as packing or inbound.|Note how they relate to people and equipment.|Map your floor roles to these concepts.")],
+  ["Self-test","Draw your warehouse in EWM terms, then check.",
+   S("Draw your warehouse structure in EWM terms from memory.|Label warehouse number, storage types, sections, bins, activity areas and work centers.|Compare with the lessons.|Note gaps.|Re-read the weakest lesson.")],
+  ["Hands-on","Look at a warehouse structure in the practice system.",
+   S("Log in to the practice system.|Follow the practice instructions to display the warehouse structure.|Find storage types, sections, bins and activity areas.|Compare what you see with your drawing.|Write down any item you do not understand.|Do not change standard settings unless the exercise tells you to.")],
+  ["Review","Review notes and update your floor-to-system document.",
+   S("Review this week's notes.|Answer five questions from memory.|Add structure terms to your floor-to-system document.|Look ahead at next week's topic, master data.|Check progress against the calendar.")]
+ ],["Can draw a warehouse structure in EWM terms"],"Ask someone at work how your site's bins and locations are named."),
+
+ W("Master data, part 1",1,"Master data is the largest area on the exam, so give it extra time.",[
+  ["Product master","Learn product master data in EWM.",
+   S("Open the lessons on master data in EWM.|Learn how the product master is shared with the ERP system.|Learn what warehouse-specific product data adds.|Note the fields that steer how a product moves.|Compare with the item master in Business One.")],
+  ["Warehouse product","Learn warehouse product data and control indicators.",
+   S("Open the lessons on warehouse product data.|Learn the putaway control and stock removal control indicators, as the lessons name them.|Learn how storage type search sequences are assigned.|Note which fields a receiving clerk's work would depend on.|Write one example of a product that needs special handling.")],
+  ["Business partners","Learn business partners and supply chain units.",
+   S("Open the business partner and supply chain unit lessons.|Learn how business partners are used in EWM.|Learn what a supply chain unit represents.|Note how they connect to deliveries.|Summarize in three lines.")],
+  ["Packaging specs","Learn packaging specifications.",
+   S("Open the packaging specification lessons.|Learn what a packaging specification defines.|Learn how it relates to handling units, as the lessons describe.|Write an example for a product that ships by the case and the pallet.|Note where this affects your shipping work.")],
+  ["Self-test","Explain each master data object from memory.",
+   S("Without notes, write what each master data object is for.|Draw how product, warehouse product, business partner and packaging spec connect.|Check against the lessons.|Note gaps.|Re-read the weakest lesson.")],
+  ["Hands-on","Display master data in the practice system.",
+   S("Log in to the practice system.|Follow the practice instructions to display a product and its warehouse data.|Find the control indicators you studied.|Display a business partner and a packaging specification if the exercise includes them.|Write what each field does in your own words.|Write down anything unclear.")],
+  ["Review","Review notes.",
+   S("Review this week's notes.|Answer five master data questions from memory.|Add terms to your floor-to-system document.|Look ahead at next week's topic, control and strategies.|Check progress against the calendar.")]
+ ],["Can explain product and warehouse product data"],"Pick one real product at work and describe how its handling would be defined in EWM."),
+
+ W("Master data, part 2 and control",1,"How the system decides where things go and where to take them from.",[
+  ["Storage type search","Learn putaway strategies and storage type search sequences.",
+   S("Open the putaway strategy lessons.|Learn how the system searches storage types for a destination.|Learn the common putaway strategies the lessons name.|Write the putaway rules your site follows today.|Map them to strategies.")],
+  ["Stock removal","Learn stock removal strategies.",
+   S("Open the stock removal lessons.|Learn how the system chooses where to pick from.|Learn removal strategies such as first in, first out, as the lessons describe.|Write the picking rules your site follows today.|Map them to strategies.")],
+  ["Process types","Learn warehouse process types.",
+   S("Open the warehouse process type lessons.|Learn what a warehouse process type defines.|Learn how it steers warehouse tasks.|Note a few examples, such as putaway and picking.|Summarize in three lines.")],
+  ["Storage control","Learn storage control.",
+   S("Open the storage control lessons.|Learn the idea of routing goods through steps, such as inbound staging then putaway.|Learn the difference between layout-oriented and process-oriented control, as the lessons explain.|Write a multi-step flow from your own site.|Draw it as steps.")],
+  ["Master data self-test","Test everything from weeks 3 and 4.",
+   S("Gather your notes from weeks 3 and 4.|Write 15 questions.|Answer them from memory.|Mark the ones you missed.|Re-read those lessons.")],
+  ["Hands-on","Work through master data and control exercises in the practice system.",
+   S("Log in to the practice system.|Follow the practice exercises for master data and control.|Display putaway and removal settings.|Note how a product's settings lead to a destination bin.|Write down what each step proved.|Mark any exercise you could not complete.")],
+  ["Master data checkpoint","Rate your confidence on the heaviest exam area.",
+   S("Rate your confidence 1 to 5 on each master data topic.|List the two weakest topics.|Re-read them.|Add the final notes to your floor-to-system document.|Look ahead at next week's topic, ERP to EWM integration.")]
+ ],["Completed a master data self-test","Master data confidence at 3 or above"],"Explain putaway and removal strategies to a coworker without notes."),
+
+ W("ERP to EWM integration",2,"The other heaviest exam area: how documents and data flow between the ERP side and EWM.",[
+  ["Integration overview","Learn how the ERP and EWM sides exchange data.",
+   S("Open the lessons on the connection between ERP and EWM.|Learn what data flows from the ERP side to EWM.|Learn what data flows back.|Draw a simple two-box diagram with arrows.|Compare with how deliveries move in Business One.")],
+  ["Master data transfer","Learn how master data gets to EWM.",
+   S("Open the lessons on transferring master data to EWM.|Learn which objects must exist before a delivery can be processed.|Learn how this differs between embedded and decentralized setups, as the lessons describe.|Note what goes wrong when master data is missing.|Write a checklist of what to verify first.")],
+  ["Inbound delivery","Learn how an inbound delivery reaches EWM.",
+   S("Open the inbound delivery lessons.|Learn how a purchase order becomes an inbound delivery on the ERP side.|Learn how the delivery appears in EWM.|Note the main statuses.|Write each step in order.")],
+  ["Outbound delivery","Learn how an outbound delivery reaches EWM.",
+   S("Open the outbound delivery lessons.|Learn how a sales order leads to an outbound delivery on the ERP side.|Learn how it appears in EWM for picking.|Note the main statuses.|Write each step in order.")],
+  ["Communication and monitoring","Learn how to check that documents transferred.",
+   S("Open the lessons on communication and monitoring.|Learn how to tell whether a delivery reached EWM.|Learn the typical causes of a failed transfer, as the lessons describe.|Write a troubleshooting checklist.|Compare with troubleshooting in Business One.")],
+  ["Trace a delivery","Hands-on: follow a delivery from the ERP side to EWM.",
+   S("Log in to the practice system.|Follow the practice exercise that creates or shows a delivery.|Find the matching document in EWM.|Note each document and its status.|Write the flow in your own words.|Mark any step you could not complete.")],
+  ["Review","Review notes.",
+   S("Review this week's notes.|Draw the full ERP to EWM flow from memory.|Add new terms to your floor-to-system document.|Look ahead at next week's topic, inbound processing.|Check progress against the calendar.")]
+ ],["Can draw the ERP to EWM flow from memory"],"Write what you think happens at your current workplace between the order and the pick."),
+
+ W("Inbound processing",2,"Receiving, the way EWM runs it. This is your home turf.",[
+  ["Inbound overview","Learn the inbound stages.",
+   S("Open the inbound process lessons.|Learn the stages: delivery, unloading, goods receipt, putaway.|Write each stage next to the equivalent step on your dock.|Mark where the system directs the work.|Summarize in three lines.")],
+  ["Unloading and receipt","Learn unloading and posting goods receipt.",
+   S("Open the lessons on unloading and goods receipt.|Learn what happens when goods are checked in.|Learn what posting goods receipt does, as the lessons state.|Write the physical and system steps side by side.|Note where mistakes usually happen.")],
+  ["Putaway","Learn warehouse tasks and orders for putaway.",
+   S("Open the putaway lessons.|Learn what a warehouse task is.|Learn what a warehouse order is and how tasks are grouped into it.|Learn how a task is confirmed.|Write how your putaway works today.")],
+  ["Exceptions","Learn how differences and exceptions are handled.",
+   S("Open the lessons on exceptions in inbound.|Learn how quantity differences and damaged goods are handled.|Learn what happens when no destination bin can be found.|Write three exceptions from your own dock.|Map each to the system's handling.")],
+  ["Self-test","Describe inbound end to end from memory.",
+   S("Without notes, describe the inbound process end to end.|Include the documents and the physical steps.|Check against the lessons.|Note gaps.|Re-read the weakest lesson.")],
+  ["Hands-on","Run an inbound process in the practice system.",
+   S("Log in to the practice system.|Follow the practice exercise for inbound.|Post a goods receipt and create putaway tasks.|Confirm the tasks.|Check the stock afterward.|Write what changed at each step.")],
+  ["Review","Review notes.",
+   S("Review this week's notes.|Answer five inbound questions from memory.|Add terms to your floor-to-system document.|Look ahead at next week's topic, outbound processing.|Check progress against the calendar.")]
+ ],["Completed an inbound process in the practice system"],"Compare one real receiving mistake at work with how EWM would have prevented it."),
+
+ W("Outbound processing",2,"Shipping, the way EWM runs it.",[
+  ["Outbound overview","Learn the outbound stages.",
+   S("Open the outbound process lessons.|Learn the stages: delivery, picking, packing, staging, loading, goods issue.|Write each stage next to the equivalent step in your shipping area.|Mark where the system directs the work.|Summarize in three lines.")],
+  ["Picking","Learn picking tasks and strategies.",
+   S("Open the picking lessons.|Learn how picking tasks are created and confirmed.|Learn how removal strategies choose bins.|Write how picking works at your site today.|Note one improvement a system could enable.")],
+  ["Waves and packing","Learn wave management and packing.",
+   S("Open the wave management lessons.|Learn what a wave is and why work is grouped into waves.|Open the packing lessons.|Learn how packing relates to handling units.|Write how your site groups and packs work.")],
+  ["Loading and goods issue","Learn staging, loading and posting goods issue.",
+   S("Open the loading and goods issue lessons.|Learn how goods are staged and loaded.|Learn what posting goods issue does, as the lessons state.|Write the physical and system steps side by side.|Note where shipping errors usually happen.")],
+  ["Self-test","Describe outbound end to end from memory.",
+   S("Without notes, describe the outbound process end to end.|Include the documents and the physical steps.|Check against the lessons.|Note gaps.|Re-read the weakest lesson.")],
+  ["Hands-on","Run an outbound process in the practice system.",
+   S("Log in to the practice system.|Follow the practice exercise for outbound.|Create picking tasks and confirm them.|Pack and post goods issue.|Check the stock afterward.|Write what changed at each step.")],
+  ["Review","Review notes.",
+   S("Review this week's notes.|Answer five outbound questions from memory.|Add terms to your floor-to-system document.|Look ahead at next week's topic, cross-process settings.|Check progress against the calendar.")]
+ ],["Completed an outbound process in the practice system"],"Write the five most common shipping errors at your site and how a system could catch each."),
+
+ W("Cross-process settings and operations",3,"Topics that apply across inbound and outbound.",[
+  ["Tasks and orders","Review warehouse tasks and warehouse orders.",
+   S("Re-open the lessons on warehouse tasks and warehouse orders.|Learn how tasks are created, grouped and confirmed in all processes.|Learn how this connects to the settings that steer them.|Write the life of one task from creation to confirmation.|Summarize in three lines.")],
+  ["Handling units","Learn handling unit management.",
+   S("Open the handling unit lessons.|Learn what a handling unit is and why it matters.|Learn how handling units move through the warehouse.|Connect them to packaging specifications.|Write a pallet example from your site.")],
+  ["Physical inventory","Learn physical inventory in EWM.",
+   S("Open the physical inventory lessons.|Learn the counting procedures the lessons describe.|Learn how differences are posted.|Compare with counting in Business One.|Write the counting process you would want at your site.")],
+  ["RF and monitoring","Learn RF devices and the warehouse monitor.",
+   S("Open the lessons on RF devices and the warehouse monitor.|Learn how RF screens guide a worker through a task.|Learn what the monitor shows a supervisor.|Note what you would watch daily.|Write the questions a supervisor needs answered.")],
+  ["Self-test","Test the cross-process topics.",
+   S("Without notes, explain each cross-process topic in two sentences.|Check against the lessons.|Note gaps.|Check the exam page for any cross-process topics you have missed.|Re-read the weakest lesson.")],
+  ["Hands-on","Run physical inventory and use the monitor in the practice system.",
+   S("Log in to the practice system.|Follow the practice exercise for physical inventory.|Count, enter results and post differences.|Open the warehouse monitor and review documents.|Write what you saw.|Mark any exercise you could not complete.")],
+  ["Review","Review all notes so far.",
+   S("Gather all notes from weeks 1 to 8.|Write 20 questions across all topics.|Answer them from memory.|Mark the ones you missed.|Plan next week's focus based on the gaps.")]
+ ],["Completed physical inventory in the practice system"],"Pick the cross-process topic you are least sure about and re-read its lesson."),
+
+ W("End-to-end practice",3,"Put the whole flow together, ERP side to EWM and back.",[
+  ["Case 1: inbound","Work an end-to-end inbound case.",
+   S("Choose or invent an inbound case: a purchase order, a delivery, receipt and putaway.|List the steps you expect before you start.|Run it in the practice system.|Note every document created.|Compare your list with what happened.")],
+  ["Case 1 review","Review what went right and wrong.",
+   S("Write what went as expected.|Write what surprised you.|Find the lesson behind each surprise.|Re-read it.|Plan to run the case again if it was messy.")],
+  ["Case 2: outbound","Work an end-to-end outbound case.",
+   S("Choose or invent an outbound case: a sales order, a delivery, picking, packing and goods issue.|List the steps you expect before you start.|Run it in the practice system.|Note every document created.|Compare your list with what happened.")],
+  ["Case 2 review","Review what went right and wrong.",
+   S("Write what went as expected.|Write what surprised you.|Find the lesson behind each surprise.|Re-read it.|Plan to run the case again if it was messy.")],
+  ["Weak areas","Re-study your weakest topics.",
+   S("Rank every topic by confidence.|Choose the weakest two.|Re-read the lessons for them.|Redo the related practice steps.|Write corrected notes.")],
+  ["Full run","Hands-on: a full timed run from ERP delivery to goods issue.",
+   S("Set aside two hours.|Run inbound from delivery to putaway.|Run outbound from delivery to goods issue.|Check stock and documents at each step.|Write every point where you got stuck.|Review your stuck points afterward.")],
+  ["Review","Review notes.",
+   S("Review this week's notes.|Update your floor-to-system document with the full flow.|Check which exam topic areas you have not practiced.|Look ahead at exam preparation.|Check progress against the calendar.")]
+ ],["Completed a full end-to-end run"],"Explain the whole flow aloud as if teaching a new hire."),
+
+ W("Exam preparation, part 1",4,"Learn the exam format and drill the heavy topic areas.",[
+  ["Exam page","Read the exam page and note the format.",
+   S("Search learning.sap.com for the C_S4EWM certification page, or use the Get Certified link on this page.|Write the topic areas and percentages: goods receipt and issue, master data, end-to-end process, cross-process settings.|Note the format as shown, including that it is a system-based assessment and the time limit and cut score.|Check what subscription and login the page says you need.|Note the changes since you last checked.")],
+  ["Gap map","Compare your confidence with the exam weights.",
+   S("List each topic area with its weight.|Rate your confidence for each.|Multiply weight by gap to find priorities.|Plan this week's time accordingly.|Write the plan in your notes.")],
+  ["Master data drill","Drill the master data area.",
+   S("Re-read your master data notes.|Redo the master data practice steps.|Write 10 questions and answer them from memory.|Mark misses.|Re-read the lessons behind them.")],
+  ["End-to-end drill","Drill the ERP to EWM area.",
+   S("Re-read your integration notes.|Redo the delivery trace in the practice system.|Write 10 questions and answer them from memory.|Mark misses.|Re-read the lessons behind them.")],
+  ["Goods receipt and issue drill","Drill inbound and outbound.",
+   S("Re-read your inbound and outbound notes.|Redo one inbound and one outbound run.|Write 10 questions and answer them from memory.|Mark misses.|Re-read the lessons behind them.")],
+  ["Timed practice","Hands-on: a timed practice session in the practice system.",
+   S("Set aside two hours.|Work through practice tasks across all topic areas without notes.|Record where you spent too long.|Review mistakes afterward.|Write a shortlist of things to fix.")],
+  ["Review","Review notes.",
+   S("Review this week's notes.|Update your gap map.|Plan next week's focus.|Check progress against the calendar.|Rest if you need to.")]
+ ],["Gap map completed"],"Ask your employer or a colleague about sponsoring the EWM exam."),
+
+ W("Exam preparation, part 2",4,"Close the gaps and practice under time pressure.",[
+  ["Cross-process drill","Drill the cross-process area.",
+   S("Re-read your cross-process notes.|Redo the related practice steps.|Write 10 questions and answer them from memory.|Mark misses.|Re-read the lessons behind them.")],
+  ["Weakest topic","Redo your weakest topic.",
+   S("Pick the topic from your gap map that is still weakest.|Re-read its lessons.|Redo its practice steps.|Explain it aloud.|Write a one-page summary.")],
+  ["Second timed run","Do another timed practice.",
+   S("Set a timer slightly shorter than the exam's time limit.|Work through practice tasks across all topics.|Do not use notes.|Record the tasks you could not finish.|Compare with your last timed run.")],
+  ["Review misses","Study the mistakes.",
+   S("List every mistake from the timed run.|Find the lesson behind each.|Re-read and redo the steps.|Write corrected notes.|Update your shortlist.")],
+  ["Notes","Condense your notes.",
+   S("Condense your notes to two pages.|Include each process flow as a short list.|Include the key settings and indicators.|Include exam logistics.|Save or print the page.")],
+  ["Full timed practice","Hands-on: a full-length timed practice.",
+   S("Set aside the longest time you can, up to the exam's time limit.|Work through practice tasks without notes.|Note how you handled time.|Review mistakes afterward.|Decide whether you are ready or need one more week.")],
+  ["Final notes","Final review of notes.",
+   S("Re-read your two-page notes.|Answer ten flashcards.|Fix any last gaps.|Stop after 45 minutes.|Decide your exam date.")]
+ ],["Two timed practice runs completed","Notes condensed to two pages"],"Update your resume with your in-progress EWM certification."),
+
+ W("Exam week",4,"Keep it light, then sit the exam.",[
+  ["Light review","Reread your condensed notes.",
+   S("Read your condensed notes once.|Go through ten flashcards.|Stop after 60 minutes.|Do not start new topics.|Get a good night's sleep.")],
+  ["Light review","Redo one process you find hard.",
+   S("Pick one process you find hard.|Redo it in the practice system.|Explain it aloud.|Check against your notes.|Stop on time.")],
+  ["Subscribe and book","Check the subscription and schedule the exam.",
+   S("Reopen the C_S4EWM certification page and re-check requirements and terms.|Make sure your SAP login meets what the page says you need.|Confirm your employer's sponsorship.|Start the subscription if you have not already.|Schedule the exam and put it in your calendar.")],
+  ["Final review","Skim notes and stop early.",
+   S("Skim your condensed notes.|Review the weak-area list.|Go through a few flashcards.|Stop early.|Read the exam rules again.")],
+  ["System check","Run the exam's system check and prepare.",
+   S("Open the exam instructions.|Run the system check if one is offered.|Prepare your space, ID and anything else the instructions require.|Test your connection and equipment.|Go to bed early.")],
+  ["Exam target day","Your target exam day. You can move it if you are not ready.",
+   S("Eat and drink something beforehand.|Log in early.|Read each task carefully.|Manage your time across tasks.|Submit, then write down the topics you remember.")],
+  ["Debrief","Note what was asked and plan next steps.",
+   S("Write down the topics you remember.|Record your result when you get it.|If you passed, update your resume and LinkedIn.|If not, note your weak areas and plan two weeks of focused review before a retake.|Take a rest day.")]
+ ],["Exam passed"],"Update your resume and start applying to EWM and warehouse systems roles.")
+];
+var PHASES = [
+ {n:"Foundations",w:"Week 1",t:"What EWM is and how it differs from classic warehouse management."},
+ {n:"Structure and master data",w:"Weeks 2 to 4",t:"Warehouse structure, products, partners and control rules. The biggest exam area."},
+ {n:"Integration and processes",w:"Weeks 5 to 7",t:"ERP to EWM flow, then inbound and outbound processing."},
+ {n:"Cross-process and practice",w:"Weeks 8 to 9",t:"Handling units, counting, monitoring and full end-to-end runs."},
+ {n:"Exam",w:"Weeks 10 to 12",t:"Format, drills, timed practice, then the exam."}
+];
+var MINS = [60,60,60,60,60,120,45];
+var DN = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+var MN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var KEY = "sap-ewm-plan-v1";
+var store = {start:"2027-02-22", done:{}};
+try { var raw = localStorage.getItem(KEY); if (raw) { var p = JSON.parse(raw); if (p && p.start) store.start = p.start; if (p && p.done) store.done = p.done; } } catch (e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
+function parse(s){ var a = s.split("-").map(Number); return new Date(a[0], a[1]-1, a[2]); }
+function iso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function add(d,n){ var x = new Date(d); x.setDate(x.getDate()+n); return x; }
+function monday(d){ var x = new Date(d); x.setDate(x.getDate() - ((x.getDay()+6)%7)); return x; }
+function fmt(d){ return MN[d.getMonth()]+" "+d.getDate(); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+function $(id){ return document.getElementById(id); }
+
+var start = monday(parse(store.start));
+var todayIso = iso(new Date());
+var openWeeks = {};
+
+function dayDate(w,d){ return add(start, w*7+d); }
+function curWeek(){
+  var t = parse(todayIso), i;
+  for (i=0;i<WEEKS.length;i++){ if (t >= dayDate(i,0) && t <= dayDate(i,6)) return i; }
+  return t < start ? 0 : WEEKS.length-1;
+}
+
+function build(){
+  start = monday(parse(store.start));
+  $("start").value = iso(start);
+  var ph = "";
+  PHASES.forEach(function(p,i){ ph += '<div class="phase"><span class="wk">'+(i+1)+' · '+p.w+'</span><h3>'+esc(p.n)+'</h3><p>'+esc(p.t)+'</p></div>'; });
+  $("phases").innerHTML = ph;
+
+  var cal = '<thead><tr><th class="wkh">Week</th>'+DN.map(function(n){return "<th>"+n+"</th>";}).join("")+'</tr></thead><tbody>';
+  WEEKS.forEach(function(wk,w){
+    cal += '<tr><td class="wkh"><b>Week '+(w+1)+'</b><span>'+esc(wk.title)+'</span></td>';
+    wk.days.forEach(function(dy,d){
+      var dt = dayDate(w,d), k = w+"-"+d;
+      cal += '<td><button type="button" class="cell'+(d>4?" wknd":"")+'" data-k="'+k+'" data-date="'+iso(dt)+'" aria-pressed="false" title="'+esc(dy[1])+'"><span class="d">'+fmt(dt)+' · '+MINS[d]+'m</span><span class="l">'+esc(dy[0])+'</span></button></td>';
+    });
+    cal += "</tr>";
+  });
+  $("cal").innerHTML = cal + "</tbody>";
+
+  var cw = curWeek();
+  var list = "";
+  WEEKS.forEach(function(wk,w){
+    var isOpen = (w in openWeeks) ? openWeeks[w] : (w === cw);
+    list += '<details class="week" data-w="'+w+'"'+(isOpen?" open":"")+'><summary><span class="t">Week '+(w+1)+': '+esc(wk.title)+'</span><span class="r">'+fmt(dayDate(w,0))+' to '+fmt(dayDate(w,6))+'</span><span class="c" data-c="'+w+'"></span></summary><div class="wbody"><p class="wintro">'+esc(wk.intro)+'</p>';
+    wk.days.forEach(function(dy,d){
+      var k = w+"-"+d;
+      list += '<details class="day" data-row="'+k+'"><summary><input type="checkbox" data-k="'+k+'" aria-label="Mark '+DN[d]+' '+esc(dy[0])+' done"><span class="meta">'+DN[d]+' '+fmt(dayDate(w,d))+' · '+MINS[d]+'m</span><span class="txt">'+esc(dy[1])+'</span><span class="more"></span></summary><ol class="steps">'+dy[2].map(function(s){ return "<li>"+esc(s)+"</li>"; }).join("")+'</ol></details>';
+    });
+    wk.miles.forEach(function(m,i){
+      var k = "m"+w+"-"+i;
+      list += '<label class="chk ms" data-row="'+k+'"><input type="checkbox" data-k="'+k+'"><span class="meta">Milestone</span><span class="txt">'+esc(m)+'</span></label>';
+    });
+    var bk = "b"+w;
+    list += '<label class="chk" data-row="'+bk+'"><input type="checkbox" data-k="'+bk+'"><span class="meta">Bonus, optional</span><span class="txt">'+esc(wk.bonus)+'</span></label>';
+    list += "</div></details>";
+  });
+  $("list").innerHTML = list;
+  update();
+}
+
+function update(){
+  var total = WEEKS.length*7, done = 0, mins = 0, firstUndone = null;
+  WEEKS.forEach(function(wk,w){
+    var wd = 0;
+    for (var d=0; d<7; d++){
+      var k = w+"-"+d, on = !!store.done[k];
+      if (on){ done++; wd++; mins += MINS[d]; } else if (!firstUndone){ firstUndone = {w:w,d:d}; }
+    }
+    var c = document.querySelector('[data-c="'+w+'"]'); if (c) c.textContent = wd+" / 7 days";
+  });
+  document.querySelectorAll("[data-k]").forEach(function(el){
+    var k = el.getAttribute("data-k"), on = !!store.done[k];
+    if (el.tagName === "INPUT"){ el.checked = on; var row = el.closest("[data-row]"); if (row) row.classList.toggle("on", on); }
+    else { el.classList.toggle("done", on); el.setAttribute("aria-pressed", on ? "true" : "false"); el.classList.toggle("today", el.getAttribute("data-date") === todayIso); }
+  });
+  var pct = Math.round(done/total*100), cw = curWeek();
+  var t = parse(todayIso);
+  var wkLabel = t < start ? "Starts "+fmt(start) : (t > dayDate(WEEKS.length-1,6) ? "Plan window over" : "Week "+(cw+1)+" of "+WEEKS.length);
+  var examDate = dayDate(WEEKS.length-1,5);
+  $("tiles").innerHTML =
+    '<div class="tile"><div class="k">Progress</div><div class="v">'+pct+'%</div><div class="bar"><i style="width:'+pct+'%"></i></div><div class="n">'+done+' of '+total+' study days</div></div>'+
+    '<div class="tile"><div class="k">Hours studied</div><div class="v">'+(mins/60).toFixed(1)+'</div><div class="n">of about 93 planned</div></div>'+
+    '<div class="tile"><div class="k">Calendar</div><div class="v" style="font-size:20px;padding-top:4px">'+wkLabel+'</div><div class="n">'+fmt(start)+' to '+fmt(dayDate(WEEKS.length-1,6))+'</div></div>'+
+    '<div class="tile"><div class="k">Exam target</div><div class="v" style="font-size:20px;padding-top:4px">'+DN[5]+' '+fmt(examDate)+'</div><div class="n">Move it if you need to</div></div>';
+  if (firstUndone){
+    var fw = WEEKS[firstUndone.w], fd = fw.days[firstUndone.d];
+    $("next").innerHTML = '<span class="k">Next up</span><b>Week '+(firstUndone.w+1)+', '+DN[firstUndone.d]+' '+fmt(dayDate(firstUndone.w,firstUndone.d))+': '+esc(fd[0])+'</b><span>'+esc(fd[1])+' Open this day in the checklist for its steps.</span>';
+  } else {
+    $("next").innerHTML = '<span class="k">Plan complete</span><b>Every study day is ticked.</b><span>Book the exam if you have not, then move on to the after-the-exam steps below.</span>';
+  }
+}
+
+document.addEventListener("click", function(e){
+  var b = e.target.closest("button.cell");
+  if (b){ var k = b.getAttribute("data-k"); store.done[k] = !store.done[k]; save(); update(); }
+});
+document.addEventListener("change", function(e){
+  var el = e.target;
+  if (el.tagName === "INPUT" && el.type === "checkbox" && el.hasAttribute("data-k")){
+    store.done[el.getAttribute("data-k")] = el.checked; save(); update();
+  }
+  if (el.id === "start" && el.value){
+    store.start = iso(monday(parse(el.value))); save(); build();
+  }
+});
+document.addEventListener("toggle", function(e){
+  var d = e.target;
+  if (d.matches && d.matches("details.week")) openWeeks[d.getAttribute("data-w")] = d.open;
+}, true);
+build();
+</script>
+</body>
+</html>

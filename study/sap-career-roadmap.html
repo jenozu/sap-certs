@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAP Career Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a single column work sheet. Summary tiles, phase strip, a week-by-day calendar grid, then a per-week checklist with expandable day steps. */
+:root{
+  --bg:#f2f5f7; --surface:#ffffff; --ink:#14212b; --muted:#566673; --line:#d3dce3;
+  --accent:#0b6e8a; --accent-soft:#dcedf3; --done:#2b7a4b; --done-soft:#dff1e6; --today:#c2570c;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1a22; --surface:#14252e; --ink:#e5edf1; --muted:#93a7b3; --line:#27404c;
+    --accent:#5cc0dc; --accent-soft:#153a47; --done:#63c78e; --done-soft:#17382a; --today:#f0944f;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1a22; --surface:#14252e; --ink:#e5edf1; --muted:#93a7b3; --line:#27404c;
+  --accent:#5cc0dc; --accent-soft:#153a47; --done:#63c78e; --done-soft:#17382a; --today:#f0944f;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding:32px 16px 72px;display:flex;flex-direction:column;gap:36px}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:0 0 8px;font-weight:600;text-wrap:balance}
+h2{font-size:20px;margin:0 0 4px;font-weight:600;text-wrap:balance}
+p{margin:0}
+.lede{color:var(--muted);max-width:65ch}
+.sub{color:var(--muted);font-size:14px;margin-bottom:14px;max-width:65ch}
+a{color:var(--accent)}
+.startrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:16px;font-size:14px;color:var(--muted)}
+.startrow input{font:inherit;font-family:var(--font-mono);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.tile .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tile .v{font-size:26px;font-weight:600;font-family:var(--font-mono);font-variant-numeric:tabular-nums;line-height:1.2;margin-top:2px}
+.tile .n{font-size:13px;color:var(--muted);margin-top:2px}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:var(--done);width:0}
+.next{background:var(--accent-soft);border:1px solid var(--accent);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.next .k{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.phase{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.phase .wk{font-family:var(--font-mono);font-size:12px;color:var(--accent)}
+.phase h3{margin:0;font-size:16px;font-weight:600}
+.phase p{font-size:14px;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:14px;font-size:14px}
+.cal{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:820px;table-layout:fixed}
+th,td{border-bottom:1px solid var(--line);padding:0;text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-size:12px;color:var(--muted);font-weight:500;padding:10px 8px;text-transform:uppercase;letter-spacing:.06em;background:var(--bg)}
+th.wkh,td.wkh{width:118px;padding:10px 12px;border-right:1px solid var(--line)}
+td.wkh{font-size:13px}
+td.wkh b{display:block;font-weight:600;font-size:14px}
+td.wkh span{color:var(--muted);font-size:12px}
+.cell{display:flex;flex-direction:column;gap:2px;width:100%;min-height:68px;padding:8px;border:0;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer;border-left:1px solid var(--line)}
+.cell:hover{background:var(--accent-soft)}
+.cell:focus-visible,.day>summary:focus-visible,.week>summary:focus-visible,.chk input:focus-visible,.startrow input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cell .d{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.cell .l{font-size:13px;line-height:1.3}
+.cell.done{background:var(--done-soft)}
+.cell.done .l{text-decoration:line-through;text-decoration-color:var(--done);color:var(--muted)}
+.cell.done .d::after{content:" \2713";color:var(--done);font-weight:600}
+.cell.today{box-shadow:inset 0 0 0 2px var(--today)}
+.cell.wknd{font-weight:500}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted);margin-top:10px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1px solid var(--line)}
+summary{list-style:none}
+summary::-webkit-details-marker{display:none}
+details.week{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+details.week+details.week{margin-top:10px}
+.week>summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;padding:12px 16px}
+.week>summary::before{content:"\25B8";color:var(--accent);margin-right:-6px}
+.week[open]>summary::before{content:"\25BE"}
+.week>summary .t{font-weight:600}
+.week>summary .r{font-size:13px;color:var(--muted);font-family:var(--font-mono)}
+.week>summary .c{margin-left:auto;font-size:13px;font-family:var(--font-mono);color:var(--accent)}
+.wbody{padding:0 16px 14px;display:flex;flex-direction:column}
+.wintro{font-size:14px;color:var(--muted);margin-bottom:6px}
+.day{border-top:1px solid var(--line)}
+.day>summary,.chk{display:flex;gap:10px;align-items:flex-start;padding:8px 0}
+.day>summary{cursor:pointer;flex-wrap:wrap}
+.chk{border-top:1px solid var(--line);cursor:pointer}
+.chk input{margin-top:5px;width:18px;height:18px;flex:none;accent-color:var(--done)}
+.meta{font-family:var(--font-mono);font-size:12px;color:var(--muted);white-space:nowrap;min-width:116px;padding-top:3px}
+.txt{font-size:15px;flex:1 1 220px}
+.more{font-size:12px;color:var(--accent);font-family:var(--font-mono);padding-top:3px;white-space:nowrap}
+.more::before{content:"Show steps"}
+.day[open] .more::before{content:"Hide steps"}
+.day.on .txt{color:var(--muted);text-decoration:line-through}
+.chk.on .txt{color:var(--muted);text-decoration:line-through}
+.steps{margin:0 0 12px 28px;padding:10px 12px 10px 32px;background:var(--bg);border-radius:6px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.steps li::marker{color:var(--accent);font-family:var(--font-mono);font-size:12px}
+.chk.ms .meta{color:var(--accent)}
+.after{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.after ol{margin:4px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.foot{font-size:13px;color:var(--muted);max-width:70ch}
+@media (max-width:520px){.meta{min-width:0;white-space:normal}.steps{margin-left:0}}
+@media (prefers-reduced-motion:no-preference){.bar>i{transition:width .3s}.cell{transition:background .15s}}
+
+.pill{font-family:var(--font-mono);font-size:11px;color:var(--accent);border:1px solid var(--accent);border-radius:10px;padding:0 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px}
+.gc{border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit;padding:6px 4px;text-align:center;cursor:pointer;font-family:var(--font-mono);font-size:12px;border-top:3px solid var(--accent)}
+.gc.done{background:var(--done-soft);border-top-color:var(--done)}
+.gc.today{box-shadow:inset 0 0 0 2px var(--today)}
+.gc small{display:block;color:var(--muted);font-size:10px}
+.notes{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.notes ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.wl{font-size:14px;margin:4px 0 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>SAP career roadmap: 58 weeks</h1>
+  <p class="lede">The path from your ChatGPT conversation, turned into a weekly plan: Business One certification with SQL, with Coursera SQL and Python certificates along the way, then the Service Layer, S/4HANA fundamentals, EWM, and BTP integration, with three portfolio projects and a job search at the end. Your two daily-step plans stay as the detailed guides for their weeks.</p>
+  <div class="startrow"><label for="start">Week 1 starts on</label><input type="date" id="start" value="2026-11-09"><span>Snaps to that week's Monday.</span></div>
+</header>
+
+<section><h2>Where you are</h2><p class="sub">Counted from the tasks you have ticked.</p>
+<div class="tiles" id="tiles"></div><div class="next" id="next" style="margin-top:12px"></div></section>
+
+<section><h2>Phases</h2><p class="sub">Assumed direction: functional plus technical, with EWM as your specialty, and remote or mostly remote work. Tell me if either should change.</p>
+<div class="phases" id="phases"></div></section>
+
+<section><h2>Coursera courses</h2><p class="sub">Both give a shareable certificate. Prices, Canadian pricing and financial aid were not confirmed, so check each page. Coursera Plus showed $239 a year on sale versus $399 regular on the pages I saw, and it lists both courses as included.</p>
+<div class="links" style="margin-top:0;flex-direction:column;gap:8px">
+<div><a href="https://www.coursera.org/learn/sql-practical-introduction-for-querying-databases" target="_blank" rel="noopener">SQL: A Practical Introduction for Querying Databases (IBM)</a>. Beginner, about 2 weeks at 10 hours a week, 5 modules. Covers SELECT, INSERT, UPDATE, DELETE, joins, views and stored procedures. Weeks 1 to 10.</div>
+<div><a href="https://www.coursera.org/specializations/python" target="_blank" rel="noopener">Python for Everybody Specialization (University of Michigan)</a>. Beginner, 5 courses, about 2 months at 10 hours a week. Courses 3 and 4 cover web data, APIs, JSON and databases, which is why it fits this path. Weeks 15 to 24.</div>
+<div>Optional later: IBM Data Analyst Professional Certificate, listed at about 4 months at 10 hours a week. It is not scheduled in this plan.</div>
+</div></section>
+
+<section><h2>Review of the ChatGPT plan</h2>
+<div class="notes">
+<ul>
+<li><b>Checked and correct:</b> SAP's page lists C_TB120 as 2 hours, 60% to pass, scenario-based, and includes the Web client. My earlier B1 plan quoted an older 65% figure from a third party, so trust SAP's page. The question count is not stated there.</li>
+<li><b>Time:</b> ChatGPT's 12 months only works at roughly 10 hours a week. With the Coursera courses this plan takes 58 weeks at about 8 hours a week, plus 2 to 3 extra SQL hours a week in weeks 1 to 13. If that is too much, drop the Coursera SQL course and add about 4 weeks to the first phase.</li>
+<li><b>Salary figures:</b> the ranges, including $180k to $220k for architects, are ChatGPT's planning targets. I did not verify them or the job ads it cited. Entry-level remote roles are rare, which it also said.</li>
+<li><b>Python:</b> ChatGPT itself warned that enterprise SAP jobs lean on BTP, ABAP, IDocs and OData more than Python, but you chose Coursera for the Python, so it now takes about ten weeks, and the SAP-specific weeks still follow it.</li>
+<li><b>Database:</b> it assumed SQL Server. Your B1 may run on HANA, so week 1 asks your admin.</li>
+<li><b>Left for later:</b> ABAP and Fiori development, which it suggests learning alongside real implementation work.</li>
+<li><b>Honesty:</b> keep your resume wording matched to what you actually did, as you said you would. Projects use sample data, never company data or code.</li>
+</ul></div></section>
+
+<section><h2>58-week map</h2><p class="sub">Click a week to mark it done. Ticking every task in a week does the same.</p>
+<div class="grid" id="grid"></div></section>
+
+<section><h2>Weekly checklist</h2><p class="sub">Open a week for its tasks. Weeks with a link point to the daily-step plan for that week.</p><div id="list"></div></section>
+
+<p class="foot">Hours are estimates. Lesson names are described by topic where I could not open SAP's pages, so follow each journey's own order. Exam prices and terms were not confirmed, so check SAP's pages before paying.</p>
+</div>
+<script>
+var B1 = "https://claude.ai/artifact/FAwLAQLVXFabvEuuw8hF9U", EWM = "https://claude.ai/artifact/DLyS4WkSDsDfyMRP6X4S8M";
+var PHASES = [
+ {n:"SAP Business One + SQL",w:"Weeks 1 to 14",t:"Pass C_TB120 while earning the IBM SQL certificate on Coursera and querying the B1 database read-only."},
+ {n:"Python, APIs, Service Layer",w:"Weeks 15 to 30",t:"Python for Everybody on Coursera, then pull B1 data with code. Portfolio project 1."},
+ {n:"S/4HANA fundamentals",w:"Weeks 31 to 36",t:"See how the enterprise SAP world differs from B1. Portfolio project 2."},
+ {n:"SAP EWM",w:"Weeks 37 to 48",t:"The C_S4EWM plan you already have, start to exam."},
+ {n:"BTP integration + job search",w:"Weeks 49 to 58",t:"Integration Suite, portfolio project 3, resume and applications."}
+];
+var WEEKS = [];
+function A(p,t,h,link,tasks){ WEEKS.push({p:p,t:t,h:h,link:link,tasks:tasks}); }
+var b1t=["Setup","Master data","Marketing documents","Purchasing","Inventory","Sales and delivery","Web client, part 1","Web client, part 2","Financials, part 1","Financials, part 2","Implementation and support, part 1","Implementation and support, part 2","Exam review","Exam week"];
+var sql=[
+ ["Ask your admin which database B1 runs on (SQL Server or HANA) and for a read-only login to a test copy","Select 10 rows from OITM (item master) and list the columns you recognize"],
+ ["Write 5 queries on OITM and OCRD using WHERE, ORDER BY and DISTINCT","Query OWHS to list your warehouses and OITB for item groups"],
+ ["Learn INNER JOIN and LEFT JOIN using OPOR and POR1","Write a query listing purchase order lines with item names"],
+ ["Join OPDN and PDN1 (goods receipt POs) to the purchase order lines","Find open purchase order lines with nothing received yet"],
+ ["Learn GROUP BY and HAVING: total purchase value by vendor","Count documents per month"],
+ ["Query OITW for stock on hand by warehouse","Find items below their minimum level and look at OINM for movements"],
+ ["Join ORDR, RDR1, ODLN and DLN1 for sales orders and deliveries","Find sales order lines not yet delivered"],
+ ["Learn subqueries: items not sold in the last 12 months","Rewrite one join query as a subquery and compare"],
+ ["Learn CTEs and ROW_NUMBER","Find the last purchase price per item with a window function"],
+ ["Explore OJDT, JDT1 and OACT (journal entries and accounts)","Write a one-month summary by account"],
+ ["Learn views and save a query in B1's Query Manager","Check with your admin what you are allowed to save"],
+ ["Learn indexes and execution plans at a basic level","Time two versions of one query on the test copy"],
+ ["Build three small read-only reports from your queries","Write one line of business purpose for each"],
+ []
+];
+var CS=[
+ "Enroll in IBM's SQL: A Practical Introduction for Querying Databases on Coursera and start module 1",
+ "Coursera SQL course: finish module 1",
+ "Coursera SQL course: start module 2",
+ "Coursera SQL course: finish module 2",
+ "Coursera SQL course: start module 3",
+ "Coursera SQL course: finish module 3",
+ "Coursera SQL course: start module 4",
+ "Coursera SQL course: finish module 4",
+ "Coursera SQL course: start module 5",
+ "Coursera SQL course: finish module 5 and the final assessment, then save your certificate"
+];
+b1t.forEach(function(t,i){
+ var tk=["Complete week "+(i+1)+" of your Business One plan"];
+ if(i<10){ tk.push(CS[i]+" (about 2 h)"); tk.push(sql[i][0]+" (about 1 h)"); }
+ else tk=tk.concat(sql[i]);
+ if(i==13) tk.push("Sit the C_TB120 exam. No SQL this week.");
+ A(0,t,i==13?7.75:(i<10?10.75:9.75),{h:B1,l:"Business One plan"},tk);
+});
+var PY="https://www.coursera.org/specializations/python";
+A(1,"Python for Everybody: course 1, part 1",7.75,{h:PY,l:"Python for Everybody (University of Michigan)"},["Enroll in the Python for Everybody Specialization","Install Python and VS Code as the course directs","Work through the first half of course 1, Programming for Everybody (about 17 hours total)"]);
+A(1,"Course 1 finish, course 2 start",7.75,null,["Finish course 1 and its assignments","Start course 2, Python Data Structures (about 20 hours)","Write a small script of your own that reads a CSV"]);
+A(1,"Course 2: data structures",7.75,null,["Work through course 2: lists, dictionaries, tuples and files","Do every assignment","Rewrite your CSV script using dictionaries"]);
+A(1,"Course 2 finish, course 3 start",7.75,null,["Finish course 2","Start course 3, Using Python to Access Web Data (about 19 hours)","Learn regular expressions from the course"]);
+A(1,"Course 3: web data and APIs",7.75,null,["Work through course 3: HTTP, JSON and APIs","Do every assignment","Call a public API with Postman and compare with Python"]);
+A(1,"Course 3 finish, course 4 start",7.75,null,["Finish course 3 and save the certificate","Start course 4, Using Databases with Python (about 14 hours)","Learn the course's database basics"]);
+A(1,"Course 4: databases with Python",7.75,null,["Finish course 4","Connect read-only to the B1 test database from Python (pyodbc for SQL Server, hdbcli for HANA)","Keep passwords out of your code, using environment variables"]);
+A(1,"Capstone, part 1",7.75,null,["Start the capstone, Retrieving, Processing and Visualizing Data with Python","Plan your data source","Build the first part"]);
+A(1,"Capstone, part 2",7.75,null,["Finish the capstone","Earn the Python for Everybody certificate","Add it to your LinkedIn profile"]);
+A(1,"Catch-up and review",7.75,null,["Finish anything left over from weeks 15 to 23","Redo the weakest assignment from the Python courses","Write down what you can now build with Python that you could not before"]);
+A(1,"pandas",7.75,null,["Read CSV and Excel into pandas","Filter, group and export to Excel","Reproduce one of your SQL reports in pandas and compare"]);
+A(1,"Service Layer, part 1",7.75,{h:"https://learning.sap.com/courses/leveraging-the-sap-business-one-service-layer",l:"Service Layer course"},["Start the free Leveraging the SAP Business One Service Layer course","Ask your admin for a limited API user on the test system","Log in with Postman and fetch one item"]);
+A(1,"Service Layer, part 2",7.75,null,["Practice GET queries with $select, $filter and $top","Handle paging for large results","Compare the results with your SQL results"]);
+A(1,"Service Layer, part 3",7.75,null,["Call the Service Layer from Python with requests","Handle sessions, logout and errors","Stay read-only. Write operations need admin approval and the test database"]);
+A(1,"Project 1: B1 reporting, build",7.75,null,["Pick one business problem and write it in two sentences","Design the report and its data source","Build the data pull and the output"]);
+A(1,"Project 1: B1 reporting, finish",7.75,null,["Finish and test on the test database","Write a README using sample data only","Have your admin review it before you show anyone"]);
+A(2,"S/4HANA architecture and processes",7.75,{h:"https://learning.sap.com/learning-journeys/explore-integrated-business-processes-in-sap-s-4hana-",l:"Explore Integrated Business Processes journey"},["Start the Explore Integrated Business Processes in SAP S/4HANA journey","Make a table comparing B1 and S/4HANA","Note what B1 does in one module that S/4HANA splits across several"]);
+A(2,"Procure-to-pay and order-to-cash",7.75,null,["Continue the journey on purchasing and sales","Map each step to the B1 equivalent","Draw both flows"]);
+A(2,"Fiori and the launchpad",7.75,null,["Search learning.sap.com for the Learning the Basics of SAP Fiori journey","Learn how apps are organized in the launchpad","Write how Fiori differs from the B1 Web client"]);
+A(2,"OData and S/4HANA APIs",7.75,null,["Learn what OData is","Find one S/4HANA API in SAP's API hub and read its description","Compare it with the Service Layer you used"]);
+A(2,"Project 2: warehouse app, build",7.75,null,["Define a small receiving and picking app, using your RF scanner experience","Build it with sample data, not company data","Document the workflow with screenshots"]);
+A(2,"Project 2: warehouse app, finish",7.75,null,["Finish and test","Write a README","Confirm no company information is in it"]);
+var ewt=["Orientation and foundations","Warehouse structure","Master data, part 1","Master data, part 2 and control","ERP to EWM integration","Inbound processing","Outbound processing","Cross-process settings and operations","End-to-end practice","Exam preparation, part 1","Exam preparation, part 2","Exam week"];
+ewt.forEach(function(t,i){
+ var tk=["Complete week "+(i+1)+" of your EWM plan"];
+ if(i==0) tk.push("Set the EWM plan's start date to this Monday","Confirm you can reach a practice system");
+ if(i==11) tk.push("Sit the C_S4EWM exam");
+ A(3,t,7.75,{h:EWM,l:"EWM plan"},tk);
+});
+A(4,"BTP basics",7.75,null,["Search learning.sap.com for the Discovering SAP Business Technology Platform journey","Create a free BTP trial account if one is offered","Write what BTP is in your own words"]);
+A(4,"Integration Suite concepts",7.75,{h:"https://learning.sap.com/learning-journey/developing-with-sap-integration-suite",l:"Developing with SAP Integration Suite"},["Start the free Developing with SAP Integration Suite journey","Learn integration flows, adapters and patterns","Draw one integration scenario from your warehouse"]);
+A(4,"Integration flows and adapters",7.75,null,["Continue the journey on modeling processes","Build the exercise flow in your trial tenant","Note every error you hit and its fix"]);
+A(4,"Mapping and scripting",7.75,null,["Learn message mapping","Learn scripting basics in a flow","Transform a JSON message to a different shape"]);
+A(4,"Security and error handling",7.75,null,["Learn inbound and outbound security options","Learn exception handling in flows","Add error handling to your exercise flow"]);
+A(4,"Build a small integration",7.75,null,["Build a flow that reads a public REST API and reshapes the data","Document it with a diagram and README","Use sample data only"]);
+A(4,"Project 3: EWM process write-up",7.75,null,["Turn your floor-to-system document into a clean inbound-to-outbound write-up","Add the master data, putaway, picking and stock movements","Remove anything specific to your employer"]);
+A(4,"Portfolio and resume",7.75,null,["Publish the three projects with README files, sample data only","Update your resume with the certifications and projects, worded honestly","Update LinkedIn"]);
+A(4,"Job search, part 1",7.75,null,["List 20 target roles, such as B1 support analyst, ERP analyst, WM or EWM analyst, integration analyst","Note what each wants that you still lack","Ask your employer about SAP project opportunities"]);
+A(4,"Job search, part 2",7.75,null,["Apply to 10 roles","Practice explaining each project in two minutes","Write down the questions you could not answer and study them"]);
+
+var MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var KEY="sap-career-roadmap-v1", store={start:"2026-11-09",done:{}};
+try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&p.start)store.start=p.start;if(p&&p.done)store.done=p.done;}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+function parse(s){var a=s.split("-").map(Number);return new Date(a[0],a[1]-1,a[2]);}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function add(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function monday(d){var x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x;}
+function fmt(d){return MN[d.getMonth()]+" "+d.getDate();}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function $(i){return document.getElementById(i);}
+var start=monday(parse(store.start)),todayIso=iso(new Date()),openW={};
+function wd(w){return add(start,w*7);}
+function curWeek(){var t=parse(todayIso);for(var i=0;i<WEEKS.length;i++){if(t>=wd(i)&&t<=add(wd(i),6))return i;}return t<start?0:WEEKS.length-1;}
+function weekDone(w){return !!store.done["w"+w];}
+function build(){
+ start=monday(parse(store.start));$("start").value=iso(start);
+ $("phases").innerHTML=PHASES.map(function(p,i){return '<div class="phase"><span class="wk">'+(i+1)+' · '+p.w+'</span><h3>'+esc(p.n)+'</h3><p>'+esc(p.t)+'</p></div>';}).join("");
+ $("grid").innerHTML=WEEKS.map(function(k,w){return '<button type="button" class="gc" data-g="'+w+'" title="'+esc(k.t)+'">'+(w+1)+'<small>'+fmt(wd(w))+'</small></button>';}).join("");
+ var cw=curWeek();
+ $("list").innerHTML=WEEKS.map(function(k,w){
+  var o=(w in openW)?openW[w]:(w===cw);
+  var h='<details class="week" data-w="'+w+'"'+(o?" open":"")+'><summary><span class="t">Week '+(w+1)+': '+esc(k.t)+'</span><span class="r">'+fmt(wd(w))+' to '+fmt(add(wd(w),6))+' · '+k.h+' h</span><span class="pill">'+esc(PHASES[k.p].n)+'</span><span class="c" data-c="'+w+'"></span></summary><div class="wbody">';
+  if(k.link)h+='<p class="wl"><a href="'+k.link.h+'" target="_blank" rel="noopener">'+esc(k.link.l)+'</a></p>';
+  k.tasks.forEach(function(t,i){var key="t"+w+"-"+i;h+='<label class="chk" data-row="'+key+'"><input type="checkbox" data-k="'+key+'"><span class="txt">'+esc(t)+'</span></label>';});
+  return h+'</div></details>';}).join("");
+ update();
+}
+function update(){
+ var tot=0,dn=0,hrs=0,next=null;
+ WEEKS.forEach(function(k,w){
+  var c=0;k.tasks.forEach(function(t,i){tot++;if(store.done["t"+w+"-"+i]){dn++;c++;}});
+  var full=c===k.tasks.length||!!store.done["w"+w];
+  if(full)hrs+=k.h;else if(!next)next=w;
+  var el=document.querySelector('[data-c="'+w+'"]');if(el)el.textContent=c+" / "+k.tasks.length;
+  var g=document.querySelector('[data-g="'+w+'"]');if(g){g.classList.toggle("done",full);g.classList.toggle("today",w===curWeek());}
+ });
+ document.querySelectorAll("input[data-k]").forEach(function(el){var on=!!store.done[el.getAttribute("data-k")];el.checked=on;var r=el.closest("[data-row]");if(r)r.classList.toggle("on",on);});
+ var pct=Math.round(dn/tot*100),t=parse(todayIso),cw=curWeek();
+ var lab=t<start?"Starts "+fmt(start):(t>add(wd(WEEKS.length-1),6)?"Plan window over":"Week "+(cw+1)+" of "+WEEKS.length);
+ $("tiles").innerHTML='<div class="tile"><div class="k">Progress</div><div class="v">'+pct+'%</div><div class="bar"><i style="width:'+pct+'%"></i></div><div class="n">'+dn+' of '+tot+' tasks</div></div>'+
+ '<div class="tile"><div class="k">Hours in finished weeks</div><div class="v">'+hrs.toFixed(1)+'</div><div class="n">of about '+WEEKS.reduce(function(a,k){return a+k.h;},0).toFixed(0)+' planned</div></div>'+
+ '<div class="tile"><div class="k">Calendar</div><div class="v" style="font-size:20px;padding-top:4px">'+lab+'</div><div class="n">'+fmt(start)+' to '+fmt(add(wd(WEEKS.length-1),6))+'</div></div>'+
+ '<div class="tile"><div class="k">Certifications</div><div class="v" style="font-size:20px;padding-top:4px">Week 14, week 48</div><div class="n">C_TB120, then C_S4EWM</div></div>';
+ if(next!==null){var k=WEEKS[next];$("next").innerHTML='<span class="k">Next up</span><b>Week '+(next+1)+': '+esc(k.t)+'</b><span>'+esc(PHASES[k.p].n)+(k.link?'. Use the linked plan for daily steps.':'.')+'</span>';}
+ else $("next").innerHTML='<span class="k">Plan complete</span><b>Every week is done.</b><span>Keep applying and keep building.</span>';
+}
+document.addEventListener("click",function(e){var b=e.target.closest("button.gc");if(b){var w=b.getAttribute("data-g"),k=WEEKS[w],c=0;k.tasks.forEach(function(t,i){if(store.done["t"+w+"-"+i])c++;});var full=c===k.tasks.length;k.tasks.forEach(function(t,i){store.done["t"+w+"-"+i]=!full;});save();update();}});
+document.addEventListener("change",function(e){var el=e.target;if(el.tagName==="INPUT"&&el.type==="checkbox"&&el.hasAttribute("data-k")){store.done[el.getAttribute("data-k")]=el.checked;save();update();}
+ if(el.id==="start"&&el.value){store.start=iso(monday(parse(el.value)));save();build();}});
+document.addEventListener("toggle",function(e){var d=e.target;if(d.matches&&d.matches("details.week"))openW[d.getAttribute("data-w")]=d.open;},true);
+build();
+</script>
+</body>
+</html>
