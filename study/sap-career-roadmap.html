@@ -156,11 +156,12 @@ details.week+details.week{margin-top:10px}
 <section><h2>58-week map</h2><p class="sub">Click a week to mark it done. Ticking every task in a week does the same.</p>
 <div class="grid" id="grid"></div></section>
 
-<section><h2>Weekly checklist</h2><p class="sub">Open a week for its tasks. Weeks with a link point to the daily-step plan for that week.</p><div id="list"></div></section>
+<section><h2>Weekly checklist</h2><p class="sub">Open a week for its tasks, and click a task's title to show its steps. Weeks with a link point to the daily-step plan for that week.</p><div id="list"></div></section>
 
 <p class="foot">Hours are estimates. Lesson names are described by topic where I could not open SAP's pages, so follow each journey's own order. Exam prices and terms were not confirmed, so check SAP's pages before paying.</p>
 </div>
 <script>
+var PLANDAYS={"b1":[[["Account","Create your SAP Learning account and open the Implementing SAP Business One learning journey. Skim every unit title."],["Exam page","Read the certification page. Write the topic areas in a notes file."],["Ask for access","Email your B1 admin for a demo or test company database. Ask your manager about sponsoring the exam."],["Intro lessons","Journey: the introduction lessons. Note any term you do not know."],["Navigation","Journey: navigation and user interface lessons."],["Explore the DB","Hands-on: click through every menu in the demo or test database. Find where your daily receiving documents live."],["Review","Review your notes. Start a running list called How B1 does it vs how we do it."]],[["Business partners","Journey: business partner master data (customers, vendors, leads)."],["Items","Journey: item master data and its inventory settings."],["Warehouses","Journey: warehouses and how stock is organised."],["Prices and units","Journey: price lists and units of measure."],["Self-test","Without notes, explain each master record, then check the lessons."],["Hands-on","Create a business partner, an item and a warehouse in the demo database."],["Review","Review notes. Add anything that differs from how your company sets up master data."]],[["Document basics","Journey: structure of a marketing document, header and rows."],["Document flow","Journey: copying from base documents to target documents."],["Drafts","Journey: draft documents and when to use them."],["Numbering and status","Journey: document numbering and open or closed status."],["Self-test","Draw the base to target chain from memory."],["Hands-on","Create a document and follow it through a copy to the next document. Open the document flow view."],["Review","Review notes and update your how-B1-does-it list."]],[["Request and quote","Journey: purchase request and purchase quotation."],["Purchase order","Journey: the purchase order."],["Goods receipt PO","Journey: goods receipt PO. This is your daily work, so take extra notes."],["A/P invoice","Journey: the A/P invoice."],["Returns and credits","Journey: goods return and A/P credit memo."],["Full cycle","Hands-on: run a purchase order through goods receipt and invoice in the demo database."],["Review","Review notes. Compare your receiving steps with B1's intended flow."]],[["Stock transfers","Journey: inventory transfers between warehouses and bins."],["Counting","Journey: inventory counting and posting."],["Adjustments","Journey: goods receipt and goods issue for adjustments."],["Batches and serials","Journey: batch and serial number management."],["Inventory reports","Journey: stock and valuation reports."],["Hands-on","Transfer stock, run a count, post an adjustment and check the reports."],["Review","Review notes."]],[["Quote and order","Journey: sales quotation and sales order."],["Delivery","Journey: the delivery document."],["A/R invoice","Journey: the A/R invoice."],["Returns and credits","Journey: return and A/R credit memo."],["Pick and pack","Journey: pick and pack manager."],["Full cycle","Hands-on: run a sales order through pick, delivery and invoice."],["Logistics review","Review every logistics note from weeks 4 to 6 and answer your own questions from memory."]],[["Navigation","Journey: Web client navigation."],["Personalizing","Journey: personalizing the Web client."],["Daily tasks","Journey: daily tasks in the Web client."],["Lists and search","Journey: lists, search and filters."],["Self-test","Explain what the Web client does well, then check the lessons."],["Hands-on","Repeat the purchase cycle from week 4 in the Web client."],["Review","Short review of notes."]],[["Collaboration","Journey: collaboration and communication tools."],["Productivity","Journey: productivity features."],["Analytics","Journey: analytics and dashboards."],["KPIs and reports","Journey: KPIs and reporting views."],["Self-test","Explain each analytics feature from memory."],["Hands-on","Open every analytics view in the demo database and note which would help your team."],["Review","Review notes and add ideas to your how-B1-does-it list."]],[["Chart of accounts","Journey: the chart of accounts."],["Posting periods","Journey: posting periods and locking."],["Journal entries","Journey: manual journal entries."],["Account determination","Journey: how documents pick their accounts."],["Self-test","Explain what accounting a goods receipt PO creates, then check."],["Hands-on","Post a journal entry, then open the journal for a goods receipt PO."],["Review","Review notes."]],[["Incoming payments","Journey: incoming payments and allocation."],["Outgoing payments","Journey: outgoing payments."],["Banking","Journey: banking basics and reconciliation."],["Cost accounting","Journey: cost centers and dimensions."],["Financial reports","Journey: financial reports."],["Hands-on","Pay an A/P invoice and receive payment on an A/R invoice in the demo database."],["Financials self-test","Answer your own questions on weeks 9 and 10 from memory. Mark weak spots."]],[["Phases","Journey: implementation phases."],["Company setup","Journey: setting up a company."],["Initial setup","Journey: initial system settings."],["Data migration","Journey: data import and migration tools."],["Self-test","List the implementation phases and what happens in each."],["Hands-on","Look through the administration and setup menus in the demo database. Change nothing important."],["Review","Review notes."]],[["User-defined fields","Journey: user-defined fields and tables."],["Authorizations","Journey: users and authorizations."],["Alerts and approvals","Journey: alerts and approval procedures."],["Support","Journey: support and troubleshooting basics."],["Self-test","Explain when a user-defined field is better than a code change."],["Hands-on","Create a user-defined field in the demo database and add it to a document."],["Review","Review notes."]],[["Practice set 1","Do a set of sample questions. Record every miss."],["Weak areas","Re-study the topics behind your misses."],["Case study","Redo a full case study in the demo database."],["Practice set 2","Do a second set of sample questions under time pressure."],["Price and terms","Check the current exam price, format and subscription terms on SAP's exam page. Ask about sponsorship again."],["Timed run","Hands-on: a timed practice session, then review the misses."],["Final notes","Condense your notes to one or two pages."]],[["Light review","Reread your condensed notes."],["Light review","Redo one process you find hard in the demo database."],["Subscribe and book","Start the exam subscription if you have not, and schedule the exam. Check terms first."],["Final review","Skim notes and the weak-area list. Stop early."],["System check","Run the exam's system check and prepare your space."],["Exam target day","Your target exam day. You can move it if you are not ready; the plan keeps."],["Debrief","Note what was asked. If you need a retake, plan two weeks of focused review."]]],"ewm":[[["Plan and access","Open the Implementing EWM learning journey and find out how to reach its practice system. Write down your target role."],["Discovering EWM","Start the Discovering Extended Warehouse Management with SAP S/4HANA journey."],["WM vs EWM","Learn how classic warehouse management differs from EWM, and what embedded versus decentralized means."],["S/4HANA basics","Get comfortable with S/4HANA navigation and how logistics modules relate to the warehouse."],["Overview finish","Finish the overview journey and test yourself."],["Floor-to-system map","Write out your real receiving and shipping flows, step by step, then mark where EWM adds control."],["Review","Review notes and look ahead to warehouse structure."]],[["Warehouse number","Learn the warehouse number and how it connects to the ERP side."],["Storage types","Learn storage types and what each represents."],["Sections and bins","Learn storage sections and storage bins."],["Activity areas and work centers","Learn activity areas and work centers."],["Self-test","Draw your warehouse in EWM terms, then check."],["Hands-on","Look at a warehouse structure in the practice system."],["Review","Review notes and update your floor-to-system document."]],[["Product master","Learn product master data in EWM."],["Warehouse product","Learn warehouse product data and control indicators."],["Business partners","Learn business partners and supply chain units."],["Packaging specs","Learn packaging specifications."],["Self-test","Explain each master data object from memory."],["Hands-on","Display master data in the practice system."],["Review","Review notes."]],[["Storage type search","Learn putaway strategies and storage type search sequences."],["Stock removal","Learn stock removal strategies."],["Process types","Learn warehouse process types."],["Storage control","Learn storage control."],["Master data self-test","Test everything from weeks 3 and 4."],["Hands-on","Work through master data and control exercises in the practice system."],["Master data checkpoint","Rate your confidence on the heaviest exam area."]],[["Integration overview","Learn how the ERP and EWM sides exchange data."],["Master data transfer","Learn how master data gets to EWM."],["Inbound delivery","Learn how an inbound delivery reaches EWM."],["Outbound delivery","Learn how an outbound delivery reaches EWM."],["Communication and monitoring","Learn how to check that documents transferred."],["Trace a delivery","Hands-on: follow a delivery from the ERP side to EWM."],["Review","Review notes."]],[["Inbound overview","Learn the inbound stages."],["Unloading and receipt","Learn unloading and posting goods receipt."],["Putaway","Learn warehouse tasks and orders for putaway."],["Exceptions","Learn how differences and exceptions are handled."],["Self-test","Describe inbound end to end from memory."],["Hands-on","Run an inbound process in the practice system."],["Review","Review notes."]],[["Outbound overview","Learn the outbound stages."],["Picking","Learn picking tasks and strategies."],["Waves and packing","Learn wave management and packing."],["Loading and goods issue","Learn staging, loading and posting goods issue."],["Self-test","Describe outbound end to end from memory."],["Hands-on","Run an outbound process in the practice system."],["Review","Review notes."]],[["Tasks and orders","Review warehouse tasks and warehouse orders."],["Handling units","Learn handling unit management."],["Physical inventory","Learn physical inventory in EWM."],["RF and monitoring","Learn RF devices and the warehouse monitor."],["Self-test","Test the cross-process topics."],["Hands-on","Run physical inventory and use the monitor in the practice system."],["Review","Review all notes so far."]],[["Case 1: inbound","Work an end-to-end inbound case."],["Case 1 review","Review what went right and wrong."],["Case 2: outbound","Work an end-to-end outbound case."],["Case 2 review","Review what went right and wrong."],["Weak areas","Re-study your weakest topics."],["Full run","Hands-on: a full timed run from ERP delivery to goods issue."],["Review","Review notes."]],[["Exam page","Read the exam page and note the format."],["Gap map","Compare your confidence with the exam weights."],["Master data drill","Drill the master data area."],["End-to-end drill","Drill the ERP to EWM area."],["Goods receipt and issue drill","Drill inbound and outbound."],["Timed practice","Hands-on: a timed practice session in the practice system."],["Review","Review notes."]],[["Cross-process drill","Drill the cross-process area."],["Weakest topic","Redo your weakest topic."],["Second timed run","Do another timed practice."],["Review misses","Study the mistakes."],["Notes","Condense your notes."],["Full timed practice","Hands-on: a full-length timed practice."],["Final notes","Final review of notes."]],[["Light review","Reread your condensed notes."],["Light review","Redo one process you find hard."],["Subscribe and book","Check the subscription and schedule the exam."],["Final review","Skim notes and stop early."],["System check","Run the exam's system check and prepare."],["Exam target day","Your target exam day. You can move it if you are not ready."],["Debrief","Note what was asked and plan next steps."]]]};
 var B1 = "https://claude.ai/artifact/FAwLAQLVXFabvEuuw8hF9U", EWM = "https://claude.ai/artifact/DLyS4WkSDsDfyMRP6X4S8M";
 var PHASES = [
  {n:"SAP Business One + SQL",w:"Weeks 1 to 14",t:"Pass C_TB120 while earning the IBM SQL certificate on Coursera and querying the B1 database read-only."},
@@ -170,83 +171,188 @@ var PHASES = [
  {n:"BTP integration + job search",w:"Weeks 49 to 58",t:"Integration Suite, portfolio project 3, resume and applications."}
 ];
 var WEEKS = [];
+function S(s){ return s.split("|"); }
+function T(t,s){ return [t,S(s)]; }
 function A(p,t,h,link,tasks){ WEEKS.push({p:p,t:t,h:h,link:link,tasks:tasks}); }
+function PW(plan,i){ return ["Complete week "+(i+1)+" of your "+(plan=="b1"?"Business One":"EWM")+" plan","@"+plan+":"+i]; }
 var b1t=["Setup","Master data","Marketing documents","Purchasing","Inventory","Sales and delivery","Web client, part 1","Web client, part 2","Financials, part 1","Financials, part 2","Implementation and support, part 1","Implementation and support, part 2","Exam review","Exam week"];
-var sql=[
- ["Ask your admin which database B1 runs on (SQL Server or HANA) and for a read-only login to a test copy","Select 10 rows from OITM (item master) and list the columns you recognize"],
- ["Write 5 queries on OITM and OCRD using WHERE, ORDER BY and DISTINCT","Query OWHS to list your warehouses and OITB for item groups"],
- ["Learn INNER JOIN and LEFT JOIN using OPOR and POR1","Write a query listing purchase order lines with item names"],
- ["Join OPDN and PDN1 (goods receipt POs) to the purchase order lines","Find open purchase order lines with nothing received yet"],
- ["Learn GROUP BY and HAVING: total purchase value by vendor","Count documents per month"],
- ["Query OITW for stock on hand by warehouse","Find items below their minimum level and look at OINM for movements"],
- ["Join ORDR, RDR1, ODLN and DLN1 for sales orders and deliveries","Find sales order lines not yet delivered"],
- ["Learn subqueries: items not sold in the last 12 months","Rewrite one join query as a subquery and compare"],
- ["Learn CTEs and ROW_NUMBER","Find the last purchase price per item with a window function"],
- ["Explore OJDT, JDT1 and OACT (journal entries and accounts)","Write a one-month summary by account"],
- ["Learn views and save a query in B1's Query Manager","Check with your admin what you are allowed to save"],
- ["Learn indexes and execution plans at a basic level","Time two versions of one query on the test copy"],
- ["Build three small read-only reports from your queries","Write one line of business purpose for each"],
- []
-];
 var CS=[
  "Enroll in IBM's SQL: A Practical Introduction for Querying Databases on Coursera and start module 1",
- "Coursera SQL course: finish module 1",
- "Coursera SQL course: start module 2",
- "Coursera SQL course: finish module 2",
- "Coursera SQL course: start module 3",
- "Coursera SQL course: finish module 3",
- "Coursera SQL course: start module 4",
- "Coursera SQL course: finish module 4",
- "Coursera SQL course: start module 5",
+ "Coursera SQL course: finish module 1","Coursera SQL course: start module 2","Coursera SQL course: finish module 2",
+ "Coursera SQL course: start module 3","Coursera SQL course: finish module 3","Coursera SQL course: start module 4",
+ "Coursera SQL course: finish module 4","Coursera SQL course: start module 5",
  "Coursera SQL course: finish module 5 and the final assessment, then save your certificate"
 ];
+function csSteps(i){
+ var n=Math.floor(i/2)+1;
+ if(i==0) return S("Create or sign in to your Coursera account|Check the course page for the price, Coursera Plus and financial aid|Enroll in the course|Watch the first videos of module 1|Run the first lab");
+ if(i==9) return S("Finish module 5's labs|Complete the final graded assessment|Retry any weak questions|Save or share your certificate to LinkedIn|Write the five query types you still find hard");
+ if(i%2==0) return S("Open the course on Coursera and go to module "+n+"|Watch the videos and read the readings|Start the labs|Write down anything you could not do from memory");
+ return S("Finish module "+n+"'s labs|Complete the graded assignment for module "+n+"|Retry weak questions|Write three queries from memory|Tick off the module");
+}
+var SQ=[
+ "Ask your B1 admin which database B1 runs on, SQL Server or HANA|Ask for a read-only login to a test copy, not the live database|Open the query tool your admin names|Select 10 rows from OITM (TOP 10 on SQL Server, LIMIT 10 on HANA)|Write down the column names you recognize",
+ "Open your query tool on the test copy|Write 5 queries on OITM and OCRD using WHERE, ORDER BY and DISTINCT|Look at OWHS for your warehouses and OITB for item groups|Save the queries in a text file|Note any column you did not understand",
+ "Learn INNER JOIN and LEFT JOIN from the Coursera course or your notes|Join OPOR to POR1|Add item names by joining OITM|Write a query listing purchase order lines with item names|Save it",
+ "Join OPDN and PDN1 for goods receipt POs|Link receipt lines back to purchase order lines using the base document fields|Write a query for open PO lines with nothing received yet|Check three results in B1 itself|Save it",
+ "Learn GROUP BY and HAVING|Write total purchase value by vendor|Write document counts per month|Check one total against a B1 report|Save the queries",
+ "Query OITW for stock on hand by warehouse|Find items below their minimum level|Look at OINM for the stock movements of one item|Compare a total with B1's own inventory report|Save the queries",
+ "Join ORDR, RDR1, ODLN and DLN1|Write a query for sales order lines not yet delivered|Check three results in B1|Note how base documents link an order to its delivery|Save it",
+ "Learn subqueries|Write a query for items not sold in the last 12 months|Rewrite one join query as a subquery|Compare results and run time|Save both versions",
+ "Learn CTEs and ROW_NUMBER|Write a CTE over purchase lines|Use ROW_NUMBER to find the last purchase price per item|Check three items by hand|Save it",
+ "Explore OJDT, JDT1 and OACT|Write a one-month summary by account|Check one account balance in B1|Note which accounts relate to inventory|Save it"
+];
+var SQ2={
+ 10:[T("Learn views and save a query in B1's Query Manager","Learn what a view is|Write the SELECT for one report you would want as a view|Save a query in Query Manager only if your user is allowed|Do not create views without admin approval|Note what worked"),
+     T("Check with your admin what you are allowed to save","Ask whether you may save queries in Query Manager|Ask whether you may create views|Ask where saved queries should live|Write down the rules|Follow them")],
+ 11:[T("Learn indexes and execution plans at a basic level","Read about indexes in your course notes or the database's documentation|Open an execution plan for one query on the test copy|Find the most expensive step|Note which columns an index could help|Do not create indexes without admin approval"),
+     T("Time two versions of one query on the test copy","Pick a query you wrote earlier|Write a second version that does the same job|Run each three times and note the times|Check the results match|Write which was faster and why")],
+ 12:[T("Build three small read-only reports from your queries","Choose three queries you found useful|Give each clear column names|Export each to Excel|Check each against B1|Keep them in one folder"),
+     T("Write one line of business purpose for each","Name who would use each report|Write one line on the decision it helps|Write what it replaces, if anything|Put the lines in a notes file|Keep company data out of anything you share")]
+};
 b1t.forEach(function(t,i){
- var tk=["Complete week "+(i+1)+" of your Business One plan"];
- if(i<10){ tk.push(CS[i]+" (about 2 h)"); tk.push(sql[i][0]+" (about 1 h)"); }
- else tk=tk.concat(sql[i]);
- if(i==13) tk.push("Sit the C_TB120 exam. No SQL this week.");
+ var tk=[PW("b1",i)];
+ if(i<10){ tk.push(T(CS[i]+" (about 2 h)",csSteps(i).join("|"))); tk.push(T("Apply it to B1: "+SQ[i].split("|")[0]+" (about 1 h)",SQ[i])); }
+ else if(i<13){ tk=tk.concat(SQ2[i]); }
+ else { tk.push(T("Sit the C_TB120 exam. No SQL this week.","Reopen the exam page and re-check the requirements|Test your equipment as the instructions say|Log in early on exam day|Read each scenario carefully|Write down the topics you remember afterward")); }
  A(0,t,i==13?7.75:(i<10?10.75:9.75),{h:B1,l:"Business One plan"},tk);
 });
 var PY="https://www.coursera.org/specializations/python";
-A(1,"Python for Everybody: course 1, part 1",7.75,{h:PY,l:"Python for Everybody (University of Michigan)"},["Enroll in the Python for Everybody Specialization","Install Python and VS Code as the course directs","Work through the first half of course 1, Programming for Everybody (about 17 hours total)"]);
-A(1,"Course 1 finish, course 2 start",7.75,null,["Finish course 1 and its assignments","Start course 2, Python Data Structures (about 20 hours)","Write a small script of your own that reads a CSV"]);
-A(1,"Course 2: data structures",7.75,null,["Work through course 2: lists, dictionaries, tuples and files","Do every assignment","Rewrite your CSV script using dictionaries"]);
-A(1,"Course 2 finish, course 3 start",7.75,null,["Finish course 2","Start course 3, Using Python to Access Web Data (about 19 hours)","Learn regular expressions from the course"]);
-A(1,"Course 3: web data and APIs",7.75,null,["Work through course 3: HTTP, JSON and APIs","Do every assignment","Call a public API with Postman and compare with Python"]);
-A(1,"Course 3 finish, course 4 start",7.75,null,["Finish course 3 and save the certificate","Start course 4, Using Databases with Python (about 14 hours)","Learn the course's database basics"]);
-A(1,"Course 4: databases with Python",7.75,null,["Finish course 4","Connect read-only to the B1 test database from Python (pyodbc for SQL Server, hdbcli for HANA)","Keep passwords out of your code, using environment variables"]);
-A(1,"Capstone, part 1",7.75,null,["Start the capstone, Retrieving, Processing and Visualizing Data with Python","Plan your data source","Build the first part"]);
-A(1,"Capstone, part 2",7.75,null,["Finish the capstone","Earn the Python for Everybody certificate","Add it to your LinkedIn profile"]);
-A(1,"Catch-up and review",7.75,null,["Finish anything left over from weeks 15 to 23","Redo the weakest assignment from the Python courses","Write down what you can now build with Python that you could not before"]);
-A(1,"pandas",7.75,null,["Read CSV and Excel into pandas","Filter, group and export to Excel","Reproduce one of your SQL reports in pandas and compare"]);
-A(1,"Service Layer, part 1",7.75,{h:"https://learning.sap.com/courses/leveraging-the-sap-business-one-service-layer",l:"Service Layer course"},["Start the free Leveraging the SAP Business One Service Layer course","Ask your admin for a limited API user on the test system","Log in with Postman and fetch one item"]);
-A(1,"Service Layer, part 2",7.75,null,["Practice GET queries with $select, $filter and $top","Handle paging for large results","Compare the results with your SQL results"]);
-A(1,"Service Layer, part 3",7.75,null,["Call the Service Layer from Python with requests","Handle sessions, logout and errors","Stay read-only. Write operations need admin approval and the test database"]);
-A(1,"Project 1: B1 reporting, build",7.75,null,["Pick one business problem and write it in two sentences","Design the report and its data source","Build the data pull and the output"]);
-A(1,"Project 1: B1 reporting, finish",7.75,null,["Finish and test on the test database","Write a README using sample data only","Have your admin review it before you show anyone"]);
-A(2,"S/4HANA architecture and processes",7.75,{h:"https://learning.sap.com/learning-journeys/explore-integrated-business-processes-in-sap-s-4hana-",l:"Explore Integrated Business Processes journey"},["Start the Explore Integrated Business Processes in SAP S/4HANA journey","Make a table comparing B1 and S/4HANA","Note what B1 does in one module that S/4HANA splits across several"]);
-A(2,"Procure-to-pay and order-to-cash",7.75,null,["Continue the journey on purchasing and sales","Map each step to the B1 equivalent","Draw both flows"]);
-A(2,"Fiori and the launchpad",7.75,null,["Search learning.sap.com for the Learning the Basics of SAP Fiori journey","Learn how apps are organized in the launchpad","Write how Fiori differs from the B1 Web client"]);
-A(2,"OData and S/4HANA APIs",7.75,null,["Learn what OData is","Find one S/4HANA API in SAP's API hub and read its description","Compare it with the Service Layer you used"]);
-A(2,"Project 2: warehouse app, build",7.75,null,["Define a small receiving and picking app, using your RF scanner experience","Build it with sample data, not company data","Document the workflow with screenshots"]);
-A(2,"Project 2: warehouse app, finish",7.75,null,["Finish and test","Write a README","Confirm no company information is in it"]);
+A(1,"Python for Everybody: course 1, part 1",7.75,{h:PY,l:"Python for Everybody (University of Michigan)"},[
+ T("Enroll in the Python for Everybody Specialization","Open the specialization page on Coursera|Check the price, Coursera Plus and financial aid|Enroll|Open course 1, Programming for Everybody|Read its first week's overview"),
+ T("Install Python and VS Code as the course directs","Follow the course's install instructions|Install VS Code|Run a hello-world script|Save your scripts in a folder you will keep|Note any problems and fix them"),
+ T("Work through the first half of course 1, Programming for Everybody (about 17 hours total)","Watch the lectures in order|Do each exercise as you go|Type the examples, do not paste them|Do the graded quizzes|Note what confused you")]);
+A(1,"Course 1 finish, course 2 start",7.75,null,[
+ T("Finish course 1 and its assignments","Finish the remaining lectures|Complete the graded assignments|Retry weak quizzes|Save your certificate for the course|Write what you can now do in Python"),
+ T("Start course 2, Python Data Structures (about 20 hours)","Open course 2|Watch the first lectures on strings and files|Do the first exercises|Do the first graded assignment|Note questions"),
+ T("Write a small script of your own that reads a CSV","Pick a small CSV, such as an export from your test report|Read it line by line with Python|Print a total|Handle a missing file with an error message|Save the script")]);
+A(1,"Course 2: data structures",7.75,null,[
+ T("Work through course 2: lists, dictionaries, tuples and files","Watch the lectures on lists, dictionaries and tuples|Type each example|Do the exercises after each lecture|Do the graded quizzes|Note what you got wrong"),
+ T("Do every assignment","List the course's assignments|Do them in order|Submit each one|Review any feedback|Redo failed ones"),
+ T("Rewrite your CSV script using dictionaries","Open your earlier CSV script|Store rows as dictionaries|Count items by key|Print the results sorted|Compare with your first version")]);
+A(1,"Course 2 finish, course 3 start",7.75,null,[
+ T("Finish course 2","Finish the remaining lectures|Complete the final assignment|Retry weak quizzes|Save the certificate|Review your notes"),
+ T("Start course 3, Using Python to Access Web Data (about 19 hours)","Open course 3|Watch the first lectures on regular expressions|Do the first exercises|Do the first graded assignment|Note questions"),
+ T("Learn regular expressions from the course","Watch the regular expression lectures|Practice on a sample text file|Extract numbers and emails from the text|Write three patterns from memory|Save them in a notes file")]);
+A(1,"Course 3: web data and APIs",7.75,null,[
+ T("Work through course 3: HTTP, JSON and APIs","Watch the lectures on HTTP, sockets and web pages|Watch the JSON and API lectures|Type each example|Do the exercises|Note questions"),
+ T("Do every assignment","List the assignments|Do them in order|Submit each|Review the feedback|Redo failed ones"),
+ T("Call a public API with Postman and compare with Python","Install Postman|Call a free public API with a GET request|Make the same call from Python with requests|Compare the JSON you get|Save both")]);
+A(1,"Course 3 finish, course 4 start",7.75,null,[
+ T("Finish course 3 and save the certificate","Finish the remaining lectures|Complete the final assignment|Retry weak quizzes|Save the certificate|Write what an API is in your own words"),
+ T("Start course 4, Using Databases with Python (about 14 hours)","Open course 4|Watch the first lectures on object-oriented Python|Do the first exercises|Do the first graded assignment|Note questions"),
+ T("Learn the course's database basics","Watch the lectures on database tables and keys|Create a small local database as the course shows|Insert and read rows in the practice database only|Connect what you see to B1's tables|Write three notes")]);
+A(1,"Course 4: databases with Python",7.75,null,[
+ T("Finish course 4","Finish the lectures|Complete the assignments|Retry weak quizzes|Save the certificate|Review your notes"),
+ T("Connect read-only to the B1 test database from Python (pyodbc for SQL Server, hdbcli for HANA)","Confirm the database type with your admin|Install the matching Python library|Ask for a read-only account on the test copy|Run a SELECT of 10 rows from OITM|Print the result"),
+ T("Keep passwords out of your code, using environment variables","Never type passwords into a script|Store them in environment variables|Read them in Python with os.environ|Add a .env file to .gitignore if you use one|Check your script has no secrets before sharing")]);
+A(1,"Capstone, part 1",7.75,null,[
+ T("Start the capstone, Retrieving, Processing and Visualizing Data with Python","Open the capstone course|Read the assignment|Choose the data source it allows|Set up your project folder|Write the first script"),
+ T("Plan your data source","List the data you will retrieve|Check the source's terms|Sketch what the final output will look like|Write the steps in order|Note risks"),
+ T("Build the first part","Retrieve a small sample of the data|Store it in a local database|Check the stored rows|Fix errors|Save your work")]);
+A(1,"Capstone, part 2",7.75,null,[
+ T("Finish the capstone","Process the full data set|Build the visualization|Test the whole script|Submit the assignment|Review the feedback"),
+ T("Earn the Python for Everybody certificate","Check every course shows complete|Open your Coursera certificates page|Claim the specialization certificate|Download or share it|Keep a copy"),
+ T("Add it to your LinkedIn profile","Open your LinkedIn profile|Add the certificate under licenses and certifications|Use the link from Coursera|Check the issue date|Keep the description honest")]);
+A(1,"Catch-up and review",7.75,null,[
+ T("Finish anything left over from weeks 15 to 23","List anything unfinished|Do the most important first|Submit missed assignments|Tick them off|Skip what no longer matters"),
+ T("Redo the weakest assignment from the Python courses","Pick the assignment that gave you the most trouble|Redo it without notes|Compare with the course solution|Write what you learned|Save the new version"),
+ T("Write down what you can now build with Python that you could not before","List five things you can now do|Mark which apply to your work|Pick one for project 1|Write it in a sentence|Save the list")]);
+A(1,"pandas",7.75,null,[
+ T("Read CSV and Excel into pandas","Install pandas|Read a CSV into a DataFrame|Read an Excel sheet|Look at the first rows and the column types|Save a script"),
+ T("Filter, group and export to Excel","Filter rows with a condition|Group and sum a column|Sort the result|Export to Excel|Open the file to check it"),
+ T("Reproduce one of your SQL reports in pandas and compare","Pick one of your SQL reports|Load its data into pandas|Recreate the report|Compare the totals with your SQL result|Write which was easier and why")]);
+A(1,"Service Layer, part 1",7.75,{h:"https://learning.sap.com/courses/leveraging-the-sap-business-one-service-layer",l:"Service Layer course"},[
+ T("Start the free Leveraging the SAP Business One Service Layer course","Open the course|Read its overview|Work through the first lessons|Note the setup it needs|Write down questions for your admin"),
+ T("Ask your admin for a limited API user on the test system","Explain what you want to do, read-only reports|Ask for an API user with only read access|Ask for the test system address|Ask about logging|Write down what you were given"),
+ T("Log in with Postman and fetch one item","Create a Postman request to the login endpoint|Send your credentials from environment variables|Copy the session from the response|Fetch one item|Log out")]);
+A(1,"Service Layer, part 2",7.75,null,[
+ T("Practice GET queries with $select, $filter and $top","Fetch a list of items|Add $top to limit rows|Add $select to choose fields|Add $filter to narrow results|Save the requests"),
+ T("Handle paging for large results","Find out how many rows a call returns by default|Look for the next-page link in the response|Fetch the second page|Write down how you would loop through all pages|Save the notes"),
+ T("Compare the results with your SQL results","Pick a report you wrote in SQL|Rebuild it with the Service Layer|Compare the totals|Note differences|Write when you would use each")]);
+A(1,"Service Layer, part 3",7.75,null,[
+ T("Call the Service Layer from Python with requests","Write the login call in Python|Fetch a list of items|Load it into pandas|Export to Excel|Log out at the end"),
+ T("Handle sessions, logout and errors","Store the session safely|Handle a timeout by logging in again|Catch error responses and print the message|Always log out|Test each case"),
+ T("Stay read-only. Write operations need admin approval and the test database","Use GET calls only|Do not call POST, PATCH or DELETE|If you need a write, ask your admin first|Test on the test database only|Write the rule at the top of your project")]);
+A(1,"Project 1: B1 reporting, build",7.75,null,[
+ T("Pick one business problem and write it in two sentences","List three reports people ask for|Pick the one that saves the most time|Write the problem in two sentences|Write who uses it|Check it is read-only"),
+ T("Design the report and its data source","Decide whether SQL or the Service Layer is the source|List the fields you need|Sketch the output|Write the steps|Note the risks"),
+ T("Build the data pull and the output","Write the query or the API call|Load it into pandas|Build the output file|Test on the test database|Save your work")]);
+A(1,"Project 1: B1 reporting, finish",7.75,null,[
+ T("Finish and test on the test database","Test with different dates|Handle empty results|Check totals against B1|Fix bugs|Save the final version"),
+ T("Write a README using sample data only","Describe the problem|Explain how to run it|Replace real data with sample data|Add a screenshot of sample output|Check for any company names"),
+ T("Have your admin review it before you show anyone","Send your admin the code and README|Ask what to change|Make the changes|Get approval before sharing anywhere|Keep the approval message")]);
+A(2,"S/4HANA architecture and processes",7.75,{h:"https://learning.sap.com/learning-journeys/explore-integrated-business-processes-in-sap-s-4hana-",l:"Explore Integrated Business Processes journey"},[
+ T("Start the Explore Integrated Business Processes in SAP S/4HANA journey","Open the journey|Read its overview|Work through the first units|Write two sentences per unit|List new terms"),
+ T("Make a table comparing B1 and S/4HANA","Make two columns, B1 and S/4HANA|List modules, interface and database|Add what each is used for|Add the company size each suits|Save the table"),
+ T("Note what B1 does in one module that S/4HANA splits across several","Pick purchasing|List the B1 steps|List the S/4HANA steps|Note which modules are involved|Write the difference in a sentence")]);
+A(2,"Procure-to-pay and order-to-cash",7.75,null,[
+ T("Continue the journey on purchasing and sales","Open the next units|Read the purchasing process|Read the sales process|Write each step|List new terms"),
+ T("Map each step to the B1 equivalent","Make a table of S/4HANA steps|Add the B1 document for each|Mark differences|Note where warehouse work enters|Save the table"),
+ T("Draw both flows","Draw procure-to-pay as boxes and arrows|Draw order-to-cash|Label the documents|Mark where the warehouse is involved|Check against the journey")]);
+A(2,"Fiori and the launchpad",7.75,null,[
+ T("Search learning.sap.com for the Learning the Basics of SAP Fiori journey","Search for the journey by name|Open it|Read the overview|Note the first units|Start the first unit"),
+ T("Learn how apps are organized in the launchpad","Learn what a tile and a group are|Learn what a role has to do with the launchpad|Note how users find apps|Write a short summary|List new terms"),
+ T("Write how Fiori differs from the B1 Web client","Open the B1 Web client if you can|List what looks different|List what works differently|Write three sentences|Save it")]);
+A(2,"OData and S/4HANA APIs",7.75,null,[
+ T("Learn what OData is","Search for a beginner explanation|Write what OData is in your own words|Compare it with the Service Layer|Note the common query options|Save the notes"),
+ T("Find one S/4HANA API in SAP's API hub and read its description","Search for SAP's API hub|Find a warehouse or inventory API|Read what it does|Note its main fields|Write one example call"),
+ T("Compare it with the Service Layer you used","List what is similar|List what is different|Note authentication differences|Write when you would use each|Save the notes")]);
+A(2,"Project 2: warehouse app, build",7.75,null,[
+ T("Define a small receiving and picking app, using your RF scanner experience","Write the problem in two sentences|List the screens|Choose sample data|Sketch each screen|List what you will not build"),
+ T("Build it with sample data, not company data","Create the sample data|Build the receiving screen|Build the picking screen|Test with the sample data|Save your work"),
+ T("Document the workflow with screenshots","Take screenshots of each screen|Write a step list for receiving|Write a step list for picking|Put them in a README|Check for company information")]);
+A(2,"Project 2: warehouse app, finish",7.75,null,[
+ T("Finish and test","Test the full receiving flow|Test the full picking flow|Fix bugs|Handle bad input|Save the final version"),
+ T("Write a README","Describe the problem|Explain how to run it|Describe the design|List what you learned|Add screenshots"),
+ T("Confirm no company information is in it","Search the files for company names|Check screenshots for real data|Check for passwords|Ask your admin if unsure|Fix anything you find")]);
 var ewt=["Orientation and foundations","Warehouse structure","Master data, part 1","Master data, part 2 and control","ERP to EWM integration","Inbound processing","Outbound processing","Cross-process settings and operations","End-to-end practice","Exam preparation, part 1","Exam preparation, part 2","Exam week"];
 ewt.forEach(function(t,i){
- var tk=["Complete week "+(i+1)+" of your EWM plan"];
- if(i==0) tk.push("Set the EWM plan's start date to this Monday","Confirm you can reach a practice system");
- if(i==11) tk.push("Sit the C_S4EWM exam");
+ var tk=[PW("ewm",i)];
+ if(i==0){ tk.push(T("Set the EWM plan's start date to this Monday","Open your EWM plan|Change the start date at the top|Check the dates updated|Check the calendar|Keep both plans open this week")); tk.push(T("Confirm you can reach a practice system","Open the learning journey's practice system page|Check what access you need|Try to log in|Note any problem|Ask SAP Learning support if you cannot")); }
+ if(i==11) tk.push(T("Sit the C_S4EWM exam","Re-check the requirements on the exam page|Test your equipment|Log in early|Read each task carefully|Write down the topics you remember"));
  A(3,t,7.75,{h:EWM,l:"EWM plan"},tk);
 });
-A(4,"BTP basics",7.75,null,["Search learning.sap.com for the Discovering SAP Business Technology Platform journey","Create a free BTP trial account if one is offered","Write what BTP is in your own words"]);
-A(4,"Integration Suite concepts",7.75,{h:"https://learning.sap.com/learning-journey/developing-with-sap-integration-suite",l:"Developing with SAP Integration Suite"},["Start the free Developing with SAP Integration Suite journey","Learn integration flows, adapters and patterns","Draw one integration scenario from your warehouse"]);
-A(4,"Integration flows and adapters",7.75,null,["Continue the journey on modeling processes","Build the exercise flow in your trial tenant","Note every error you hit and its fix"]);
-A(4,"Mapping and scripting",7.75,null,["Learn message mapping","Learn scripting basics in a flow","Transform a JSON message to a different shape"]);
-A(4,"Security and error handling",7.75,null,["Learn inbound and outbound security options","Learn exception handling in flows","Add error handling to your exercise flow"]);
-A(4,"Build a small integration",7.75,null,["Build a flow that reads a public REST API and reshapes the data","Document it with a diagram and README","Use sample data only"]);
-A(4,"Project 3: EWM process write-up",7.75,null,["Turn your floor-to-system document into a clean inbound-to-outbound write-up","Add the master data, putaway, picking and stock movements","Remove anything specific to your employer"]);
-A(4,"Portfolio and resume",7.75,null,["Publish the three projects with README files, sample data only","Update your resume with the certifications and projects, worded honestly","Update LinkedIn"]);
-A(4,"Job search, part 1",7.75,null,["List 20 target roles, such as B1 support analyst, ERP analyst, WM or EWM analyst, integration analyst","Note what each wants that you still lack","Ask your employer about SAP project opportunities"]);
-A(4,"Job search, part 2",7.75,null,["Apply to 10 roles","Practice explaining each project in two minutes","Write down the questions you could not answer and study them"]);
+A(4,"BTP basics",7.75,null,[
+ T("Search learning.sap.com for the Discovering SAP Business Technology Platform journey","Search for the journey by name|Open it|Read the overview|Start the first unit|Write what BTP is"),
+ T("Create a free BTP trial account if one is offered","Search for SAP's BTP trial page|Check the terms|Create the account with your own email|Log in|Note what you can reach"),
+ T("Write what BTP is in your own words","Write a paragraph|Draw a simple diagram|Add where integration fits|Check against the journey|Save it")]);
+A(4,"Integration Suite concepts",7.75,{h:"https://learning.sap.com/learning-journey/developing-with-sap-integration-suite",l:"Developing with SAP Integration Suite"},[
+ T("Start the free Developing with SAP Integration Suite journey","Open the journey|Read the overview|Start the first unit|Write two sentences per unit|List new terms"),
+ T("Learn integration flows, adapters and patterns","Learn what an integration flow is|Learn what an adapter does|Learn a few common patterns|Write each in a sentence|Save the notes"),
+ T("Draw one integration scenario from your warehouse","Pick a scenario, such as a scanner app sending receipts to ERP|Draw the systems|Draw the messages between them|Label the protocols|Save the drawing")]);
+A(4,"Integration flows and adapters",7.75,null,[
+ T("Continue the journey on modeling processes","Open the modeling units|Read each unit|Follow the exercise steps|Note differences from the instructions|Save the notes"),
+ T("Build the exercise flow in your trial tenant","Open your tenant|Follow the exercise|Deploy the flow|Test it|Save the steps you followed"),
+ T("Note every error you hit and its fix","Keep a list as you work|Write the error text|Write the fix|Note where you found it|Keep the list")]);
+A(4,"Mapping and scripting",7.75,null,[
+ T("Learn message mapping","Open the mapping units|Learn what a mapping does|Build the exercise mapping|Test with sample data|Save the notes"),
+ T("Learn scripting basics in a flow","Open the scripting units|Read the language the exercise uses|Add a small script step|Test it|Save the notes"),
+ T("Transform a JSON message to a different shape","Pick sample JSON|Decide the target shape|Build the transformation|Test it|Save the result")]);
+A(4,"Security and error handling",7.75,null,[
+ T("Learn inbound and outbound security options","Open the security units|List the options|Note which suit your scenario|Write short notes|List new terms"),
+ T("Learn exception handling in flows","Open the exception units|Learn how errors are caught|Learn how they are reported|Write short notes|Save them"),
+ T("Add error handling to your exercise flow","Open your flow|Add an exception step|Trigger an error on purpose|Check the result|Save the final flow")]);
+A(4,"Build a small integration",7.75,null,[
+ T("Build a flow that reads a public REST API and reshapes the data","Pick a free public API|Build a flow that calls it|Reshape the response|Test it|Save the flow"),
+ T("Document it with a diagram and README","Draw the flow|Write what it does|Write how to run it|List what you learned|Save them"),
+ T("Use sample data only","Check no company data is used|Check no credentials are in the files|Use public data|Review the README|Fix anything you find")]);
+A(4,"Project 3: EWM process write-up",7.75,null,[
+ T("Turn your floor-to-system document into a clean inbound-to-outbound write-up","Open your floor-to-system document|Organize it into inbound then outbound|Add the EWM terms you learned|Add simple diagrams|Proofread"),
+ T("Add the master data, putaway, picking and stock movements","Add the master data needed|Describe putaway|Describe picking|Describe stock movements|Check against your EWM notes"),
+ T("Remove anything specific to your employer","Search for company names|Replace real numbers with samples|Check diagrams|Ask someone to review|Fix anything you find")]);
+A(4,"Portfolio and resume",7.75,null,[
+ T("Publish the three projects with README files, sample data only","Create a repository or folder for each project|Add the code and README|Check for secrets and company data|Publish only after checking|Share the link in your notes"),
+ T("Update your resume with the certifications and projects, worded honestly","List each certification with its date|List each project with one line|Describe your experience in your own words|Ask a friend to read it|Fix anything that overstates"),
+ T("Update LinkedIn","Update the headline|Add the certifications|Add the projects|Update the summary|Check the privacy settings")]);
+A(4,"Job search, part 1",7.75,null,[
+ T("List 20 target roles, such as B1 support analyst, ERP analyst, WM or EWM analyst, integration analyst","Search job boards for each title|Save 20 postings|Note the location and remote options|Note the required experience|Rank them"),
+ T("Note what each wants that you still lack","Read each posting|List missing skills|Count how often each appears|Pick the top three|Plan how to learn them"),
+ T("Ask your employer about SAP project opportunities","Pick the right person|Ask what SAP projects are coming|Offer help with reporting or testing|Ask about training support|Write down the answer")]);
+A(4,"Job search, part 2",7.75,null,[
+ T("Apply to 10 roles","Tailor your resume to each|Write a short cover note|Apply|Track each application|Follow up after a week"),
+ T("Practice explaining each project in two minutes","Write a two-minute script per project|Say it aloud|Record yourself|Shorten it|Practice with a friend"),
+ T("Write down the questions you could not answer and study them","Keep a list of questions you could not answer|Look each up|Write an answer|Practice them|Add new ones after every interview")]);
 
 var MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 var KEY="sap-career-roadmap-v1", store={start:"2026-11-09",done:{}};
@@ -272,7 +378,9 @@ function build(){
   var o=(w in openW)?openW[w]:(w===cw);
   var h='<details class="week" data-w="'+w+'"'+(o?" open":"")+'><summary><span class="t">Week '+(w+1)+': '+esc(k.t)+'</span><span class="r">'+fmt(wd(w))+' to '+fmt(add(wd(w),6))+' · '+k.h+' h</span><span class="pill">'+esc(PHASES[k.p].n)+'</span><span class="c" data-c="'+w+'"></span></summary><div class="wbody">';
   if(k.link)h+='<p class="wl"><a href="'+k.link.h+'" target="_blank" rel="noopener">'+esc(k.link.l)+'</a></p>';
-  k.tasks.forEach(function(t,i){var key="t"+w+"-"+i;h+='<label class="chk" data-row="'+key+'"><input type="checkbox" data-k="'+key+'"><span class="txt">'+esc(t)+'</span></label>';});
+  k.tasks.forEach(function(t,i){var key="t"+w+"-"+i,tx=t[0],st=t[1];
+   if(typeof st==="string"&&st.charAt(0)==="@"){var q=st.slice(1).split(":"),days=PLANDAYS[q[0]][+q[1]],DN=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];st=days.map(function(d,n){return DN[n]+": "+d[1];});st.push("Open the plan above for each day's detailed steps.");}
+   h+='<details class="day" data-row="'+key+'"><summary><input type="checkbox" data-k="'+key+'" aria-label="Mark done: '+esc(tx)+'"><span class="txt">'+esc(tx)+'</span><span class="more"></span></summary><ol class="steps">'+st.map(function(s){return "<li>"+esc(s)+"</li>";}).join("")+'</ol></details>';});
   return h+'</div></details>';}).join("");
  update();
 }
