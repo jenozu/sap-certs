@@ -1,7 +1,15 @@
-# Study plans
+# Legacy study plans
 
-Self-contained HTML study plans. Open any file in a browser; progress is saved in that browser.
+The HTML plans in this folder were created for an earlier career direction focused on SAP Business One certification and SAP EWM. They are retained for historical reference only and are **not the active learning roadmap**.
 
-- `sap-career-roadmap.html`: 58-week roadmap (Business One, SQL, Python, Service Layer, S/4HANA, EWM, BTP, job search)
-- `sap-b1-study-plan.html`: 14-week SAP Business One (C_TB120) plan with daily steps
-- `sap-ewm-study-plan.html`: 12-week SAP EWM (C_S4EWM) plan with daily steps
+The current career direction is ERP Business Process Automation Developer / ERP Application Developer.
+
+Use these active documents instead:
+
+- [Main learning hub](../README.md)
+- [Career roadmap](../docs/career-roadmap.md)
+- [Course index](../courses/README.md)
+- [SQL learning plan](../courses/sql/README.md)
+- [Portfolio projects](../projects/README.md)
+
+The older Business One and EWM study plans should not be treated as current priorities.
