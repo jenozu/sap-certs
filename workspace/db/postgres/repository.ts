@@ -1,9 +1,9 @@
 import { and, eq, sql } from 'drizzle-orm';
-import type { PgDatabase, PgQueryResultHKT } from 'drizzle-orm/pg-core';
+import type { getPostgresDb } from './index';
 import { workspaces } from './schema';
 
 // The caller must derive userId from a verified server-side session.
-export function workspaceRepository(db: PgDatabase<PgQueryResultHKT>) {
+export function workspaceRepository(db: ReturnType<typeof getPostgresDb>) {
   return {
     async load(userId: string) {
       const [row] = await db.select({ data: workspaces.data, version: workspaces.version })
