@@ -1,14 +1,9 @@
 # Vercel / Neon migration
 
-Status: PostgreSQL baseline provisioned and verified; adapter source staged, not yet wired into the application or build-tested.
-
-The original Sites runtime remains in place until the Next.js runtime, Neon driver and verified session authentication can be switched together. Do not expose the existing header-based API on Vercel.
-
-- Neon PostgreSQL 17, database neondb, AWS us-east-2.
-- PostgreSQL schema: db/postgres/schema.ts.
-- Baseline SQL: drizzle-postgres/0000_workspaces.sql.
-- Repository: db/postgres/repository.ts; optimistic concurrency and per-user filtering preserved.
-- Next: install @neondatabase/serverless and regenerate the lockfile; wire drizzle-orm/neon-http; replace header authentication with verified server-side sessions; switch API routes and build scripts; add import validation and integration tests.
-- Configure DATABASE_URL and authentication secrets only in the deployment environment, never in Git.
-- Preserve the original D1 migrations and recovered main branch.
-- Existing hosted progress is not copied automatically; export/import is a separate step.
+Next.js runtime and GitHub Auth.js integration staged. Not yet build-tested or deployed.
+GitHub sign-in is restricted to jenozu; database keys use the verified provider account ID.
+Configure DATABASE_URL, AUTH_SECRET, AUTH_GITHUB_ID and AUTH_GITHUB_SECRET in Vercel.
+Register a GitHub OAuth app with callback https://<deployment-domain>/api/auth/callback/github.
+Run npm install to regenerate the lockfile before npm ci. Then run npx tsc --noEmit and npm run build.
+Original D1 files and legacy tests are retained for reference; legacy route tests need replacement.
+Existing hosted progress requires separate validated import.
