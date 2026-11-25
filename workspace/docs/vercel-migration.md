@@ -1,9 +1,9 @@
-# Vercel / Neon migration
+# Vercel / Neon setup (current)
 
-Next.js runtime and GitHub Auth.js integration staged. Not yet build-tested or deployed.
-GitHub sign-in is restricted to jenozu; database keys use the verified provider account ID.
-Configure DATABASE_URL, AUTH_SECRET, AUTH_GITHUB_ID and AUTH_GITHUB_SECRET in Vercel.
-Register a GitHub OAuth app with callback https://<deployment-domain>/api/auth/callback/github.
-Run npm install to regenerate the lockfile before npm ci. Then run npx tsc --noEmit and npm run build.
-Original D1 files and legacy tests are retained for reference; legacy route tests need replacement.
-Existing hosted progress requires separate validated import.
+- Hosting: Vercel project `career-roadmap` (Next.js, Node runtime).
+- Access: **Vercel Authentication only** (Deployment Protection, scope "All deployments"). It must cover the production domain, preview URLs and every `/api` route. No app-level sign-in.
+- Owner: fixed server-side `OWNER_ID`. If it is missing, the API answers 503 and serves no data. Identity never comes from request headers.
+- Database: Neon project `career-roadmap`. Production uses branch `main`, previews use branch `preview`, and `backup-*` branches are point-in-time copies. Two `DATABASE_URL` entries, scoped Production and Preview.
+- Environment variables: `DATABASE_URL` (secret, per environment), `DB_ENV` (`production`/`preview`), `OWNER_ID`.
+- Health: `GET /api/health` → `{ ok, dbEnv, ownerConfigured, schemaVersion }` (no data, no secrets).
+- Plan and status: `docs/pathway-v2/` (see `CHECKLIST.md`).
