@@ -98,12 +98,12 @@
         "id": 5,
         "title": "[P1] Review and merge playground phase-6",
         "description": "Owner-approved, conditional on its own criteria.",
-        "status": "pending",
+        "status": "done",
         "priority": "medium",
         "dependencies": [
           1
         ],
-        "details": "In jenozu/playground: review the 26-file diff (tasks 37–42, 65) for regressions and security; run its gate (task 43): lint, typecheck, vitest, build, Playwright incl. new autosave/dashboard/notes/progress specs; confirm phase 1–5 e2e still pass; open PR phase-6 → main with results; merge; record SHA. Requires push access to playground.",
+        "details": "In jenozu/playground: review the 26-file diff (tasks 37–42, 65) for regressions and security; run its gate (task 43): lint, typecheck, vitest, build, Playwright incl. new autosave/dashboard/notes/progress specs; confirm phase 1–5 e2e still pass; open PR phase-6 → main with results; merge; record SHA. Requires push access to playground.\n\n[2026-11-25T17:16:51-05:00] playground PR #5 merged 4d5f263 after gate: lint, tsc, vitest 106/106, build, Playwright 26/26; review clean (minor: no size cap on local import).",
         "testStrategy": "Acceptance: PR shows all checks green (106+ unit tests, all e2e) and a written review; merged SHA logged; playground TASKS.md shows tasks 37–43 done.",
         "complexity": 4,
         "subtasks": []
@@ -833,7 +833,7 @@
     ],
     "metadata": {
       "created": "2026-11-25T13:00:00",
-      "updated": "2026-11-25T17:12:09-05:00",
+      "updated": "2026-11-25T17:16:51-05:00",
       "description": "Pathway v2 upgrade plan, revision 2 (awaiting owner approval)"
     }
   }

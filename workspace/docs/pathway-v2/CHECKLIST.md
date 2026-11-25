@@ -2,7 +2,7 @@
 
 Living status file. Update it at every task change. Source of truth for tasks: `.taskmaster/tasks/tasks.json` (rendered in `05-TASKS.md`).
 
-_Last updated: 2026-11-25 17:12 (America/Toronto)_
+_Last updated: 2026-11-25 17:30 (America/Toronto)_
 
 ## Standing conditions (owner, 2026-11-25)
 - Stop for approval before: any production database migration, any destructive operation, any production release.
@@ -13,7 +13,6 @@ _Last updated: 2026-11-25 17:12 (America/Toronto)_
 
 ## Current
 - **Task 7: protection verification** (in progress). Remaining: unauthenticated checks of the new preview routes (needs owner to approve web requests), production domain check at Release 0, `VERCEL_TOKEN` CI secret (A10).
-- **Task 5: merge playground phase-6**: waiting on push access to jenozu/playground (A2).
 - Then **task 11: Release 0** (mandatory approval: production migration + production release).
 
 ## Completed
@@ -21,6 +20,7 @@ _Last updated: 2026-11-25 17:12 (America/Toronto)_
 |---|---|---|---|
 | 0 Audit + plan rev. 1 | 2026-11-25 | — | Baselines recorded in 01-AUDIT.md |
 | 1 Approval of revision 2 | 2026-11-25 | cf65201 | Approved 13:30 |
+| 5 Merge playground phase-6 | 2026-11-25 | playground 4d5f263 (PR #5) | Gate: lint, tsc, vitest 106/106, build, Playwright 26/26; review clean |
 | 10 Snapshots + validated import | 2026-11-25 | 9ea12f3 | Additive `workspace_snapshots`; dry-run preview; never deletes; applied to **preview** DB only |
 | 9 Regression + visual baseline | 2026-11-25 | 1991894 | 8 views × desktop/mobile; 16 screenshots (VISUAL=1); axe baseline |
 | 8 Test harness + CI | 2026-11-25 | 1991894, 54f4256 | Vitest+PGlite, Playwright, GitHub Actions green |
@@ -30,7 +30,7 @@ _Last updated: 2026-11-25 17:12 (America/Toronto)_
 | 2 Verify and back up data | 2026-11-25 | this commit | Neon backup branch `backup-pre-v2` (br-ancient-heart-bdf2u1lx); Neon `workspaces` has **0 rows**; Sites not exportable (limitation) |
 
 ## Upcoming
-Release 0: 5 Merge playground phase-6 · 7 finish protection checks · 11 Release 0 (approval) · 12 Retire Sites files (approval)
+Release 0: 7 finish protection checks · 11 Release 0 (approval) · 12 Retire Sites files (approval)
 Release 1: 13 Vendor engine (upstream PR) · 14 Practice tables · 15 Evaluator · 16 Pack format · 17 Dataset · 18 Priority exercises · 19 Focus view · 20 Skill Library v1 · 21 Export v2 · 22 Nav · 23 Release 1
 
 ## Blockers / owner actions
@@ -43,7 +43,7 @@ Release 1: 13 Vendor engine (upstream PR) · 14 Practice tables · 15 Evaluator 
 | A7 | Vercel: Preview-scoped DATABASE_URL | **done** 15:40, verified by API |
 | A8 | Delete stale AUTH_* env vars | **done** by owner 16:32 (Vercel connector has no delete); 5 vars remain: DATABASE_URL×2, DB_ENV×2, OWNER_ID (preview) |
 | A2b | Optional: reset Neon `preview` role password (appeared in a screenshot); low risk, empty branch | offered |
-| A2 | Push access to jenozu/playground | **requested now** |
+| A2 | Push access to jenozu/playground | **granted** 17:15 |
 | A9 | Vercel protection-bypass secret → GitHub secret `VERCEL_AUTOMATION_BYPASS_SECRET` (e2e on previews) | pending |
 | A10 | Vercel read token → GitHub secret `VERCEL_TOKEN` (protection check in CI) | pending |
 | A11 | Approve web requests so Claude can run unauthenticated protection checks | **requested** |
@@ -65,7 +65,7 @@ Release 1: 13 Vendor engine (upstream PR) · 14 Practice tables · 15 Evaluator 
 | tsc / eslint | pass / 0 errors (7 pre-existing warnings) |
 | next build | pass |
 | GitHub Actions workspace-ci | **success** (run 45710713644) |
-| playground main / phase-6 | 95/95, 106/106 (2026-11-25 audit) |
+| playground main after phase-6 merge | lint, tsc, vitest 106/106, build, Playwright 26/26 |
 
 ## Deployment status
 - Production: **not live** (main builds fail on Vercel; expected until Release 0).
@@ -76,6 +76,7 @@ Release 1: 13 Vendor engine (upstream PR) · 14 Practice tables · 15 Evaluator 
 - Production OWNER_ID: intentionally **unset** until task 7 protection checks.
 
 ## Relevant commits
+- playground `4d5f263`: PR #5 phase-6 merged
 - `dced9df` spike · `1991894` harness/regression/CI · `9ea12f3` snapshots+import · `00974c3` protection check · `54f4256` CI fix
 - sap-certs `2d7e063` (feat/v2-p1-platform): Vercel/Neon setup doc
 - sap-certs `368bafb` (feat/v2-p1-platform): health endpoint, server-side owner, guard, next-auth removed
