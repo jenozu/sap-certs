@@ -2,7 +2,7 @@
 
 Living status file. Update it at every task change. Source of truth for tasks: `.taskmaster/tasks/tasks.json` (rendered in `05-TASKS.md`).
 
-_Last updated: 2026-11-25 13:35 (America/Toronto)_
+_Last updated: 2026-11-25 14:50 (America/Toronto)_
 
 ## Standing conditions (owner, 2026-11-25)
 - Stop for approval before: any production database migration, any destructive operation, any production release.
@@ -12,7 +12,7 @@ _Last updated: 2026-11-25 13:35 (America/Toronto)_
 - Owner actions are given one at a time, with URLs, clicks, values and how to verify.
 
 ## Current
-- **Task 2: verify and back up Sites and Neon data** (in progress). Waiting on owner action A3.
+- **Task 2: verify and back up Sites and Neon data** (in progress). Waiting on owner action A4 (Neon export from Vercel preview).
 
 ## Completed
 | Task | Date | Commit | Notes |
@@ -26,11 +26,16 @@ _Last updated: 2026-11-25 13:35 (America/Toronto)_
 ## Blockers / owner actions
 | ID | Action | Status |
 |---|---|---|
-| A3 | Sites "Export workspace" JSON | **requested** |
-| A4 | Vercel preview "Export workspace" JSON | pending |
+| A3 | Sites "Export workspace" JSON | **blocked: button downloads nothing (known issue)** — see Backup limitations |
+| A4 | Vercel preview "Export workspace" JSON | **requested** |
 | A5 | Neon backup branch `backup-pre-v2` | pending |
 | A6 | Neon inventory query output | pending |
 | A2 | Push access to jenozu/playground | requested when task 5 starts |
+
+## Backup limitations
+- **Sites (ChatGPT-hosted, D1) data cannot be exported** (2026-11-25): the footer "Export workspace" button downloads nothing; this happened before and was never resolved. Any data only in Sites is therefore not backed up.
+- Mitigation: the Sites deployment is preserved untouched (never redeployed, unpublished or deleted by this project). Its source is frozen at Git tag `sites-legacy-2026-11-25` (= main `7befba6`). Task 12 removes Sites files from main only, never the deployment.
+- Recovery options if needed later: investigate the export button inside Sites (likely a blocked download in the embedded frame; copy-to-clipboard fallback), or re-enter items manually from screenshots.
 
 ## Test results (latest)
 | Target | Result | Date |
