@@ -5,10 +5,10 @@
         "id": 1,
         "title": "[P0] Owner approval of the revised plan  [HUMAN]",
         "description": "Record the owner's decisions (2026-11-25) and approval of plan v2.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [],
-        "details": "Decisions already given: back up and verify both Sites and Neon; Vercel Authentication only + server-side OWNER_ID, stop if the plan cannot protect production/previews/API; job-watch = daily ChatGPT automation, CSV/JSON import + manual entry, import designed for later automation; phase-6 merge allowed if its criteria and tests pass; plan docs on docs/pathway-v2-plan. Remaining: approve plan v2.",
+        "details": "Decisions already given: back up and verify both Sites and Neon; Vercel Authentication only + server-side OWNER_ID, stop if the plan cannot protect production/previews/API; job-watch = daily ChatGPT automation, CSV/JSON import + manual entry, import designed for later automation; phase-6 merge allowed if its criteria and tests pass; plan docs on docs/pathway-v2-plan. Remaining: approve plan v2.\n\n[2026-11-25T13:30:44-05:00] Owner approved revision 2 on 2026-11-25 13:30 with conditions (see CHECKLIST).",
         "testStrategy": "Acceptance: prd.md decision log has an 'approved v2' entry; no application code changed before it.",
         "complexity": 1,
         "subtasks": []
@@ -17,12 +17,12 @@
         "id": 2,
         "title": "[P1] Verify and back up Sites and Neon data  [HUMAN + script]",
         "description": "Know exactly what data exists in both stores before any change.",
-        "status": "pending",
+        "status": "in-progress",
         "priority": "high",
         "dependencies": [
           1
         ],
-        "details": "Owner: (a) Sites app \u2192 'Export workspace' \u2192 save JSON; (b) current Vercel preview \u2192 'Export workspace' \u2192 save JSON (this is the Neon copy); (c) Neon console \u2192 create branch `backup-pre-v2` from main; (d) run the read-only SQL in docs/pathway-v2/06-OWNER-ACTIONS.md (row count, version, md5 of data) and paste the output. Claude: `scripts/compare-exports.mjs a.json b.json` (local, read-only) reports item counts by kind, sessions count, and every item that differs by id/field, and which side is newer by field content. Exports stay outside the repo.",
+        "details": "Owner: (a) Sites app → 'Export workspace' → save JSON; (b) current Vercel preview → 'Export workspace' → save JSON (this is the Neon copy); (c) Neon console → create branch `backup-pre-v2` from main; (d) run the read-only SQL in docs/pathway-v2/06-OWNER-ACTIONS.md (row count, version, md5 of data) and paste the output. Claude: `scripts/compare-exports.mjs a.json b.json` (local, read-only) reports item counts by kind, sessions count, and every item that differs by id/field, and which side is newer by field content. Exports stay outside the repo.",
         "testStrategy": "Acceptance: both exports parse with stateSchema; Neon backup branch exists; comparison report recorded in the task log (counts and ids only, no note text); owner confirms which copy is authoritative per differing item.",
         "complexity": 3,
         "subtasks": []
@@ -36,7 +36,7 @@
         "dependencies": [
           2
         ],
-        "details": "Owner: Neon branch `preview` from main; in Vercel set DATABASE_URL Production-only (existing) and a new Preview-scoped DATABASE_URL for the preview branch (Claude never sees the value). Claude: add DB_ENV (production/preview) and GET /api/health \u2192 {ok, dbEnv, schemaVersion} with no data or secrets.",
+        "details": "Owner: Neon branch `preview` from main; in Vercel set DATABASE_URL Production-only (existing) and a new Preview-scoped DATABASE_URL for the preview branch (Claude never sees the value). Claude: add DB_ENV (production/preview) and GET /api/health → {ok, dbEnv, schemaVersion} with no data or secrets.",
         "testStrategy": "Acceptance: a new preview reports dbEnv=preview; editing data on the preview leaves the production md5 from task 2 unchanged.",
         "complexity": 3,
         "subtasks": []
@@ -103,8 +103,8 @@
         "dependencies": [
           1
         ],
-        "details": "In jenozu/playground: review the 26-file diff (tasks 37\u201342, 65) for regressions and security; run its gate (task 43): lint, typecheck, vitest, build, Playwright incl. new autosave/dashboard/notes/progress specs; confirm phase 1\u20135 e2e still pass; open PR phase-6 \u2192 main with results; merge; record SHA. Requires push access to playground.",
-        "testStrategy": "Acceptance: PR shows all checks green (106+ unit tests, all e2e) and a written review; merged SHA logged; playground TASKS.md shows tasks 37\u201343 done.",
+        "details": "In jenozu/playground: review the 26-file diff (tasks 37–42, 65) for regressions and security; run its gate (task 43): lint, typecheck, vitest, build, Playwright incl. new autosave/dashboard/notes/progress specs; confirm phase 1–5 e2e still pass; open PR phase-6 → main with results; merge; record SHA. Requires push access to playground.",
+        "testStrategy": "Acceptance: PR shows all checks green (106+ unit tests, all e2e) and a written review; merged SHA logged; playground TASKS.md shows tasks 37–43 done.",
         "complexity": 4,
         "subtasks": []
       },
@@ -118,7 +118,7 @@
           3
         ],
         "details": "lib/server/owner.ts resolveOwner() = process.env.OWNER_ID or 503 'Server not configured'. Production OWNER_ID = existing Neon workspaces.user_id (from task 2 output); preview gets its own. Shared request guard: same-origin, JSON content-type, size cap. Remove next-auth dependency; remove stale AUTH_* env vars (owner OK given in decision 2). Fix pre-existing lint error page.tsx:19 without behaviour change. Update README and docs/vercel-migration.md.",
-        "testStrategy": "Acceptance: lint/typecheck/build green; route tests: OWNER_ID unset \u2192 503, foreign Origin \u2192 403, non-JSON \u2192 415, stale version \u2192 409, valid \u2192 200; a second workspaces row no longer breaks loading.",
+        "testStrategy": "Acceptance: lint/typecheck/build green; route tests: OWNER_ID unset → 503, foreign Origin → 403, non-JSON → 415, stale version → 409, valid → 200; a second workspaces row no longer breaks loading.",
         "complexity": 5,
         "subtasks": []
       },
@@ -132,7 +132,7 @@
           6
         ],
         "details": "Read settings via Vercel API (ssoProtection.deploymentType must be 'all'; already set). Unauthenticated HTTP checks of /, /api/health, /api/workspace on: a preview URL, the branch alias, and the production domain career-roadmap-jenozus-projects.vercel.app. Production is checked on the first production deploy made with OWNER_ID unset, so even an unprotected domain could return only 503 and no data; OWNER_ID is set only after the checks pass. scripts/check-protection.mjs runs the settings check in CI. If any target is reachable without Vercel login, stop and discuss alternatives (e.g. Pro 'all deployments' scope, password protection, app-level secret).",
-        "testStrategy": "Acceptance: every target returns a redirect to vercel.com/login (or 401) when unauthenticated; result table logged. Already verified 2026-11-25: preview /api/workspace \u2192 302 vercel.com/login.",
+        "testStrategy": "Acceptance: every target returns a redirect to vercel.com/login (or 401) when unauthenticated; result table logged. Already verified 2026-11-25: preview /api/workspace → 302 vercel.com/login.",
         "complexity": 3,
         "subtasks": []
       },
@@ -192,7 +192,7 @@
           9,
           10
         ],
-        "details": "Merge main's doc commits into the Vercel branch; PR with CI green; owner approves; merge. First production deploy with OWNER_ID unset \u2192 run task 7 production checks \u2192 set OWNER_ID \u2192 redeploy. Fresh Neon backup branch, then apply the reconciliation import on production if task 2 found newer Sites data.",
+        "details": "Merge main's doc commits into the Vercel branch; PR with CI green; owner approves; merge. First production deploy with OWNER_ID unset → run task 7 production checks → set OWNER_ID → redeploy. Fresh Neon backup branch, then apply the reconciliation import on production if task 2 found newer Sites data.",
         "testStrategy": "Acceptance: production READY and protected (task 7 table); regression suite read-only subset green on production; production data matches the agreed reconciliation; CHANGELOG records test results.",
         "complexity": 3,
         "subtasks": []
@@ -235,7 +235,7 @@
           11
         ],
         "details": "Tables: skills (owner-scoped: id slug, language, name, aliases text[], state default 'introduced', source, notes), exercise_attempts (insert-only, client id = idempotency key; exercise_id, exercise_version, content_hash, pack_id, code, passed, construct_ok, results jsonb, hints_used, solution_viewed, independent, mode, practice_session_id, duration_ms, started_at, submitted_at), saved_code (exercise_id, code, rev), practice_sessions (id, config jsonb, started_at, ended_at). Repository helpers always filter owner_id; rev-checked updates; ON CONFLICT DO NOTHING inserts; zod schemas shared with client; body caps. Routes under /api/v2.",
-        "testStrategy": "Acceptance: PGlite tests: owner isolation, duplicate attempt id \u2192 one row, stale rev \u2192 409, oversize \u2192 413; migration applies on top of the production schema; workspaces table untouched.",
+        "testStrategy": "Acceptance: PGlite tests: owner isolation, duplicate attempt id → one row, stale rev → 409, oversize → 413; migration applies on top of the production schema; workspaces table untouched.",
         "complexity": 6,
         "subtasks": []
       },
@@ -290,7 +290,7 @@
         "dependencies": [
           17
         ],
-        "details": "Pack sql-erp-core v1.0.0: 5 LEFT JOIN (missing orders, unsold products\u2026), 5 CROSS JOIN (warehouse/product matrix\u2026), 5 UNION/UNION ALL (at least 2 require UNION ALL and 2 UNION, incl. duplicate-handling contrast; branch shipments), 5 WITH/CTE (supplier spend, outstanding receipts\u2026), 5 mixed. Each: business purpose, instructions, starter, \u22652 hints, tests with fixtures + requiredConstructs, verified solution.",
+        "details": "Pack sql-erp-core v1.0.0: 5 LEFT JOIN (missing orders, unsold products…), 5 CROSS JOIN (warehouse/product matrix…), 5 UNION/UNION ALL (at least 2 require UNION ALL and 2 UNION, incl. duplicate-handling contrast; branch shipments), 5 WITH/CTE (supplier spend, outstanding receipts…), 5 mixed. Each: business purpose, instructions, starter, ≥2 hints, tests with fixtures + requiredConstructs, verified solution.",
         "testStrategy": "Acceptance: content:verify passes all 25 on all fixtures; a hard-coded answer fails every graded exercise; owner reviews 5 samples before release.",
         "complexity": 7,
         "subtasks": []
@@ -306,7 +306,7 @@
           16
         ],
         "details": "/practice/[exerciseId]: instructions, schema browser, editor, output, progressive hints, solution (confirm), Run (free), Submit (evaluate + POST attempt with hints_used, solution_viewed, independent flag, version, duration), Reset sandbox (fixture re-init, keeps draft), Restore starter (separate). Drafts: debounced cloud save + IndexedDB offline queue for drafts and unsent attempts. SQLite dialect label. Existing visual design tokens (globals.css). Desktop panels, mobile tabs.",
-        "testStrategy": "Acceptance: e2e: run; pass and fail submits each create one attempt row; double-click submit \u2192 one row; offline submit appears after reconnect; reset keeps draft; reload restores draft; 390px usable; axe clean.",
+        "testStrategy": "Acceptance: e2e: run; pass and fail submits each create one attempt row; double-click submit → one row; offline submit appears after reconnect; reset keeps draft; reload restores draft; 390px usable; axe clean.",
         "complexity": 7,
         "subtasks": [
           {
@@ -375,7 +375,7 @@
           18,
           19
         ],
-        "details": "/skills: list with state; 'Add learned material' form (language, concept names, notes/source, difficulty, wanted count 5/10/20/30). Normalise case/punctuation/plurals + alias table seeded from the SQL foundation checklist (e.g. 'with clause'/'common table expression' \u2192 sql-cte); dedupe; new concepts start 'introduced'. Result page lists matching exercises first; if too few, shows 'import a pack' and 'copy AI prompt' (prompt text template, implemented fully in task 'author'). Simple practice launcher: choose concept(s), count, hints on/off \u2192 session of matching exercises.",
+        "details": "/skills: list with state; 'Add learned material' form (language, concept names, notes/source, difficulty, wanted count 5/10/20/30). Normalise case/punctuation/plurals + alias table seeded from the SQL foundation checklist (e.g. 'with clause'/'common table expression' → sql-cte); dedupe; new concepts start 'introduced'. Result page lists matching exercises first; if too few, shows 'import a pack' and 'copy AI prompt' (prompt text template, implemented fully in task 'author'). Simple practice launcher: choose concept(s), count, hints on/off → session of matching exercises.",
         "testStrategy": "Acceptance: entering 'with clause, Left Join, cross joins, UNION, union all' yields 5 skills, no duplicates, linked to the 25 exercises; an unknown concept is created as introduced with zero exercises and clear next steps; e2e at 390px.",
         "complexity": 5,
         "subtasks": []
@@ -391,7 +391,7 @@
           14
         ],
         "details": "Extend Export to {format:'pathway-export', version:2, workspace, skills, attempts, drafts, sessions}; import accepts v1 and v2 with dry run; attempts imported by id (idempotent).",
-        "testStrategy": "Acceptance: export \u2192 import into an empty owner reproduces everything; second import changes nothing; v1 files still import.",
+        "testStrategy": "Acceptance: export → import into an empty owner reproduces everything; second import changes nothing; v1 files still import.",
         "complexity": 4,
         "subtasks": []
       },
@@ -437,7 +437,7 @@
         "dependencies": [
           23
         ],
-        "details": "Tables packs, pack_versions (status staged/validated/published/rejected, manifest, files jsonb \u22642 MB, report). Upload ZIP (fflate, path checks) or JSON; server + client validation; client worker runs each reference solution on each fixture and stores expected results; review screen; publish creates an immutable version; same exerciseId keeps identity; attempts keep their version. Bundled and imported packs appear in one registry.",
+        "details": "Tables packs, pack_versions (status staged/validated/published/rejected, manifest, files jsonb ≤2 MB, report). Upload ZIP (fflate, path checks) or JSON; server + client validation; client worker runs each reference solution on each fixture and stores expected results; review screen; publish creates an immutable version; same exerciseId keeps identity; attempts keep their version. Bundled and imported packs appear in one registry.",
         "testStrategy": "Acceptance: malformed JSON, ../ path, absolute path, oversized file, duplicate id, version downgrade, failing reference solution each rejected with an actionable message and retry; a valid pack is practisable immediately after publish; attempts recorded before a republish still show the original version.",
         "complexity": 9,
         "subtasks": [
@@ -536,7 +536,7 @@
           26
         ],
         "details": "",
-        "testStrategy": "Acceptance: register unknown concept \u2192 import/author pack \u2192 validate \u2192 publish \u2192 practise, with no code change; all rejection rules tested; ids and attempts preserved; suites green.",
+        "testStrategy": "Acceptance: register unknown concept → import/author pack → validate → publish → practise, with no code change; all rejection rules tested; ids and attempts preserved; suites green.",
         "complexity": 2,
         "subtasks": []
       },
@@ -549,7 +549,7 @@
         "dependencies": [
           14
         ],
-        "details": "Tables job_applications, application_events. /jobs list + status board: title, company, URL, remote type, Canada eligibility, posted salary, requirements, fit notes/suitability, gaps, status (saved/applied/interviewing/offer/rejected/withdrawn/closed), applied date, follow-up date, source, external_ref; events timeline; follow-up due list; optional link to an existing role-target item (j1\u2013j5). Existing visual style.",
+        "details": "Tables job_applications, application_events. /jobs list + status board: title, company, URL, remote type, Canada eligibility, posted salary, requirements, fit notes/suitability, gaps, status (saved/applied/interviewing/offer/rejected/withdrawn/closed), applied date, follow-up date, source, external_ref; events timeline; follow-up due list; optional link to an existing role-target item (j1–j5). Existing visual style.",
         "testStrategy": "Acceptance: e2e: add an application with no practice evidence; status change logs an event; follow-up due today is listed; 390px; owner isolation tested.",
         "complexity": 5,
         "subtasks": []
@@ -563,7 +563,7 @@
         "dependencies": [
           28
         ],
-        "details": "Versioned contract pathway.jobs.v1 (JSON array or CSV with header mapping): required title, company, url; optional remote, canada_eligible, salary_text, requirements, suitability, posted_at, source, external_ref. Dry run \u2192 new / duplicate (canonical URL or source+external_ref) / invalid; apply is idempotent; imported rows start 'saved'. Spec published at docs/pathway-v2/job-import-contract.md with a ready-to-paste ChatGPT instruction so the daily automation outputs this format. Future: same handler behind a token-authenticated endpoint.",
+        "details": "Versioned contract pathway.jobs.v1 (JSON array or CSV with header mapping): required title, company, url; optional remote, canada_eligible, salary_text, requirements, suitability, posted_at, source, external_ref. Dry run → new / duplicate (canonical URL or source+external_ref) / invalid; apply is idempotent; imported rows start 'saved'. Spec published at docs/pathway-v2/job-import-contract.md with a ready-to-paste ChatGPT instruction so the daily automation outputs this format. Future: same handler behind a token-authenticated endpoint.",
         "testStrategy": "Acceptance: sample JSON and CSV import; re-import creates no duplicates; invalid rows reported with line numbers; contract doc includes JSON schema and CSV columns.",
         "complexity": 4,
         "subtasks": []
@@ -593,7 +593,7 @@
           27
         ],
         "details": "lib/domain/mastery.ts with injectable clock; recompute skills.state after each submit and once over history at release.",
-        "testStrategy": "Acceptance: 3 distinct independent passes \u2192 understood; same exercise 3\u00d7 \u2192 not; hint/solution-assisted passes ignored; 2 mixed \u2192 proficient; 2 delayed \u22657 days \u2192 mastered; 6 days \u2192 not; historical attempts produce the expected states.",
+        "testStrategy": "Acceptance: 3 distinct independent passes → understood; same exercise 3× → not; hint/solution-assisted passes ignored; 2 mixed → proficient; 2 delayed ≥7 days → mastered; 6 days → not; historical attempts produce the expected states.",
         "complexity": 6,
         "subtasks": []
       },
@@ -650,13 +650,13 @@
           23
         ],
         "details": "Optional new item fields (provider, progressSource, skills[], milestones[], evidence[], impact[], publishable, simulated, roleTargetId) and kinds ('stage'); old documents stay valid. Seed by id only when missing: Stage 0 'now', 'ts-node', 'integration'; 14 curriculum courses; Learn SQL at 78% marked last-reported only if no item has the Learn SQL URL; role targets per master-plan table; 6 roadmap projects. Never modify an existing item; 'update available' suggestions for unedited seed items; 'suggested re-mapping' list (ADR-007).",
-        "testStrategy": "Acceptance: seeding twice adds nothing; edited items untouched; user Learn SQL value wins; c1\u2013c6, p1\u2013p5, f1\u2013f3, j1\u2013j5, o1\u2013o3 unchanged; snapshot taken before first seed.",
+        "testStrategy": "Acceptance: seeding twice adds nothing; edited items untouched; user Learn SQL value wins; c1–c6, p1–p5, f1–f3, j1–j5, o1–o3 unchanged; snapshot taken before first seed.",
         "complexity": 6,
         "subtasks": []
       },
       {
         "id": 36,
-        "title": "[P6] Roadmap stages 0\u20136 and current-phase next action",
+        "title": "[P6] Roadmap stages 0–6 and current-phase next action",
         "description": "Stage cards with courses, skills, assessments, projects, evidence, job targets.",
         "status": "pending",
         "priority": "medium",
@@ -769,7 +769,7 @@
         "dependencies": [
           42
         ],
-        "details": "e2e/acceptance.spec.ts: register WITH/LEFT JOIN/CROSS JOIN/UNION \u2192 import validated pack \u2192 practise, attempts recorded \u2192 skill/review update \u2192 assessment \u2192 link SQL project + portfolio evidence \u2192 job targets \u2192 track application \u2192 reload \u2192 persistence and older records verified. Preview automated; production manual.",
+        "details": "e2e/acceptance.spec.ts: register WITH/LEFT JOIN/CROSS JOIN/UNION → import validated pack → practise, attempts recorded → skill/review update → assessment → link SQL project + portfolio evidence → job targets → track application → reload → persistence and older records verified. Preview automated; production manual.",
         "testStrategy": "Acceptance: automated green on preview; owner signs off production checklist.",
         "complexity": 6,
         "subtasks": []
@@ -833,7 +833,7 @@
     ],
     "metadata": {
       "created": "2026-11-25T13:00:00",
-      "updated": "2026-11-25T13:40:00",
+      "updated": "2026-11-25T13:30:44-05:00",
       "description": "Pathway v2 upgrade plan, revision 2 (awaiting owner approval)"
     }
   }

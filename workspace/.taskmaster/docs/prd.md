@@ -1,6 +1,6 @@
 # Pathway v2 — PRD (revision 2)
 
-Status: **revision 2, awaiting owner approval** (2026-11-25). Revision 1 was broadly approved with adjustments; this revision applies them (see decision log). Sources of truth: `workspace/docs/MASTER-PLAN.md`, `workspace/docs/practice-lab/README.md` and the documents they link. If this PRD and those documents disagree, the source documents win and this PRD gets a decision-log entry.
+Status: **revision 2, approved 2026-11-25** (2026-11-25). Revision 1 was broadly approved with adjustments; this revision applies them (see decision log). Sources of truth: `workspace/docs/MASTER-PLAN.md`, `workspace/docs/practice-lab/README.md` and the documents they link. If this PRD and those documents disagree, the source documents win and this PRD gets a decision-log entry.
 
 ## Goal
 
@@ -109,4 +109,5 @@ Next.js 16 App Router on Vercel, Neon Postgres via Drizzle, Vercel Authenticatio
 - 2026-11-25 (owner): job-watch is a daily ChatGPT automation; CSV/JSON import + manual entry now; import contract designed for later automation. (tasks 28, 29)
 - 2026-11-25 (owner): Merge playground phase-6 if its acceptance criteria and tests pass after review. (task 5)
 - 2026-11-25 (owner): Commit planning docs to `docs/pathway-v2-plan` in jenozu/sap-certs; GitHub is the single source of truth.
+- 2026-11-25 (owner): Revision 2 approved; Release 0 may begin. Stop for approval before production DB migration, destructive operations or production release.
 - 2026-11-25 (owner): Re-ordered: platform safety → usable SQL Practice Lab (with attempts recorded from day one) → expandable Skill Library → job tracker (early, not blocking practice) → mastery → career layer; spike moved into Phase 1; JS/TS/Node before Python; minimal infrastructure. Consequence: revision 1's full relational migration and page.tsx route split are dropped in favour of additive tables and an additive document schema. (supersedes revision 1 tasks 8–13)
