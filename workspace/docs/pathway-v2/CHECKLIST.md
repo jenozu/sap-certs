@@ -34,7 +34,7 @@ _Last updated: 2026-11-25 14:50 (America/Toronto)_
 
 ## Backup limitations
 - **Sites (ChatGPT-hosted, D1) data cannot be exported** (2026-11-25): the footer "Export workspace" button downloads nothing; this happened before and was never resolved. Any data only in Sites is therefore not backed up.
-- Mitigation: the Sites deployment is preserved untouched (never redeployed, unpublished or deleted by this project). Its source is frozen at Git tag `sites-legacy-2026-11-25` (= main `7befba6`). Task 12 removes Sites files from main only, never the deployment.
+- Mitigation: the Sites deployment is preserved untouched (never redeployed, unpublished or deleted by this project). Its source is frozen at branch `legacy/sites-2026-11-25` (tag push is blocked by the session proxy) (= main `7befba6`). Task 12 removes Sites files from main only, never the deployment.
 - Recovery options if needed later: investigate the export button inside Sites (likely a blocked download in the embedded frame; copy-to-clipboard fallback), or re-enter items manually from screenshots.
 
 ## Test results (latest)

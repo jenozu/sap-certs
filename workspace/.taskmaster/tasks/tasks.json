@@ -200,7 +200,7 @@
       {
         "id": 12,
         "title": "[P1] Retire Sites/vinext scaffolding after owner confirmation",
-        "description": "Remove the Cloudflare/Sites build files from main only. The Sites deployment itself must be preserved (never redeployed, unpublished or deleted); source frozen at tag sites-legacy-2026-11-25.",
+        "description": "Remove the Cloudflare/Sites build files from main only. The Sites deployment itself must be preserved (never redeployed, unpublished or deleted); source frozen at branch legacy/sites-2026-11-25.",
         "status": "pending",
         "priority": "low",
         "dependencies": [
