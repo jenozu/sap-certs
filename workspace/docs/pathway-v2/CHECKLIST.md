@@ -2,7 +2,7 @@
 
 Living status file. Update it at every task change. Source of truth for tasks: `.taskmaster/tasks/tasks.json` (rendered in `05-TASKS.md`).
 
-_Last updated: 2026-11-25 14:55 (America/Toronto)_
+_Last updated: 2026-11-25 14:52 (America/Toronto)_
 
 ## Standing conditions (owner, 2026-11-25)
 - Stop for approval before: any production database migration, any destructive operation, any production release.
@@ -12,13 +12,14 @@ _Last updated: 2026-11-25 14:55 (America/Toronto)_
 - Owner actions are given one at a time, with URLs, clicks, values and how to verify.
 
 ## Current
-- **Task 2: verify and back up Sites and Neon data** (in progress). Waiting on owner action A5 (Neon backup branch).
+- **Task 3: isolate preview database** (in progress). Neon branch `preview` created; waiting on owner action A7 (Vercel env).
 
 ## Completed
 | Task | Date | Commit | Notes |
 |---|---|---|---|
 | 0 Audit + plan rev. 1 | 2026-11-25 | — | Baselines recorded in 01-AUDIT.md |
-| 1 Approval of revision 2 | 2026-11-25 | this commit | Approved 13:30 |
+| 1 Approval of revision 2 | 2026-11-25 | cf65201 | Approved 13:30 |
+| 2 Verify and back up data | 2026-11-25 | this commit | Neon backup branch `backup-pre-v2` (br-ancient-heart-bdf2u1lx); Neon `workspaces` has **0 rows**; Sites not exportable (limitation) |
 
 ## Upcoming (Release 0)
 3 Isolate preview DB · 4 Compatibility spike · 5 Merge playground phase-6 · 6 Owner identity + hardening · 7 Protection verification · 8 Test harness · 9 Regression/visual baseline · 10 Snapshots + reconciliation import · 11 Release 0 (approval) · 12 Retire Sites scaffolding (approval)
@@ -28,8 +29,9 @@ _Last updated: 2026-11-25 14:55 (America/Toronto)_
 |---|---|---|
 | A3 | Sites "Export workspace" JSON | **blocked: button downloads nothing (known issue)** — see Backup limitations |
 | A4 | Vercel preview "Export workspace" JSON | **done** 14:46: 27 items, 0 sessions, **identical to the seed defaults** (no user edits found). File kept by owner, not in repo |
-| A5 | Neon backup branch `backup-pre-v2` | **requested** |
-| A6 | Neon inventory query output | pending |
+| A5 | Neon backup branch `backup-pre-v2` | **done by Claude via Neon connector** 14:49 |
+| A6 | Neon inventory query | **done by Claude**: project `career-roadmap` (square-lab-67866008), only table `workspaces`, 0 rows |
+| A7 | Vercel: Preview-scoped DATABASE_URL for Neon branch `preview` (br-bold-thunder-bdiare1u) | **requested** |
 | A2 | Push access to jenozu/playground | requested when task 5 starts |
 
 ## Backup limitations
@@ -38,7 +40,7 @@ _Last updated: 2026-11-25 14:55 (America/Toronto)_
 - Recovery options if needed later: investigate the export button inside Sites (likely a blocked download in the embedded frame; copy-to-clipboard fallback), or re-enter items manually from screenshots.
 
 ## Data findings
-- Neon (via Vercel preview export, 2026-11-25 14:46): every item and setting equals the built-in defaults; no sessions. Either the Neon row holds only defaults or no row exists (app shows defaults). A6 query will tell which.
+- Neon (via Vercel preview export, 2026-11-25 14:46): every item and setting equals the built-in defaults; no sessions. Confirmed by query: Neon has **no saved row** (app shows defaults). So production OWNER_ID will be the new value `owner:andel` (ADR-003 fallback); nothing in Neon to migrate.
 - Implication: any personal progress entered so far is most likely only in the Sites version, which cannot be exported (see Backup limitations).
 
 ## Test results (latest)

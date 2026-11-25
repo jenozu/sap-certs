@@ -17,12 +17,12 @@
         "id": 2,
         "title": "[P1] Verify and back up Sites and Neon data  [HUMAN + script]",
         "description": "Know exactly what data exists in both stores before any change.",
-        "status": "in-progress",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           1
         ],
-        "details": "Owner: (a) Sites app → 'Export workspace' → save JSON; (b) current Vercel preview → 'Export workspace' → save JSON (this is the Neon copy); (c) Neon console → create branch `backup-pre-v2` from main; (d) run the read-only SQL in docs/pathway-v2/06-OWNER-ACTIONS.md (row count, version, md5 of data) and paste the output. Claude: `scripts/compare-exports.mjs a.json b.json` (local, read-only) reports item counts by kind, sessions count, and every item that differs by id/field, and which side is newer by field content. Exports stay outside the repo.",
+        "details": "Owner: (a) Sites app → 'Export workspace' → save JSON; (b) current Vercel preview → 'Export workspace' → save JSON (this is the Neon copy); (c) Neon console → create branch `backup-pre-v2` from main; (d) run the read-only SQL in docs/pathway-v2/06-OWNER-ACTIONS.md (row count, version, md5 of data) and paste the output. Claude: `scripts/compare-exports.mjs a.json b.json` (local, read-only) reports item counts by kind, sessions count, and every item that differs by id/field, and which side is newer by field content. Exports stay outside the repo.\n\n[2026-11-25T14:50:19-05:00] Neon: project square-lab-67866008, main br-bold-tree-bddd5rw2; backup-pre-v2 br-ancient-heart-bdf2u1lx; workspaces 0 rows. Preview export = seed defaults. Sites export broken (limitation).",
         "testStrategy": "Acceptance: both exports parse with stateSchema; Neon backup branch exists; comparison report recorded in the task log (counts and ids only, no note text); owner confirms which copy is authoritative per differing item.",
         "complexity": 3,
         "subtasks": []
@@ -31,12 +31,12 @@
         "id": 3,
         "title": "[P1] Isolate preview database from production  [HUMAN env value]",
         "description": "Stop preview deployments from writing the production Neon data.",
-        "status": "pending",
+        "status": "in-progress",
         "priority": "high",
         "dependencies": [
           2
         ],
-        "details": "Owner: Neon branch `preview` from main; in Vercel set DATABASE_URL Production-only (existing) and a new Preview-scoped DATABASE_URL for the preview branch (Claude never sees the value). Claude: add DB_ENV (production/preview) and GET /api/health → {ok, dbEnv, schemaVersion} with no data or secrets.",
+        "details": "Owner: Neon branch `preview` from main; in Vercel set DATABASE_URL Production-only (existing) and a new Preview-scoped DATABASE_URL for the preview branch (Claude never sees the value). Claude: add DB_ENV (production/preview) and GET /api/health → {ok, dbEnv, schemaVersion} with no data or secrets.\n\n[2026-11-25T14:50:19-05:00] Neon branch preview br-bold-thunder-bdiare1u created.",
         "testStrategy": "Acceptance: a new preview reports dbEnv=preview; editing data on the preview leaves the production md5 from task 2 unchanged.",
         "complexity": 3,
         "subtasks": []
@@ -833,7 +833,7 @@
     ],
     "metadata": {
       "created": "2026-11-25T13:00:00",
-      "updated": "2026-11-25T13:30:44-05:00",
+      "updated": "2026-11-25T14:50:19-05:00",
       "description": "Pathway v2 upgrade plan, revision 2 (awaiting owner approval)"
     }
   }
