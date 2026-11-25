@@ -2,7 +2,7 @@
 
 Living status file. Update it at every task change. Source of truth for tasks: `.taskmaster/tasks/tasks.json` (rendered in `05-TASKS.md`).
 
-_Last updated: 2026-11-25 15:47 (America/Toronto)_
+_Last updated: 2026-11-25 16:35 (America/Toronto)_
 
 ## Standing conditions (owner, 2026-11-25)
 - Stop for approval before: any production database migration, any destructive operation, any production release.
@@ -12,7 +12,7 @@ _Last updated: 2026-11-25 15:47 (America/Toronto)_
 - Owner actions are given one at a time, with URLs, clicks, values and how to verify.
 
 ## Current
-- **Task 6: owner identity + hardening** (in progress on branch `feat/v2-p1-platform`): code done; remaining: README/docs update, route tests (with task 8), removal of stale AUTH_* env vars (**needs owner approval: destructive**).
+- **Task 6: owner identity + hardening** (in progress on branch `feat/v2-p1-platform`): code done; docs updated (2d7e063), stale AUTH_* env vars deleted by owner 16:32; remaining: automated route tests (done with task 8).
 - Next independent work: task 4 compatibility spike, task 8 test harness.
 
 ## Completed
@@ -34,7 +34,7 @@ _Last updated: 2026-11-25 15:47 (America/Toronto)_
 | A5 | Neon backup branch `backup-pre-v2` | **done by Claude via Neon connector** 14:49 |
 | A6 | Neon inventory query | **done by Claude**: project `career-roadmap` (square-lab-67866008), only table `workspaces`, 0 rows |
 | A7 | Vercel: Preview-scoped DATABASE_URL | **done** 15:40, verified by API |
-| A8 | Approve deleting stale env vars AUTH_SECRET (×4), AUTH_GITHUB_ID, AUTH_GITHUB_SECRET | **requested** |
+| A8 | Delete stale AUTH_* env vars | **done** by owner 16:32 (Vercel connector has no delete); 5 vars remain: DATABASE_URL×2, DB_ENV×2, OWNER_ID (preview) |
 | A2b | Optional: reset Neon `preview` role password (appeared in a screenshot); low risk, empty branch | offered |
 | A2 | Push access to jenozu/playground | requested when task 5 starts |
 
@@ -63,5 +63,6 @@ _Last updated: 2026-11-25 15:47 (America/Toronto)_
 - Production OWNER_ID: intentionally **unset** until task 7 protection checks.
 
 ## Relevant commits
+- sap-certs `2d7e063` (feat/v2-p1-platform): Vercel/Neon setup doc
 - sap-certs `368bafb` (feat/v2-p1-platform): health endpoint, server-side owner, guard, next-auth removed
 - sap-certs `6e09951`: plan revision 2 (branch docs/pathway-v2-plan)
