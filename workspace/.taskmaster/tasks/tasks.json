@@ -45,7 +45,7 @@
         "id": 4,
         "title": "[P1] Playground compatibility spike (moved early)",
         "description": "Find integration blockers before building on the engine.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           3
@@ -58,7 +58,7 @@
             "id": 1,
             "title": "Worker + wasm under Turbopack production build",
             "description": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": "preview: SELECT 1 returns a table"
@@ -67,7 +67,7 @@
             "id": 2,
             "title": "CodeMirror editor on React 19",
             "description": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": "typing, undo, theme work; vitest mount"
@@ -76,7 +76,7 @@
             "id": 3,
             "title": "zod/v4 parse of sample course.json",
             "description": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": "vitest parses sql-fundamentals"
@@ -85,7 +85,7 @@
             "id": 4,
             "title": "CSP + timeout/terminate + mobile",
             "description": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               1
             ],
@@ -833,7 +833,7 @@
     ],
     "metadata": {
       "created": "2026-11-25T13:00:00",
-      "updated": "2026-11-25T17:11:58-05:00",
+      "updated": "2026-11-25T17:12:09-05:00",
       "description": "Pathway v2 upgrade plan, revision 2 (awaiting owner approval)"
     }
   }
