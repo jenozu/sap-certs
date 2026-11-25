@@ -2,7 +2,7 @@
 
 Living status file. Update it at every task change. Source of truth for tasks: `.taskmaster/tasks/tasks.json` (rendered in `05-TASKS.md`).
 
-_Last updated: 2026-11-25 14:50 (America/Toronto)_
+_Last updated: 2026-11-25 14:55 (America/Toronto)_
 
 ## Standing conditions (owner, 2026-11-25)
 - Stop for approval before: any production database migration, any destructive operation, any production release.
@@ -12,7 +12,7 @@ _Last updated: 2026-11-25 14:50 (America/Toronto)_
 - Owner actions are given one at a time, with URLs, clicks, values and how to verify.
 
 ## Current
-- **Task 2: verify and back up Sites and Neon data** (in progress). Waiting on owner action A4 (Neon export from Vercel preview).
+- **Task 2: verify and back up Sites and Neon data** (in progress). Waiting on owner action A5 (Neon backup branch).
 
 ## Completed
 | Task | Date | Commit | Notes |
@@ -27,8 +27,8 @@ _Last updated: 2026-11-25 14:50 (America/Toronto)_
 | ID | Action | Status |
 |---|---|---|
 | A3 | Sites "Export workspace" JSON | **blocked: button downloads nothing (known issue)** — see Backup limitations |
-| A4 | Vercel preview "Export workspace" JSON | **requested** |
-| A5 | Neon backup branch `backup-pre-v2` | pending |
+| A4 | Vercel preview "Export workspace" JSON | **done** 14:46: 27 items, 0 sessions, **identical to the seed defaults** (no user edits found). File kept by owner, not in repo |
+| A5 | Neon backup branch `backup-pre-v2` | **requested** |
 | A6 | Neon inventory query output | pending |
 | A2 | Push access to jenozu/playground | requested when task 5 starts |
 
@@ -36,6 +36,10 @@ _Last updated: 2026-11-25 14:50 (America/Toronto)_
 - **Sites (ChatGPT-hosted, D1) data cannot be exported** (2026-11-25): the footer "Export workspace" button downloads nothing; this happened before and was never resolved. Any data only in Sites is therefore not backed up.
 - Mitigation: the Sites deployment is preserved untouched (never redeployed, unpublished or deleted by this project). Its source is frozen at branch `legacy/sites-2026-11-25` (tag push is blocked by the session proxy) (= main `7befba6`). Task 12 removes Sites files from main only, never the deployment.
 - Recovery options if needed later: investigate the export button inside Sites (likely a blocked download in the embedded frame; copy-to-clipboard fallback), or re-enter items manually from screenshots.
+
+## Data findings
+- Neon (via Vercel preview export, 2026-11-25 14:46): every item and setting equals the built-in defaults; no sessions. Either the Neon row holds only defaults or no row exists (app shows defaults). A6 query will tell which.
+- Implication: any personal progress entered so far is most likely only in the Sites version, which cannot be exported (see Backup limitations).
 
 ## Test results (latest)
 | Target | Result | Date |
