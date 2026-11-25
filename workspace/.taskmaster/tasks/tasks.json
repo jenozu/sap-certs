@@ -1,0 +1,840 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "[P0] Owner approval of the revised plan  [HUMAN]",
+        "description": "Record the owner's decisions (2026-11-25) and approval of plan v2.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [],
+        "details": "Decisions already given: back up and verify both Sites and Neon; Vercel Authentication only + server-side OWNER_ID, stop if the plan cannot protect production/previews/API; job-watch = daily ChatGPT automation, CSV/JSON import + manual entry, import designed for later automation; phase-6 merge allowed if its criteria and tests pass; plan docs on docs/pathway-v2-plan. Remaining: approve plan v2.",
+        "testStrategy": "Acceptance: prd.md decision log has an 'approved v2' entry; no application code changed before it.",
+        "complexity": 1,
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "[P1] Verify and back up Sites and Neon data  [HUMAN + script]",
+        "description": "Know exactly what data exists in both stores before any change.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "details": "Owner: (a) Sites app \u2192 'Export workspace' \u2192 save JSON; (b) current Vercel preview \u2192 'Export workspace' \u2192 save JSON (this is the Neon copy); (c) Neon console \u2192 create branch `backup-pre-v2` from main; (d) run the read-only SQL in docs/pathway-v2/06-OWNER-ACTIONS.md (row count, version, md5 of data) and paste the output. Claude: `scripts/compare-exports.mjs a.json b.json` (local, read-only) reports item counts by kind, sessions count, and every item that differs by id/field, and which side is newer by field content. Exports stay outside the repo.",
+        "testStrategy": "Acceptance: both exports parse with stateSchema; Neon backup branch exists; comparison report recorded in the task log (counts and ids only, no note text); owner confirms which copy is authoritative per differing item.",
+        "complexity": 3,
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "[P1] Isolate preview database from production  [HUMAN env value]",
+        "description": "Stop preview deployments from writing the production Neon data.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "details": "Owner: Neon branch `preview` from main; in Vercel set DATABASE_URL Production-only (existing) and a new Preview-scoped DATABASE_URL for the preview branch (Claude never sees the value). Claude: add DB_ENV (production/preview) and GET /api/health \u2192 {ok, dbEnv, schemaVersion} with no data or secrets.",
+        "testStrategy": "Acceptance: a new preview reports dbEnv=preview; editing data on the preview leaves the production md5 from task 2 unchanged.",
+        "complexity": 3,
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "[P1] Playground compatibility spike (moved early)",
+        "description": "Find integration blockers before building on the engine.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "details": "Throwaway route /lab-spike on a spike branch: copy (not yet vendor) playground CodeEditor, OutputPanel, execution manager and sql worker; run in Next 16 production build on React 19; zod/v4 import of the course schema; sql-wasm.wasm served from public/sqljs with the worker receiving wasmUrl; CSP header; deploy to the isolated preview.",
+        "testStrategy": "Acceptance: on the preview (desktop and a phone) a fixture query renders a table; a runaway recursive CTE is stopped at 5 s and the next run works; no CSP or hydration errors; written result (works / blockers + fallback) logged. If a blocker has no fallback, stop and discuss before Phase 2.",
+        "complexity": 8,
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Worker + wasm under Turbopack production build",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": "preview: SELECT 1 returns a table"
+          },
+          {
+            "id": 2,
+            "title": "CodeMirror editor on React 19",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": "typing, undo, theme work; vitest mount"
+          },
+          {
+            "id": 3,
+            "title": "zod/v4 parse of sample course.json",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": "vitest parses sql-fundamentals"
+          },
+          {
+            "id": 4,
+            "title": "CSP + timeout/terminate + mobile",
+            "description": "",
+            "status": "pending",
+            "dependencies": [
+              1
+            ],
+            "details": "",
+            "testStrategy": "console clean; runaway stopped; 390px usable"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "[P1] Review and merge playground phase-6",
+        "description": "Owner-approved, conditional on its own criteria.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "details": "In jenozu/playground: review the 26-file diff (tasks 37\u201342, 65) for regressions and security; run its gate (task 43): lint, typecheck, vitest, build, Playwright incl. new autosave/dashboard/notes/progress specs; confirm phase 1\u20135 e2e still pass; open PR phase-6 \u2192 main with results; merge; record SHA. Requires push access to playground.",
+        "testStrategy": "Acceptance: PR shows all checks green (106+ unit tests, all e2e) and a written review; merged SHA logged; playground TASKS.md shows tasks 37\u201343 done.",
+        "complexity": 4,
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "[P1] Server-side owner identity, fail-closed API, cleanup",
+        "description": "Vercel Authentication only, with an explicit owner (ADR-002/003).",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "details": "lib/server/owner.ts resolveOwner() = process.env.OWNER_ID or 503 'Server not configured'. Production OWNER_ID = existing Neon workspaces.user_id (from task 2 output); preview gets its own. Shared request guard: same-origin, JSON content-type, size cap. Remove next-auth dependency; remove stale AUTH_* env vars (owner OK given in decision 2). Fix pre-existing lint error page.tsx:19 without behaviour change. Update README and docs/vercel-migration.md.",
+        "testStrategy": "Acceptance: lint/typecheck/build green; route tests: OWNER_ID unset \u2192 503, foreign Origin \u2192 403, non-JSON \u2192 415, stale version \u2192 409, valid \u2192 200; a second workspaces row no longer breaks loading.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "[P1] Verify protection of production domain, previews and API (stop condition)",
+        "description": "Owner requirement: confirm Vercel Authentication covers everything on the current plan.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          6
+        ],
+        "details": "Read settings via Vercel API (ssoProtection.deploymentType must be 'all'; already set). Unauthenticated HTTP checks of /, /api/health, /api/workspace on: a preview URL, the branch alias, and the production domain career-roadmap-jenozus-projects.vercel.app. Production is checked on the first production deploy made with OWNER_ID unset, so even an unprotected domain could return only 503 and no data; OWNER_ID is set only after the checks pass. scripts/check-protection.mjs runs the settings check in CI. If any target is reachable without Vercel login, stop and discuss alternatives (e.g. Pro 'all deployments' scope, password protection, app-level secret).",
+        "testStrategy": "Acceptance: every target returns a redirect to vercel.com/login (or 401) when unauthenticated; result table logged. Already verified 2026-11-25: preview /api/workspace \u2192 302 vercel.com/login.",
+        "complexity": 3,
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "[P1] Test harness: Vitest + PGlite + Playwright + CI",
+        "description": "Real test suites for the workspace.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          6
+        ],
+        "details": "vitest, @testing-library/react, @electric-sql/pglite (test-only, runs the real Drizzle Postgres migrations), @playwright/test, @axe-core/playwright. Port every assertion of tests/workspace-unit.mjs to a PGlite route test. Playwright against local `next start` or PREVIEW_URL with the protection-bypass header from env. GitHub Actions: lint, typecheck, unit, integration, build, e2e on the preview.",
+        "testStrategy": "Acceptance: npm test, npm run test:integration, npm run test:e2e green locally and in CI; original seven behaviours asserted.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "[P1] Regression and visual baseline of existing workspace",
+        "description": "Lock existing functionality and visual design before adding anything.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          8
+        ],
+        "details": "e2e/regression at 1440px and 390px: all 8 views render; edit item; add course; filters; search; weekly session edit and week navigation; settings; export; modal Escape/focus trap; mobile drawer; 409 message. Playwright toHaveScreenshot baselines per view (visual design lock). axe baseline (fail on new violations only).",
+        "testStrategy": "Acceptance: suite and screenshots green against the current preview build; baselines committed.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "[P1] Snapshots and validated import to reconcile Sites/Neon data",
+        "description": "Bring any newer Sites data into Neon without losing anything.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          2,
+          8
+        ],
+        "details": "Additive table workspace_snapshots (id, source, data jsonb, created_at). POST /api/workspace/import?dryRun=1 accepts the existing export format {exportedAt, workspace}: validates with stateSchema, returns per-item diff (add / differs / same) and sessions diff. Apply: snapshot current doc first, add missing items/sessions, and for differing items use the owner's per-item choice from task 2 (default: keep current, copy the other version into notes). Never deletes. Import button in the settings modal using existing styles.",
+        "testStrategy": "Acceptance: PGlite tests: double import is a no-op; nothing removed; snapshot row created before change; malformed file and javascript: URLs rejected with field paths. Preview rehearsal with the real export files gives the expected diff.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "[P1] Release 0: merge to main, production live, data reconciled  [HUMAN approval]",
+        "description": "Production on Vercel/Neon, protected and backed up.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          4,
+          5,
+          7,
+          9,
+          10
+        ],
+        "details": "Merge main's doc commits into the Vercel branch; PR with CI green; owner approves; merge. First production deploy with OWNER_ID unset \u2192 run task 7 production checks \u2192 set OWNER_ID \u2192 redeploy. Fresh Neon backup branch, then apply the reconciliation import on production if task 2 found newer Sites data.",
+        "testStrategy": "Acceptance: production READY and protected (task 7 table); regression suite read-only subset green on production; production data matches the agreed reconciliation; CHANGELOG records test results.",
+        "complexity": 3,
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "[P1] Retire Sites/vinext scaffolding after owner confirmation",
+        "description": "Remove the Cloudflare/Sites build once Sites data is confirmed safe.",
+        "status": "pending",
+        "priority": "low",
+        "dependencies": [
+          11
+        ],
+        "details": "Remove worker/, wrangler, vinext, @cloudflare/*, .openai/hosting.json, Sites scripts/plugins, D1 db/index.ts; move drizzle/ D1 migration to docs/legacy/. One revertible commit.",
+        "testStrategy": "Acceptance: all suites green; no cloudflare/vinext dependencies; owner confirmation logged.",
+        "complexity": 2,
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "[P2] Vendor the playground engine (pinned snapshot)",
+        "description": "ADR-004 using the spike's findings.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          11
+        ],
+        "details": "Upstream PR to playground: sql worker accepts wasmUrl in init (fallback to Vite ?url), single zod import module; merge; then copy the listed modules to workspace/vendor/playground with UPSTREAM.json (sha, files, sha256), scripts/sync-playground.mjs, tests/vendor-integrity.test.ts, prebuild copy of sql-wasm.wasm. Delete the spike route.",
+        "testStrategy": "Acceptance: integrity test fails if a vendored file is edited; ported vendored unit tests pass; build green; playground CI green.",
+        "complexity": 4,
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "[P2] Practice tables and owner-scoped API",
+        "description": "Only the tables Release 1 needs; additive migration.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          11
+        ],
+        "details": "Tables: skills (owner-scoped: id slug, language, name, aliases text[], state default 'introduced', source, notes), exercise_attempts (insert-only, client id = idempotency key; exercise_id, exercise_version, content_hash, pack_id, code, passed, construct_ok, results jsonb, hints_used, solution_viewed, independent, mode, practice_session_id, duration_ms, started_at, submitted_at), saved_code (exercise_id, code, rev), practice_sessions (id, config jsonb, started_at, ended_at). Repository helpers always filter owner_id; rev-checked updates; ON CONFLICT DO NOTHING inserts; zod schemas shared with client; body caps. Routes under /api/v2.",
+        "testStrategy": "Acceptance: PGlite tests: owner isolation, duplicate attempt id \u2192 one row, stale rev \u2192 409, oversize \u2192 413; migration applies on top of the production schema; workspaces table untouched.",
+        "complexity": 6,
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "[P2] Evaluator extensions: fixtures, constructs, equivalence, caps",
+        "description": "Robust, fair grading.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          13
+        ],
+        "details": "lib/practice/evaluate.ts wraps vendored evaluateSql: per-fixture runs with expected results from the reference solution; ignoreColumnNames default true; numericTolerance; requiredConstructs checked on comment/string-stripped tokens and reported separately; caps 1,000 rows shown / 2 MB / 50 result sets. Old test files behave exactly as before.",
+        "testStrategy": "Acceptance: vitest: hard-coded rows pass fixture A but fail B; alias-renamed correct query passes; missing LEFT JOIN or UNION ALL flagged by construct check; 1 vs 1.0 within tolerance passes; playground sample course tests unchanged.",
+        "complexity": 6,
+        "subtasks": []
+      },
+      {
+        "id": 16,
+        "title": "[P2] Pack format, validator and bundled-pack loader",
+        "description": "One content path for bundled and (later) imported packs; no code change per concept.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          15
+        ],
+        "details": "ADR-009 optional fields on course.json v1 (exerciseId, skills, difficulty, kind, businessPurpose, exerciseVersion; tests: fixtures, requiredConstructs, numericTolerance, ignoreColumnNames). lib/practice/pack-validator.ts (strict rules, size/path/ID checks). Bundled packs under content/packs/* built into a manifest at build time. `npm run content:verify` runs every reference solution on every fixture in Node sql.js.",
+        "testStrategy": "Acceptance: validator unit test per rejection rule (bad JSON, traversal, absolute path, oversize, duplicate id, missing solution, <2 fixtures); a valid pack loads; content:verify runs in CI.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 17,
+        "title": "[P2] Synthetic distributor dataset and fixtures",
+        "description": "Deterministic ERP data with deliberate edge cases.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          16
+        ],
+        "details": "content/packs/sql-erp-core/datasets/base.sql, variant-b.sql, variant-c.sql: suppliers, customers, products, warehouses, purchase_orders/lines, receipts/lines, invoices/lines, sales_orders/lines, shipments, inventory_movements; unmatched rows, duplicate cities, partial receipts, NULLs, multiple branches, discrepancies; fictional names only; docs/dataset.md.",
+        "testStrategy": "Acceptance: content:verify loads all fixtures; each listed edge case has a documented query proving it exists; variants share the schema with different values.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "[P2] Priority exercises: WITH/CTE, LEFT JOIN, CROSS JOIN, UNION, UNION ALL",
+        "description": "The owner's immediate learning priorities, 25 verified exercises.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          17
+        ],
+        "details": "Pack sql-erp-core v1.0.0: 5 LEFT JOIN (missing orders, unsold products\u2026), 5 CROSS JOIN (warehouse/product matrix\u2026), 5 UNION/UNION ALL (at least 2 require UNION ALL and 2 UNION, incl. duplicate-handling contrast; branch shipments), 5 WITH/CTE (supplier spend, outstanding receipts\u2026), 5 mixed. Each: business purpose, instructions, starter, \u22652 hints, tests with fixtures + requiredConstructs, verified solution.",
+        "testStrategy": "Acceptance: content:verify passes all 25 on all fixtures; a hard-coded answer fails every graded exercise; owner reviews 5 samples before release.",
+        "complexity": 7,
+        "subtasks": []
+      },
+      {
+        "id": 19,
+        "title": "[P2] Practice focus view with attempt recording from day one",
+        "description": "Run/Submit/reset/hints/solution/drafts; every Submit is stored.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          14,
+          16
+        ],
+        "details": "/practice/[exerciseId]: instructions, schema browser, editor, output, progressive hints, solution (confirm), Run (free), Submit (evaluate + POST attempt with hints_used, solution_viewed, independent flag, version, duration), Reset sandbox (fixture re-init, keeps draft), Restore starter (separate). Drafts: debounced cloud save + IndexedDB offline queue for drafts and unsent attempts. SQLite dialect label. Existing visual design tokens (globals.css). Desktop panels, mobile tabs.",
+        "testStrategy": "Acceptance: e2e: run; pass and fail submits each create one attempt row; double-click submit \u2192 one row; offline submit appears after reconnect; reset keeps draft; reload restores draft; 390px usable; axe clean.",
+        "complexity": 7,
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Layout + schema browser",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": "e2e desktop/mobile render"
+          },
+          {
+            "id": 2,
+            "title": "Run/Submit/reset via manager",
+            "description": "",
+            "status": "pending",
+            "dependencies": [
+              1
+            ],
+            "details": "",
+            "testStrategy": "e2e run and submit"
+          },
+          {
+            "id": 3,
+            "title": "Attempt recording + offline queue",
+            "description": "",
+            "status": "pending",
+            "dependencies": [
+              2
+            ],
+            "details": "",
+            "testStrategy": "PGlite + e2e idempotency/offline"
+          },
+          {
+            "id": 4,
+            "title": "Drafts",
+            "description": "",
+            "status": "pending",
+            "dependencies": [
+              2
+            ],
+            "details": "",
+            "testStrategy": "reload restores code"
+          },
+          {
+            "id": 5,
+            "title": "Accessibility + Ctrl+Enter",
+            "description": "",
+            "status": "pending",
+            "dependencies": [
+              2
+            ],
+            "details": "",
+            "testStrategy": "axe + keyboard e2e"
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "title": "[P2] Skill Library v1: register concepts right after learning them",
+        "description": "Owner priority: register a concept the moment it is learned externally.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          14,
+          18,
+          19
+        ],
+        "details": "/skills: list with state; 'Add learned material' form (language, concept names, notes/source, difficulty, wanted count 5/10/20/30). Normalise case/punctuation/plurals + alias table seeded from the SQL foundation checklist (e.g. 'with clause'/'common table expression' \u2192 sql-cte); dedupe; new concepts start 'introduced'. Result page lists matching exercises first; if too few, shows 'import a pack' and 'copy AI prompt' (prompt text template, implemented fully in task 'author'). Simple practice launcher: choose concept(s), count, hints on/off \u2192 session of matching exercises.",
+        "testStrategy": "Acceptance: entering 'with clause, Left Join, cross joins, UNION, union all' yields 5 skills, no duplicates, linked to the 25 exercises; an unknown concept is created as introduced with zero exercises and clear next steps; e2e at 390px.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 21,
+        "title": "[P2] Export/import includes practice data",
+        "description": "Data preservation applies to attempts from the first release.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          10,
+          14
+        ],
+        "details": "Extend Export to {format:'pathway-export', version:2, workspace, skills, attempts, drafts, sessions}; import accepts v1 and v2 with dry run; attempts imported by id (idempotent).",
+        "testStrategy": "Acceptance: export \u2192 import into an empty owner reproduces everything; second import changes nothing; v1 files still import.",
+        "complexity": 4,
+        "subtasks": []
+      },
+      {
+        "id": 22,
+        "title": "[P2] Add Practice and Skills to the existing navigation",
+        "description": "Integrate without redesigning the workspace.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          9,
+          19
+        ],
+        "details": "Extract the sidebar into a shared component used by page.tsx and the new routes; add 'Practice' and 'Skills' entries with lucide icons; existing 8 views unchanged.",
+        "testStrategy": "Acceptance: regression suite and visual baselines unchanged for existing views (only the two new nav rows differ, baseline updated deliberately); new routes reachable at 1440 and 390.",
+        "complexity": 3,
+        "subtasks": []
+      },
+      {
+        "id": 23,
+        "title": "[P2] Release 1: usable SQL Practice Lab  [HUMAN approval]",
+        "description": "Practice Lab gates 1 and 2 (MVP scope).",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          18,
+          19,
+          20,
+          21,
+          22
+        ],
+        "details": "Backup, migrate, deploy, smoke on production.",
+        "testStrategy": "Acceptance: automated: correct/incorrect/equivalent queries, empty results, mutations, timeouts, production WASM, mobile, attempt idempotency, owner isolation; all 25 solutions verified; regression + visual suites green; playground suite green; owner can register WITH/LEFT JOIN/CROSS JOIN/UNION/UNION ALL and practise them on production.",
+        "complexity": 2,
+        "subtasks": []
+      },
+      {
+        "id": 24,
+        "title": "[P3] Pack import pipeline: stage, validate, verify, review, publish",
+        "description": "New exercises without code changes, never trusted blindly.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          23
+        ],
+        "details": "Tables packs, pack_versions (status staged/validated/published/rejected, manifest, files jsonb \u22642 MB, report). Upload ZIP (fflate, path checks) or JSON; server + client validation; client worker runs each reference solution on each fixture and stores expected results; review screen; publish creates an immutable version; same exerciseId keeps identity; attempts keep their version. Bundled and imported packs appear in one registry.",
+        "testStrategy": "Acceptance: malformed JSON, ../ path, absolute path, oversized file, duplicate id, version downgrade, failing reference solution each rejected with an actionable message and retry; a valid pack is practisable immediately after publish; attempts recorded before a republish still show the original version.",
+        "complexity": 9,
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Upload + staging tables",
+            "description": "",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": "staged row created"
+          },
+          {
+            "id": 2,
+            "title": "Validation server + client",
+            "description": "",
+            "status": "pending",
+            "dependencies": [
+              1
+            ],
+            "details": "",
+            "testStrategy": "one test per rule"
+          },
+          {
+            "id": 3,
+            "title": "Reference-solution verification in worker",
+            "description": "",
+            "status": "pending",
+            "dependencies": [
+              2
+            ],
+            "details": "",
+            "testStrategy": "wrong solution flagged; expected stored"
+          },
+          {
+            "id": 4,
+            "title": "Review + publish + versioning",
+            "description": "",
+            "status": "pending",
+            "dependencies": [
+              3
+            ],
+            "details": "",
+            "testStrategy": "republish keeps ids, new version"
+          },
+          {
+            "id": 5,
+            "title": "Error/retry UX",
+            "description": "",
+            "status": "pending",
+            "dependencies": [
+              4
+            ],
+            "details": "",
+            "testStrategy": "e2e fix and re-upload"
+          }
+        ]
+      },
+      {
+        "id": 25,
+        "title": "[P3] Manual authoring and copyable AI generation prompt",
+        "description": "Generate exercises with any AI chat or by hand.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          24
+        ],
+        "details": "Authoring form writes a staged pack (same pipeline). 'Copy AI prompt' embeds the pack schema, dataset schema, selected skills and rules (business purpose, fixtures, required constructs, synthetic data only). No server-side AI provider.",
+        "testStrategy": "Acceptance: authored exercise passes the pipeline and is practisable; prompt snapshot test contains schema and selected skills; a pack produced from the prompt by an AI chat imports successfully (manual check).",
+        "complexity": 4,
+        "subtasks": []
+      },
+      {
+        "id": 26,
+        "title": "[P3] Practice modes and session setup",
+        "description": "Mixed, debugging, predict-output, business challenge, free sandbox; 15/30/45/60 min.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          23
+        ],
+        "details": "Session setup adds difficulty, duration timer and mode; selection prefers unattempted then failed; predict-output (type expected output, then reveal); debugging from buggy starter; free sandbox with fixture picker and no grading; session summary.",
+        "testStrategy": "Acceptance: unit tests for selection; e2e per mode at 1440 and 390; timer ends session with summary; sandbox never records graded attempts.",
+        "complexity": 6,
+        "subtasks": []
+      },
+      {
+        "id": 27,
+        "title": "[P3] Release 2: expandable Skill Library",
+        "description": "Practice Lab gate 3.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          24,
+          25,
+          26
+        ],
+        "details": "",
+        "testStrategy": "Acceptance: register unknown concept \u2192 import/author pack \u2192 validate \u2192 publish \u2192 practise, with no code change; all rejection rules tested; ids and attempts preserved; suites green.",
+        "complexity": 2,
+        "subtasks": []
+      },
+      {
+        "id": 28,
+        "title": "[P4] Job application tracker",
+        "description": "Early, small deliverable; never locked behind readiness.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          14
+        ],
+        "details": "Tables job_applications, application_events. /jobs list + status board: title, company, URL, remote type, Canada eligibility, posted salary, requirements, fit notes/suitability, gaps, status (saved/applied/interviewing/offer/rejected/withdrawn/closed), applied date, follow-up date, source, external_ref; events timeline; follow-up due list; optional link to an existing role-target item (j1\u2013j5). Existing visual style.",
+        "testStrategy": "Acceptance: e2e: add an application with no practice evidence; status change logs an event; follow-up due today is listed; 390px; owner isolation tested.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 29,
+        "title": "[P4] Job import contract for the job-watch automation",
+        "description": "CSV/JSON import now; automatable later without redesign (ADR-013).",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          28
+        ],
+        "details": "Versioned contract pathway.jobs.v1 (JSON array or CSV with header mapping): required title, company, url; optional remote, canada_eligible, salary_text, requirements, suitability, posted_at, source, external_ref. Dry run \u2192 new / duplicate (canonical URL or source+external_ref) / invalid; apply is idempotent; imported rows start 'saved'. Spec published at docs/pathway-v2/job-import-contract.md with a ready-to-paste ChatGPT instruction so the daily automation outputs this format. Future: same handler behind a token-authenticated endpoint.",
+        "testStrategy": "Acceptance: sample JSON and CSV import; re-import creates no duplicates; invalid rows reported with line numbers; contract doc includes JSON schema and CSV columns.",
+        "complexity": 4,
+        "subtasks": []
+      },
+      {
+        "id": 30,
+        "title": "[P4] Release 3: job tracker live",
+        "description": "Can be released before Release 2 if wanted; depends only on Release 1 infrastructure.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          28,
+          29
+        ],
+        "details": "",
+        "testStrategy": "Acceptance: owner imports a real job-watch file and tracks an application on production; suites green.",
+        "complexity": 1,
+        "subtasks": []
+      },
+      {
+        "id": 31,
+        "title": "[P5] Mastery engine over recorded attempts",
+        "description": "ADR-011; works retroactively on attempts stored since Release 1.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          27
+        ],
+        "details": "lib/domain/mastery.ts with injectable clock; recompute skills.state after each submit and once over history at release.",
+        "testStrategy": "Acceptance: 3 distinct independent passes \u2192 understood; same exercise 3\u00d7 \u2192 not; hint/solution-assisted passes ignored; 2 mixed \u2192 proficient; 2 delayed \u22657 days \u2192 mastered; 6 days \u2192 not; historical attempts produce the expected states.",
+        "complexity": 6,
+        "subtasks": []
+      },
+      {
+        "id": 32,
+        "title": "[P5] Review queue (1/3/7/14/30)",
+        "description": "Spaced repetition prioritising overdue and weak concepts.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          31
+        ],
+        "details": "review_queue table; lib/domain/review.ts; /practice/review mode.",
+        "testStrategy": "Acceptance: step changes on pass/assisted/fail unit-tested; queue order tested; e2e item due after clock advance.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 33,
+        "title": "[P5] Assessments",
+        "description": "Independent evidence: timed, no hints or solutions.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          31
+        ],
+        "details": "assessments (content-defined), assessment_attempts; runner; SQL practice assessment (10 of the priority exercises).",
+        "testStrategy": "Acceptance: hint/solution controls absent; timeout ends attempt; result stored and visible on the skill pages; retakes stored separately.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 34,
+        "title": "[P5] Release 4: mastery, review, assessments",
+        "description": "Practice Lab gate 4 (minus career links, which come in Phase 6).",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          32,
+          33
+        ],
+        "details": "",
+        "testStrategy": "Acceptance: assisted, duplicate and delayed rules; cross-device persistence (two browser contexts); unauthorized/missing owner; export/import round-trip incl. reviews; suites green.",
+        "complexity": 2,
+        "subtasks": []
+      },
+      {
+        "id": 35,
+        "title": "[P6] Additive workspace schema and idempotent content seeding",
+        "description": "Extend the existing JSON document instead of replacing it (ADR-005 v2).",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          23
+        ],
+        "details": "Optional new item fields (provider, progressSource, skills[], milestones[], evidence[], impact[], publishable, simulated, roleTargetId) and kinds ('stage'); old documents stay valid. Seed by id only when missing: Stage 0 'now', 'ts-node', 'integration'; 14 curriculum courses; Learn SQL at 78% marked last-reported only if no item has the Learn SQL URL; role targets per master-plan table; 6 roadmap projects. Never modify an existing item; 'update available' suggestions for unedited seed items; 'suggested re-mapping' list (ADR-007).",
+        "testStrategy": "Acceptance: seeding twice adds nothing; edited items untouched; user Learn SQL value wins; c1\u2013c6, p1\u2013p5, f1\u2013f3, j1\u2013j5, o1\u2013o3 unchanged; snapshot taken before first seed.",
+        "complexity": 6,
+        "subtasks": []
+      },
+      {
+        "id": 36,
+        "title": "[P6] Roadmap stages 0\u20136 and current-phase next action",
+        "description": "Stage cards with courses, skills, assessments, projects, evidence, job targets.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          35,
+          34,
+          30
+        ],
+        "details": "Existing Roadmap/Current phase views extended in place; lib/domain/nextAction.ts (overdue review > follow-up due > in-progress course > unmet exit criterion > next milestone); unmet exit criteria; Apply panel always visible.",
+        "testStrategy": "Acceptance: 7 stages in roadmap order + deferred section; exactly one next action; unit tests per branch; visual baselines updated deliberately.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 37,
+        "title": "[P6] Library, projects and portfolio evidence",
+        "description": "Course provenance and skills; project milestones, evidence, honest impact; portfolio of publishable evidence.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          35
+        ],
+        "details": "Library: provenance badge, related skills, completion prompt (practise/assess/project). Projects: milestones with acceptance criteria, evidence types, impact measured vs estimate, simulated flag, limitations; RF scanner and batch shipping kept verbatim. Portfolio: publishable only + 10-point checklist + demo outline.",
+        "testStrategy": "Acceptance: course completion does not change skill state; impact cannot be saved without kind; unpublishable evidence never shown; existing portfolio items unchanged.",
+        "complexity": 6,
+        "subtasks": []
+      },
+      {
+        "id": 38,
+        "title": "[P6] Career checkpoints with evidence and gaps",
+        "description": "Readiness explanations from skills, assessments and projects; never a gate.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          37,
+          36
+        ],
+        "details": "lib/domain/readiness.ts; per-stage met/missing; suggested titles; link to jobs.",
+        "testStrategy": "Acceptance: unit tests; tracking an application is never disabled; titles match the master-plan table.",
+        "complexity": 4,
+        "subtasks": []
+      },
+      {
+        "id": 39,
+        "title": "[P6] Weekly plan v2",
+        "description": "Template from the schedule doc; sessions linked to course/practice/project; history preserved.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          35,
+          34
+        ],
+        "details": "Template stored in the document with effectiveFrom; planned sessions per week; links; editable duration/done/notes/next action; launching practice from a session records minutes; Sunday review form (5 questions). Existing date sessions untouched.",
+        "testStrategy": "Acceptance: template change never alters past sessions; legacy sessions display unchanged; default week totals 15 h; practice session from Tuesday marks it done.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 40,
+        "title": "[P6] Release 5: career layer expansion",
+        "description": "",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          36,
+          37,
+          38,
+          39
+        ],
+        "details": "",
+        "testStrategy": "Acceptance: suites + visual baselines green; all prior records intact (export diff vs pre-release export shows only additions).",
+        "complexity": 2,
+        "subtasks": []
+      },
+      {
+        "id": 41,
+        "title": "[P7] Expand to 100 SQL exercises through the pipeline",
+        "description": "Spec distribution, published as packs (no code changes).",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          27
+        ],
+        "details": "filtering 8, manipulation 8, aggregates 10, INNER 8, LEFT 10, CROSS 8, UNION 8, CTE 10, mixed 15, assessment 15.",
+        "testStrategy": "Acceptance: content:verify passes all; category counts match; the original 25 ids unchanged.",
+        "complexity": 8,
+        "subtasks": []
+      },
+      {
+        "id": 42,
+        "title": "[P7] SQL graduation assessment and checklist",
+        "description": "Stage 1 exit evidence.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          41,
+          40
+        ],
+        "details": "Graduation assessment from the 15 assessment items; graduation checklist linked to skills, assessment and Distribution Operations Database evidence.",
+        "testStrategy": "Acceptance: passing marks the criterion met; remaining gaps (e.g. walkthrough video) shown honestly.",
+        "complexity": 4,
+        "subtasks": []
+      },
+      {
+        "id": 43,
+        "title": "[P7] Master-plan acceptance scenario",
+        "description": "End-to-end proof.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          42
+        ],
+        "details": "e2e/acceptance.spec.ts: register WITH/LEFT JOIN/CROSS JOIN/UNION \u2192 import validated pack \u2192 practise, attempts recorded \u2192 skill/review update \u2192 assessment \u2192 link SQL project + portfolio evidence \u2192 job targets \u2192 track application \u2192 reload \u2192 persistence and older records verified. Preview automated; production manual.",
+        "testStrategy": "Acceptance: automated green on preview; owner signs off production checklist.",
+        "complexity": 6,
+        "subtasks": []
+      },
+      {
+        "id": 44,
+        "title": "[P7] Hardening, docs, release",
+        "description": "",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          43
+        ],
+        "details": "Code-split engine; axe all routes; README, runbook (backup/restore/rollback, rehearsed), COURSE-FORMAT addendum, CHANGELOG with actual results.",
+        "testStrategy": "Acceptance: all suites both repos green; restore rehearsed on a Neon branch; release approved.",
+        "complexity": 4,
+        "subtasks": []
+      },
+      {
+        "id": 45,
+        "title": "[P8] JavaScript/TypeScript/Node practice sandbox ADR",
+        "description": "Next roadmap stage; precedes Python.",
+        "status": "pending",
+        "priority": "low",
+        "dependencies": [
+          27
+        ],
+        "details": "Design: JS in a sandboxed iframe (no same-origin, per playground decision), TS compiled in the sandbox, Node-style exercises against simulated ERP/carrier APIs (no real network), evaluator for asserts/stdout, packs through the same pipeline.",
+        "testStrategy": "Acceptance: ADR approved by owner.",
+        "complexity": 4,
+        "subtasks": []
+      },
+      {
+        "id": 46,
+        "title": "[P8] JavaScript practice adapter and first JS pack",
+        "description": "",
+        "status": "pending",
+        "priority": "low",
+        "dependencies": [
+          45
+        ],
+        "details": "Implement per ADR (reuse playground task-50 design if built there); JS fundamentals pack aligned with courses/javascript.",
+        "testStrategy": "Acceptance: JS exercise runs isolated, times out, records attempts; pack verified.",
+        "complexity": 7,
+        "subtasks": []
+      },
+      {
+        "id": 47,
+        "title": "[P9] Python practice via existing Pyodide adapter (deferred)",
+        "description": "After JS/TS/Node and CAP.",
+        "status": "deferred",
+        "priority": "low",
+        "dependencies": [
+          46
+        ],
+        "details": "Reuse vendored python adapter and evaluator.",
+        "testStrategy": "Acceptance (when scheduled): Python exercise runs, times out, records attempts.",
+        "complexity": 5,
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2026-11-25T13:00:00",
+      "updated": "2026-11-25T13:40:00",
+      "description": "Pathway v2 upgrade plan, revision 2 (awaiting owner approval)"
+    }
+  }
+}
