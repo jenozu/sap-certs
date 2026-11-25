@@ -50,7 +50,7 @@
         "dependencies": [
           3
         ],
-        "details": "Throwaway route /lab-spike on a spike branch: copy (not yet vendor) playground CodeEditor, OutputPanel, execution manager and sql worker; run in Next 16 production build on React 19; zod/v4 import of the course schema; sql-wasm.wasm served from public/sqljs with the worker receiving wasmUrl; CSP header; deploy to the isolated preview.",
+        "details": "Throwaway route /lab-spike on a spike branch: copy (not yet vendor) playground CodeEditor, OutputPanel, execution manager and sql worker; run in Next 16 production build on React 19; zod/v4 import of the course schema; sql-wasm.wasm served from public/sqljs with the worker receiving wasmUrl; CSP header; deploy to the isolated preview.\n\n[2026-11-25T17:11:58-05:00] dced9df: vendored engine runs in Next 16 prod build on React 19; zod/v4 ok; wasm from /sqljs; CSP ok; e2e desktop+mobile pass locally; preview serves page+CSP+wasm. Finding: playground sql/index.ts statically references Vite worker -> documented shim; upstream PR in task 13.",
         "testStrategy": "Acceptance: on the preview (desktop and a phone) a fixture query renders a table; a runaway recursive CTE is stopped at 5 s and the next run works; no CSP or hydration errors; written result (works / blockers + fallback) logged. If a blocker has no fallback, stop and discuss before Phase 2.",
         "complexity": 8,
         "subtasks": [
@@ -112,7 +112,7 @@
         "id": 6,
         "title": "[P1] Server-side owner identity, fail-closed API, cleanup",
         "description": "Vercel Authentication only, with an explicit owner (ADR-002/003).",
-        "status": "in-progress",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           3
@@ -126,12 +126,12 @@
         "id": 7,
         "title": "[P1] Verify protection of production domain, previews and API (stop condition)",
         "description": "Owner requirement: confirm Vercel Authentication covers everything on the current plan.",
-        "status": "pending",
+        "status": "in-progress",
         "priority": "high",
         "dependencies": [
           6
         ],
-        "details": "Read settings via Vercel API (ssoProtection.deploymentType must be 'all'; already set). Unauthenticated HTTP checks of /, /api/health, /api/workspace on: a preview URL, the branch alias, and the production domain career-roadmap-jenozus-projects.vercel.app. Production is checked on the first production deploy made with OWNER_ID unset, so even an unprotected domain could return only 503 and no data; OWNER_ID is set only after the checks pass. scripts/check-protection.mjs runs the settings check in CI. If any target is reachable without Vercel login, stop and discuss alternatives (e.g. Pro 'all deployments' scope, password protection, app-level secret).",
+        "details": "Read settings via Vercel API (ssoProtection.deploymentType must be 'all'; already set). Unauthenticated HTTP checks of /, /api/health, /api/workspace on: a preview URL, the branch alias, and the production domain career-roadmap-jenozus-projects.vercel.app. Production is checked on the first production deploy made with OWNER_ID unset, so even an unprotected domain could return only 503 and no data; OWNER_ID is set only after the checks pass. scripts/check-protection.mjs runs the settings check in CI. If any target is reachable without Vercel login, stop and discuss alternatives (e.g. Pro 'all deployments' scope, password protection, app-level secret).\n\n[2026-11-25T17:11:58-05:00] Settings: ssoProtection=all. Preview /api/workspace 302->login (earlier). CI check script 00974c3 (needs VERCEL_TOKEN secret). Pending: unauthenticated checks of new preview routes (WebFetch approval) and production domain at Release 0.",
         "testStrategy": "Acceptance: every target returns a redirect to vercel.com/login (or 401) when unauthenticated; result table logged. Already verified 2026-11-25: preview /api/workspace → 302 vercel.com/login.",
         "complexity": 3,
         "subtasks": []
@@ -140,7 +140,7 @@
         "id": 8,
         "title": "[P1] Test harness: Vitest + PGlite + Playwright + CI",
         "description": "Real test suites for the workspace.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           6
@@ -154,7 +154,7 @@
         "id": 9,
         "title": "[P1] Regression and visual baseline of existing workspace",
         "description": "Lock existing functionality and visual design before adding anything.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           8
@@ -168,13 +168,13 @@
         "id": 10,
         "title": "[P1] Snapshots and validated import to reconcile Sites/Neon data",
         "description": "Bring any newer Sites data into Neon without losing anything.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           2,
           8
         ],
-        "details": "Additive table workspace_snapshots (id, source, data jsonb, created_at). POST /api/workspace/import?dryRun=1 accepts the existing export format {exportedAt, workspace}: validates with stateSchema, returns per-item diff (add / differs / same) and sessions diff. Apply: snapshot current doc first, add missing items/sessions, and for differing items use the owner's per-item choice from task 2 (default: keep current, copy the other version into notes). Never deletes. Import button in the settings modal using existing styles.",
+        "details": "Additive table workspace_snapshots (id, source, data jsonb, created_at). POST /api/workspace/import?dryRun=1 accepts the existing export format {exportedAt, workspace}: validates with stateSchema, returns per-item diff (add / differs / same) and sessions diff. Apply: snapshot current doc first, add missing items/sessions, and for differing items use the owner's per-item choice from task 2 (default: keep current, copy the other version into notes). Never deletes. Import button in the settings modal using existing styles.\n\n[2026-11-25T17:11:58-05:00] 9ea12f3: workspace_snapshots + import dry-run/apply; preview Neon migrated; production migration awaits approval.",
         "testStrategy": "Acceptance: PGlite tests: double import is a no-op; nothing removed; snapshot row created before change; malformed file and javascript: URLs rejected with field paths. Preview rehearsal with the real export files gives the expected diff.",
         "complexity": 5,
         "subtasks": []
@@ -833,7 +833,7 @@
     ],
     "metadata": {
       "created": "2026-11-25T13:00:00",
-      "updated": "2026-11-25T15:46:35-05:00",
+      "updated": "2026-11-25T17:11:58-05:00",
       "description": "Pathway v2 upgrade plan, revision 2 (awaiting owner approval)"
     }
   }
