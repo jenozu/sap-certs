@@ -85,6 +85,24 @@ test('stale save shows the conflict message', async ({ page }, info) => {
   await expect(page.getByText(/changed in another tab/).first()).toBeVisible();
 });
 
+test('import adds new items after a preview, keeps existing', async ({ page }) => {
+  const file = { exportedAt: 'x', workspace: structuredClone((await import('../app/model')).initial) };
+  file.workspace.items.push({ ...file.workspace.items[5], id: 'imported-1', title: 'Imported course' });
+  let preview = '';
+  page.once('dialog', d => { preview = d.message(); d.accept(); });
+  await page.locator('input[type=file]').setInputFiles({ name: 'export.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(file)) });
+  await expect.poll(() => api.version).toBe(1);
+  expect(preview).toContain('1 new item(s) will be added');
+  expect(preview).toContain('Nothing will be deleted');
+  expect((api.data as { items: unknown[] }).items.length).toBe(file.workspace.items.length);
+});
+
+test('import rejects an invalid file with a clear message', async ({ page }) => {
+  await page.locator('input[type=file]').setInputFiles({ name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from('{"workspace":{"nope":1}}') });
+  await expect(page.getByText(/Invalid file at/).first()).toBeVisible();
+  expect(api.version).toBe(0);
+});
+
 // Accessibility baseline: existing violations are recorded; only NEW rule violations fail.
 test('no new accessibility violations', async ({ page }, info) => {
   const mobile = info.project.name === 'mobile';
