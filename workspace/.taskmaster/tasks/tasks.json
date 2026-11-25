@@ -31,7 +31,7 @@
         "id": 3,
         "title": "[P1] Isolate preview database from production  [HUMAN env value]",
         "description": "Stop preview deployments from writing the production Neon data.",
-        "status": "in-progress",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           2
@@ -112,12 +112,12 @@
         "id": 6,
         "title": "[P1] Server-side owner identity, fail-closed API, cleanup",
         "description": "Vercel Authentication only, with an explicit owner (ADR-002/003).",
-        "status": "pending",
+        "status": "in-progress",
         "priority": "high",
         "dependencies": [
           3
         ],
-        "details": "lib/server/owner.ts resolveOwner() = process.env.OWNER_ID or 503 'Server not configured'. Production OWNER_ID = existing Neon workspaces.user_id (from task 2 output); preview gets its own. Shared request guard: same-origin, JSON content-type, size cap. Remove next-auth dependency; remove stale AUTH_* env vars (owner OK given in decision 2). Fix pre-existing lint error page.tsx:19 without behaviour change. Update README and docs/vercel-migration.md.",
+        "details": "lib/server/owner.ts resolveOwner() = process.env.OWNER_ID or 503 'Server not configured'. Production OWNER_ID = existing Neon workspaces.user_id (from task 2 output); preview gets its own. Shared request guard: same-origin, JSON content-type, size cap. Remove next-auth dependency; remove stale AUTH_* env vars (owner OK given in decision 2). Fix pre-existing lint error page.tsx:19 without behaviour change. Update README and docs/vercel-migration.md.\n\n[2026-11-25T15:46:35-05:00] 368bafb on feat/v2-p1-platform: owner.ts, guard.ts, health; next-auth removed; lint 0 errors; next build ok.",
         "testStrategy": "Acceptance: lint/typecheck/build green; route tests: OWNER_ID unset → 503, foreign Origin → 403, non-JSON → 415, stale version → 409, valid → 200; a second workspaces row no longer breaks loading.",
         "complexity": 5,
         "subtasks": []
@@ -833,7 +833,7 @@
     ],
     "metadata": {
       "created": "2026-11-25T13:00:00",
-      "updated": "2026-11-25T14:50:19-05:00",
+      "updated": "2026-11-25T15:46:35-05:00",
       "description": "Pathway v2 upgrade plan, revision 2 (awaiting owner approval)"
     }
   }
