@@ -16,7 +16,8 @@
     "predev": "node scripts/copy-sqljs.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:protection": "node scripts/check-protection.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
