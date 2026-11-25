@@ -1,0 +1,26 @@
+name: workspace-ci
+on:
+  push:
+    paths: ['workspace/**', '.github/workflows/workspace-ci.yml']
+  pull_request:
+    paths: ['workspace/**', '.github/workflows/workspace-ci.yml']
+defaults:
+  run:
+    working-directory: workspace
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: workspace/package-lock.json }
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with: { name: playwright-results, path: workspace/test-results, retention-days: 7 }

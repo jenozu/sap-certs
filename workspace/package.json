@@ -13,7 +13,10 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate --config drizzle.postgres.config.ts",
     "prebuild": "node scripts/copy-sqljs.mjs",
-    "predev": "node scripts/copy-sqljs.mjs"
+    "predev": "node scripts/copy-sqljs.mjs",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -54,19 +57,23 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.1",
     "@cloudflare/vite-plugin": "1.37.1",
     "@cloudflare/workers-types": "4.20260515.1",
+    "@electric-sql/pglite": "^0.6.0",
     "@playwright/test": "^1.65.1",
     "@tailwindcss/postcss": "4.2.1",
+    "@testing-library/react": "^16.3.3",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@types/sql.js": "^1.16.1",
-    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-react": "^6.0.2",
     "@vitejs/plugin-rsc": "0.5.26",
     "drizzle-kit": "0.31.10",
     "eslint": "9.39.4",
     "eslint-config-next": "16.3.4",
+    "jsdom": "^31.0.1",
     "json-rpc-2.0": "1.7.1",
     "raw-body": "3.0.2",
     "react-server-dom-webpack": "19.2.6",
@@ -75,6 +82,7 @@
     "typescript": "5.9.3",
     "vinext": "1.0.0-beta.5",
     "vite": "8.0.13",
+    "vitest": "^5.1.2",
     "wrangler": "4.92.0"
   },
   "type": "module",

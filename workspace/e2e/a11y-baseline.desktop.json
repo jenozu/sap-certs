@@ -1,0 +1,32 @@
+{
+  "Roadmap": [
+    "color-contrast"
+  ],
+  "Current phase": [
+    "color-contrast"
+  ],
+  "Weekly plan": [
+    "color-contrast",
+    "heading-order",
+    "label-content-name-mismatch"
+  ],
+  "Learning library": [
+    "color-contrast",
+    "heading-order"
+  ],
+  "Projects": [
+    "color-contrast",
+    "heading-order"
+  ],
+  "Portfolio": [
+    "color-contrast"
+  ],
+  "Career checkpoints": [
+    "color-contrast",
+    "heading-order"
+  ],
+  "Compare next steps": [
+    "color-contrast",
+    "heading-order"
+  ]
+}
