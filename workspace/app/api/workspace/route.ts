@@ -1,19 +1,21 @@
-import { auth } from '@/auth';
+import { workspaces } from '@/db/postgres/schema';
 import { getPostgresDb } from '@/db/postgres';
 import { workspaceRepository } from '@/db/postgres/repository';
 import { initial, stateSchema } from '../../model';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const response = (body: unknown, status = 200) => Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
+// Vercel Deployment Protection is the only access gate. It must remain
+// enabled for ALL environments and domains, including the API endpoints.
+// Preserve the existing GitHub-scoped Neon row rather than starting fresh.
 async function userId() {
-  const session = await auth();
-  const id = (session?.user as { id?: string } | undefined)?.id;
-  return id?.startsWith('github:') ? id : null;
+  const rows = await getPostgresDb().select({ id: workspaces.userId }).from(workspaces).limit(2);
+  if (rows.length > 1) throw new Error('More than one workspace owner exists; configure an explicit owner before continuing.');
+  return rows[0]?.id ?? 'personal:vercel';
 }
 export async function GET() {
   try {
     const uid = await userId();
-    if (!uid) return response({ error: 'Sign in to load your workspace.' }, 401);
     const row = await workspaceRepository(getPostgresDb()).load(uid);
     return response(row ?? { data: initial, version: 0 });
   } catch { return response({ error: 'Your workspace could not be loaded. Please retry.' }, 503); }
@@ -21,7 +23,6 @@ export async function GET() {
 export async function PUT(req: Request) {
   try {
     const uid = await userId();
-    if (!uid) return response({ error: 'Sign in to save your workspace.' }, 401);
     if (req.headers.get('origin') !== new URL(req.url).origin) return response({ error: 'Invalid request origin.' }, 403);
     if (!req.headers.get('content-type')?.startsWith('application/json')) return response({ error: 'Expected JSON.' }, 415);
     const raw = await req.text();
