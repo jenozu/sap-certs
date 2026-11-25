@@ -1,30 +1,28 @@
-import { workspaces } from '@/db/postgres/schema';
 import { getPostgresDb } from '@/db/postgres';
 import { workspaceRepository } from '@/db/postgres/repository';
 import { initial, stateSchema } from '../../model';
+import { resolveOwner, OwnerNotConfigured } from '@/lib/server/owner';
+import { guardMutation } from '@/lib/server/guard';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const response = (body: unknown, status = 200) => Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
-// Vercel Deployment Protection is the only access gate. It must remain
-// enabled for ALL environments and domains, including the API endpoints.
-// Preserve the existing GitHub-scoped Neon row rather than starting fresh.
-async function userId() {
-  const rows = await getPostgresDb().select({ id: workspaces.userId }).from(workspaces).limit(2);
-  if (rows.length > 1) throw new Error('More than one workspace owner exists; configure an explicit owner before continuing.');
-  return rows[0]?.id ?? 'personal:vercel';
-}
+// Vercel Deployment Protection (all deployments) is the only access gate.
+// The owner is fixed server-side via OWNER_ID; requests fail closed without it.
+const notConfigured = () => response({ error: 'Server not configured.' }, 503);
 export async function GET() {
+  let uid: string;
+  try { uid = resolveOwner(); } catch (e) { if (e instanceof OwnerNotConfigured) return notConfigured(); throw e; }
   try {
-    const uid = await userId();
     const row = await workspaceRepository(getPostgresDb()).load(uid);
     return response(row ?? { data: initial, version: 0 });
   } catch { return response({ error: 'Your workspace could not be loaded. Please retry.' }, 503); }
 }
 export async function PUT(req: Request) {
+  let uid: string;
+  try { uid = resolveOwner(); } catch (e) { if (e instanceof OwnerNotConfigured) return notConfigured(); throw e; }
+  const blocked = guardMutation(req, 500000);
+  if (blocked) return blocked;
   try {
-    const uid = await userId();
-    if (req.headers.get('origin') !== new URL(req.url).origin) return response({ error: 'Invalid request origin.' }, 403);
-    if (!req.headers.get('content-type')?.startsWith('application/json')) return response({ error: 'Expected JSON.' }, 415);
     const raw = await req.text();
     if (raw.length > 500000) return response({ error: 'Workspace is too large.' }, 413);
     let body;
