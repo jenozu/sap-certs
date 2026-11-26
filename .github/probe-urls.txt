@@ -1,13 +1,19 @@
-# Release 1 preview probe
-https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/practice
-https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/practice/sql.left-join.customers-without-orders
-https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/skills
-https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/packs/index.json
-https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/packs/sql-erp-core.json
-https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/api/v2/export
-https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/api/v2/skills
-https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/api/v2/attempts
-https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/api/v2/drafts/sql.cte.supplier-spend
-https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/api/v2/practice-sessions
-https://career-roadmap-git-feat-v2-p2-practice-jenozus-projects.vercel.app/practice
-https://career-roadmap-git-feat-v2-p2-practice-jenozus-projects.vercel.app/api/v2/export
+# Release 1 production probe
+https://career-roadmap-jenozus-projects.vercel.app/
+https://career-roadmap-jenozus-projects.vercel.app/practice
+https://career-roadmap-jenozus-projects.vercel.app/practice/sql.left-join.customers-without-orders
+https://career-roadmap-jenozus-projects.vercel.app/skills
+https://career-roadmap-jenozus-projects.vercel.app/packs/index.json
+https://career-roadmap-jenozus-projects.vercel.app/packs/sql-erp-core.json
+https://career-roadmap-jenozus-projects.vercel.app/sqljs/sql-wasm.wasm
+https://career-roadmap-jenozus-projects.vercel.app/api/health
+https://career-roadmap-jenozus-projects.vercel.app/api/workspace
+https://career-roadmap-jenozus-projects.vercel.app/api/workspace/import
+https://career-roadmap-jenozus-projects.vercel.app/api/v2/export
+https://career-roadmap-jenozus-projects.vercel.app/api/v2/skills
+https://career-roadmap-jenozus-projects.vercel.app/api/v2/attempts
+https://career-roadmap-jenozus-projects.vercel.app/api/v2/drafts/x
+https://career-roadmap-jenozus-projects.vercel.app/api/v2/practice-sessions
+https://career-roadmap-md388ipmw-jenozus-projects.vercel.app/practice
+https://career-roadmap-md388ipmw-jenozus-projects.vercel.app/api/v2/export
+https://career-roadmap-git-main-jenozus-projects.vercel.app/api/v2/export
