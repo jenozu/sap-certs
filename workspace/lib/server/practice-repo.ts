@@ -76,3 +76,30 @@ export function practiceRepo(db: Db, owner: string) {
     allSessions() { return db.select().from(practiceSessions).where(eq(practiceSessions.ownerId, owner)); },
   };
 }
+
+/** Export all practice data for an owner in importable shape. */
+export async function exportPractice(db: Db, owner: string) {
+  const repo = practiceRepo(db, owner);
+  const [sk, at, dr, se] = await Promise.all([repo.listSkills(), repo.allAttempts(), repo.allDrafts(), repo.allSessions()]);
+  return {
+    skills: sk.map(s => ({ id: s.id, language: s.language, name: s.name, aliases: s.aliases, tags: s.tags, source: s.source, notes: s.notes, state: s.state })),
+    attempts: at.map(a => ({ id: a.id, language: a.language, exerciseId: a.exerciseId, exerciseVersion: a.exerciseVersion, contentHash: a.contentHash, packId: a.packId, skills: a.skills, mode: a.mode, code: a.code, passed: a.passed, correct: a.correct, constructOk: a.constructOk, results: a.results, hintsUsed: a.hintsUsed, solutionViewed: a.solutionViewed, practiceSessionId: a.practiceSessionId, durationMs: a.durationMs, startedAt: a.startedAt.toISOString(), submittedAt: a.submittedAt.toISOString() })),
+    drafts: dr.map(d => ({ exerciseId: d.exerciseId, language: d.language, code: d.code })),
+    sessions: se.map(s => ({ id: s.id, language: s.language, config: s.config, startedAt: s.startedAt.toISOString(), endedAt: s.endedAt?.toISOString() ?? null })),
+  };
+}
+
+/** Idempotent: attempts by id, skills merged (existing state kept), drafts only where none exist. */
+export async function importPractice(db: Db, owner: string, p: import('@/lib/practice/export').PracticeExport, dryRun: boolean) {
+  const repo = practiceRepo(db, owner);
+  const [sk, at, dr] = await Promise.all([repo.listSkills(), repo.allAttempts(), repo.allDrafts()]);
+  const haveSk = new Set(sk.map(s => s.id)), haveAt = new Set(at.map(a => a.id)), haveDr = new Set(dr.map(d => d.exerciseId));
+  const plan = { skillsAdded: p.skills.filter(s => !haveSk.has(s.id)).length, skillsMerged: p.skills.filter(s => haveSk.has(s.id)).length, attemptsAdded: p.attempts.filter(a => !haveAt.has(a.id)).length, draftsAdded: p.drafts.filter(d => !haveDr.has(d.exerciseId)).length };
+  if (dryRun) return plan;
+  for (let i = 0; i < p.skills.length; i += 50) await repo.upsertSkills(p.skills.slice(i, i + 50).map(({ state: _s, ...rest }) => { void _s; return rest; }));
+  const newStates = p.skills.filter(s => !haveSk.has(s.id) && s.state !== 'introduced');
+  for (const s of newStates) await db.update(skills).set({ state: s.state }).where(and(eq(skills.ownerId, owner), eq(skills.id, s.id)));
+  for (const a of p.attempts) if (!haveAt.has(a.id)) await repo.addAttempt(a);
+  for (const d of p.drafts) if (!haveDr.has(d.exerciseId)) await repo.saveDraft(d.exerciseId, d.language, d.code, 0);
+  return plan;
+}
