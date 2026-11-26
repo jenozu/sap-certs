@@ -1,9 +1,8 @@
 import type { ExecutionEngine, ExecutionResult } from "../../../types/execution";
 
-const spawnWorker = () => new Worker(new URL("./worker.ts", import.meta.url), { type: "module" });
-
-/** Main-thread side: talks to the sql.js worker. stop() kills and respawns it (dataset reapplied). */
-export function createSqlEngine(makeWorker: () => Worker = spawnWorker): ExecutionEngine {
+/** Framework-agnostic main-thread side (no bundler-specific imports): the caller supplies the worker.
+ * talks to the sql.js worker. stop() kills and respawns it (dataset reapplied). */
+export function createSqlEngineWith(makeWorker: () => Worker): ExecutionEngine {
   let worker: Worker | undefined;
   let dataset: string | undefined;
   let seq = 0;

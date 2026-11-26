@@ -1,8 +1,7 @@
 /// <reference lib="webworker" />
-// Pathway's sql.js worker: same message handler as the playground (vendored core),
-// but the wasm is served from /sqljs/ instead of a Vite `?url` import.
+// Browser worker: vendored playground message handler; wasm served from /sqljs/.
 import initSqlJs from 'sql.js';
-import { createHandler, type SqlMsg } from '../../vendor/playground/execution/adapters/sql/core';
+import { createHandler, type SqlMsg } from '../../../../vendor/playground/execution/adapters/sql/core';
 
 const ready = initSqlJs({ locateFile: () => '/sqljs/sql-wasm.wasm' }).then(createHandler);
 
