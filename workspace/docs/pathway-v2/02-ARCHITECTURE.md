@@ -49,6 +49,10 @@ Content (datasets, exercise packs, skill aliases, career seeds) is versioned in 
 - Delayed: two passes ≥7 days apart after reaching proficient.
 - Review steps: 1/3/7/14/30 days. An independent pass moves up a step, an assisted pass stays, a fail resets to step 1.
 
+**ADR-014 Language adapters (multi-language academy, 2026-11-26).** `lib/practice/adapters/index.ts` holds a registry keyed by language id (`sql`, later `javascript`, `typescript`, `node`, `python`…). Each adapter provides: `label`, `dialectNote`, `editorLanguage`, `createEngine()` (isolated: Web Worker or sandboxed iframe, with timeout/terminate), `evaluate(code, tests, ctx)` returning a shared result shape `{passed, checks[], constructOk?, output}`, and `validatePackExtras(pack)` for language-specific pack rules. Practice UI, storage, attempts, mastery, review and assessments only see the shared shapes. SQL wraps the vendored playground sql adapter; Python will wrap the vendored Pyodide adapter; JS/TS get a sandboxed-iframe adapter (designed in task 45). An unknown language shows "not supported yet" instead of failing.
+
+**ADR-015 Dynamic concepts and learning material.** Concepts (`skills`) are per-owner rows with free-text `language`, `aliases`, `tags`, `source`; there are no topic enums or category tables. Aliases seeded from content are suggestions only. `learning_materials` (Release 2) store notes, lesson text, code examples and links linked to concepts; full-text search via Postgres `to_tsvector` over title/body/tags. Materials can be passed into the generation prompt.
+
 **ADR-012 Readiness and fit explain, never gate.** Apply/track actions are always enabled.
 
 **ADR-013 Job import contract `pathway.jobs.v1`.** JSON array or CSV with a header.
@@ -62,13 +66,13 @@ Content (datasets, exercise packs, skill aliases, career seeds) is versioned in 
 | Release | Tables | Notes |
 |---|---|---|
 | 0 | `workspaces` (existing, unchanged), `workspace_snapshots` (id, source, data jsonb, created_at) | Snapshots before imports/seeds |
-| 1 | `skills` (owner_id, id, language, name, aliases text[], state, source, notes, rev), `exercise_attempts` (insert-only; see PRD C4), `saved_code` (exercise_id, code, rev), `practice_sessions` (config jsonb, times) | Bundled packs are read from `content/` and not stored |
-| 2 | `packs`, `pack_versions` (status, manifest, files jsonb, validation report, published_at) | Imported/authored packs; immutable published versions |
+| 1 | `skills` (owner_id, id, language, name, aliases text[], tags text[], state, source, notes, rev), `exercise_attempts` (insert-only; see PRD C4), `saved_code` (exercise_id, code, rev), `practice_sessions` (config jsonb, times) | Bundled packs are read from `content/` and not stored |
+| 2 | `packs`, `pack_versions` (language, status, manifest, files jsonb, validation report, published_at), `learning_materials` (language, kind, title, body, url, concept ids, tags, source) | Imported/authored packs for any language; searchable learning material |
 | 3 | `job_applications`, `application_events` | ADR-013 |
 | 4 | `review_queue`, `assessment_attempts` | Assessments defined in content |
 | 5 | none (document extended) | ADR-005/007/008 |
 
-Every table has `owner_id`, `created_at` and `updated_at`. Attempts reference `(exercise_id, exercise_version, content_hash)`.
+Every table has `owner_id`, `created_at` and `updated_at`; every practice table (skills, attempts, drafts, sessions, packs, materials) has a free-text `language`. Attempts reference `(exercise_id, exercise_version, content_hash)`.
 
 ## 4. API (all owner-scoped, zod-validated, same-origin)
 

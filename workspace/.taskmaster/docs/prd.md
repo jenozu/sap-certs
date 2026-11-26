@@ -6,6 +6,19 @@ Status: **revision 2, approved 2026-11-25** (2026-11-25). Revision 1 was broadly
 
 Make Pathway a private, deployed workspace where Andel can (1) practise the SQL concepts he is learning right now — WITH/CTE, LEFT JOIN, CROSS JOIN, UNION and UNION ALL — against a synthetic distributor database, with every attempt recorded; (2) register a concept the moment he learns it elsewhere and add practice for it without code changes; (3) track job applications, including results from his daily job-watch automation; and (4) grow into the full career roadmap (stages 0–6, mastery, assessments, projects, portfolio, checkpoints). Every release must keep all existing workspace functionality, visual design, course progress and portfolio records. Done means the master-plan acceptance scenario passes on production.
 
+## Long-term vision (owner, 2026-11-26)
+
+The Practice Lab is a **permanent, extensible, multi-language personal coding academy**, not a SQL application. SQL is the first language because it is what Andel is studying now; JavaScript, TypeScript, Node.js, Python and others follow alongside his learning. The WITH/CTE, LEFT JOIN, CROSS JOIN, UNION and UNION ALL exercises are **seed content**, not a fixed curriculum. The platform must support:
+
+- Modular **language adapters** (execution + automatic grading), each isolated (SQL: Web Worker; JS/TS: sandboxed iframe; Python: Pyodide worker), reusing playground adapters where practical.
+- One shared exercise/pack format, attempt history, mastery, assessments and spaced repetition across languages.
+- A **dynamic concept library**: any concept from any course or platform can be registered; no hardcoded topics or categories.
+- A **learning material library** (course notes, lesson text, code examples) that is searchable, filterable, linked to concepts, and usable as context for generating exercises.
+- Creating, importing, validating and publishing packs for any supported language without code changes.
+- Custom sessions: one or several concepts, difficulty, quantity.
+
+Release 1 stays SQL-only in content and adapters, but its interfaces (adapter registry, `language` on every practice record, language-declared packs) must let a new language be added without refactoring. New languages are introduced when the owner starts studying them, not after every SQL feature.
+
 ## Principles (owner adjustments)
 
 1. Platform security, database isolation, backups and data preservation come first.
@@ -30,8 +43,8 @@ Make Pathway a private, deployed workspace where Andel can (1) practise the SQL 
 | Release | You can… | Success criteria |
 |---|---|---|
 | **0 — Platform safety** | Use production on Vercel/Neon safely | Sites and Neon data verified and backed up; previews use a separate DB; Vercel Authentication verified on production domain, previews and every API route; explicit `OWNER_ID`, fail-closed; reconciled data intact; regression + visual baselines green; spike passed |
-| **1 — SQL Practice Lab** | Register WITH/LEFT JOIN/CROSS JOIN/UNION/UNION ALL and practise 25 verified ERP exercises | Run/Submit/reset/hints/solution/drafts work on desktop and phone; **every Submit stored** with version, hints/solution usage and independence flag; equivalent answers accepted, hard-coded answers fail; export includes attempts |
-| **2 — Expandable Skill Library** | Import or author new exercise packs (incl. AI-generated) for any registered concept, no code change | Pipeline rejects malformed/unsafe/unverified packs with actionable errors; published versions immutable; attempts keep their version; more practice modes |
+| **1 — Practice Lab (SQL first)** | Register any concept; practise 25 verified SQL seed exercises | Language adapter registry with SQL as first adapter; Run/Submit/reset/hints/solution/drafts work on desktop and phone; **every Submit stored** with version, hints/solution usage and independence flag; equivalent answers accepted, hard-coded answers fail; export includes attempts |
+| **2 — Expandable Skill Library** | Import or author new exercise packs (incl. AI-generated, using your saved notes and examples as context) for any registered concept; search and revisit learning material | Pipeline rejects malformed/unsafe/unverified packs with actionable errors; published versions immutable; attempts keep their version; more practice modes |
 | **3 — Job tracker** | Track applications and import job-watch results (CSV/JSON) | Manual entry, statuses, events, follow-ups; idempotent import with duplicate detection; documented `pathway.jobs.v1` contract ready for later automation |
 | **4 — Mastery & review** | See mastery states, a review queue and take assessments | Rules applied retroactively to attempts recorded since Release 1; assisted/repeated attempts do not inflate mastery |
 | **5 — Career layer** | See stages 0–6, curriculum, project evidence, portfolio, checkpoints, weekly plan v2 | All prior records unchanged; seeding idempotent; Learn SQL 78% only as last-reported seed |
@@ -62,8 +75,11 @@ States introduced → practising → understood → proficient → mastered; rul
 ### C7 Career layer (Release 5)
 Additive extension of the workspace document: stages 0–6 with exit criteria, curriculum (14 courses), Learn SQL last-reported 78% seed rule, role targets per stage, 6 roadmap projects with milestones/evidence/impact (measured vs estimate), portfolio of publishable evidence, readiness checkpoints (never a gate), weekly plan v2 (template from the schedule doc, linked sessions, forward-only template changes, Sunday review).
 
-### C8 Later languages
-JS/TS/Node practice sandbox (Phase 8) before Python (Phase 9, deferred).
+### C8 Additional languages
+Each new language = one adapter (engine + evaluator + pack checks) + packs; no changes to practice UI, storage, mastery or review. JavaScript/TypeScript/Node.js first (start when JS study begins, any time after Release 1), then Python.
+
+### C9 Learning material library (Release 2)
+Notes, lesson text, code examples and links per language, linked to concepts, searchable and filterable, exportable, and selectable as context for AI exercise generation.
 
 ## Structure
 
@@ -110,4 +126,6 @@ Next.js 16 App Router on Vercel, Neon Postgres via Drizzle, Vercel Authenticatio
 - 2026-11-25 (owner): Merge playground phase-6 if its acceptance criteria and tests pass after review. (task 5)
 - 2026-11-25 (owner): Commit planning docs to `docs/pathway-v2-plan` in jenozu/sap-certs; GitHub is the single source of truth.
 - 2026-11-25 (owner): Revision 2 approved; Release 0 may begin. Stop for approval before production DB migration, destructive operations or production release.
+- 2026-11-26 (owner): Practice Lab is a permanent multi-language academy; SQL concepts are seed content. Added language adapter registry (task 13), `language` on all practice data (14), language-declared packs (16), learning material library (task 48, Release 2), and JS/TS/Node adapters may start any time after Release 1 (tasks 45–46). Release 1 scope unchanged otherwise.
+- 2026-11-26 (owner): Release 0 production deployment approved, conditional on all security checks, backups, tests and acceptance criteria passing; stop before exposing data if any check fails. Optional Vercel automation secrets deferred.
 - 2026-11-25 (owner): Re-ordered: platform safety → usable SQL Practice Lab (with attempts recorded from day one) → expandable Skill Library → job tracker (early, not blocking practice) → mastery → career layer; spike moved into Phase 1; JS/TS/Node before Python; minimal infrastructure. Consequence: revision 1's full relational migration and page.tsx route split are dropped in favour of additive tables and an additive document schema. (supersedes revision 1 tasks 8–13)

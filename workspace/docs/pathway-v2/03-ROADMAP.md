@@ -7,13 +7,16 @@ No dates: order and gates matter. Each phase runs on a feature branch with small
 | 0 Approval | — | Revision 2 approved | 1 |
 | 1 → **Release 0** Platform safety | Production live on Vercel/Neon, protected, backed up, data reconciled | Both data sources backed up; previews isolated; protection verified (stop condition); spike passed; phase-6 merged; regression + visual baselines green | 2–12 |
 | 2 → **Release 1** SQL Practice Lab | Register WITH/CTE, LEFT JOIN, CROSS JOIN, UNION, UNION ALL; practise 25 verified ERP exercises; every Submit recorded | Practice Lab gates 1–2 (MVP scope); idempotent attempts; export includes attempts | 13–23 |
-| 3 → **Release 2** Expandable Skill Library | Import/author/AI-generate packs for any concept without code change; more practice modes | Practice Lab gate 3 | 24–27 |
+| 3 → **Release 2** Expandable Skill Library | Import/author/AI-generate packs for any concept and language without code change; learning material library as generation context; more practice modes | Practice Lab gate 3 | 24–27, 48 |
 | 4 → **Release 3** Job tracker | Track applications; import job-watch CSV/JSON | Idempotent import, dedupe, contract documented | 28–30 |
 | 5 → **Release 4** Mastery & review | Mastery states (computed over all attempts since Release 1), review queue, assessments | Practice Lab gate 4 (minus career links) | 31–34 |
 | 6 → **Release 5** Career layer | Stages 0–6, curriculum, project evidence, portfolio, checkpoints, weekly plan v2 | Prior records unchanged (export diff = additions only) | 35–40 |
 | 7 → **Release 6** Acceptance | 100 exercises, SQL graduation assessment | Master-plan acceptance scenario | 41–44 |
-| 8 JS/TS/Node practice | JavaScript practice sandbox and first pack | ADR approved; isolated execution tested | 45–46 |
+| 8 JS/TS/Node practice | JavaScript adapter and first pack — **starts when JS study begins, any time after Release 1** | ADR approved; isolated execution tested | 45–46 |
 | 9 Python practice | Deferred | — | 47 |
+
+## Multi-language vision (2026-11-26)
+The Practice Lab is a permanent multi-language academy. Release 1 builds SQL content only, but on language-neutral foundations (adapter registry, `language` everywhere, language-declared packs). Languages are added alongside the owner's learning: the JS/TS/Node adapter (tasks 45–46) can start as soon as JS study begins, in parallel with Releases 2–6.
 
 ## What changed from revision 1
 

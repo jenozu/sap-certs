@@ -9,7 +9,7 @@ Status: **awaiting owner approval of revision 2**. No implementation has started
 | [02-ARCHITECTURE.md](02-ARCHITECTURE.md) | System design, ADR-001…013, additive data model per release, API, deployment, security |
 | [03-ROADMAP.md](03-ROADMAP.md) | Phases → releases, what changed from revision 1, rationale, procedure, deployment |
 | [04-TRACEABILITY.md](04-TRACEABILITY.md) | Owner adjustments, master plan and Practice Lab requirements → UI, data, tests, tasks |
-| [05-TASKS.md](05-TASKS.md) | 47 tasks with acceptance criteria (rendered from `.taskmaster/tasks/tasks.json`) |
+| [05-TASKS.md](05-TASKS.md) | 48 tasks with acceptance criteria (rendered from `.taskmaster/tasks/tasks.json`) |
 | [06-OWNER-ACTIONS.md](06-OWNER-ACTIONS.md) | Actions that need your logins or secret values |
 
 Paths are relative to `jenozu/sap-certs/workspace/`.

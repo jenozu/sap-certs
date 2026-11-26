@@ -22,7 +22,7 @@
         "dependencies": [
           1
         ],
-        "details": "Owner: (a) Sites app → 'Export workspace' → save JSON; (b) current Vercel preview → 'Export workspace' → save JSON (this is the Neon copy); (c) Neon console → create branch `backup-pre-v2` from main; (d) run the read-only SQL in docs/pathway-v2/06-OWNER-ACTIONS.md (row count, version, md5 of data) and paste the output. Claude: `scripts/compare-exports.mjs a.json b.json` (local, read-only) reports item counts by kind, sessions count, and every item that differs by id/field, and which side is newer by field content. Exports stay outside the repo.\n\n[2026-11-25T14:50:19-05:00] Neon: project square-lab-67866008, main br-bold-tree-bddd5rw2; backup-pre-v2 br-ancient-heart-bdf2u1lx; workspaces 0 rows. Preview export = seed defaults. Sites export broken (limitation).",
+        "details": "Owner: (a) Sites app \u2192 'Export workspace' \u2192 save JSON; (b) current Vercel preview \u2192 'Export workspace' \u2192 save JSON (this is the Neon copy); (c) Neon console \u2192 create branch `backup-pre-v2` from main; (d) run the read-only SQL in docs/pathway-v2/06-OWNER-ACTIONS.md (row count, version, md5 of data) and paste the output. Claude: `scripts/compare-exports.mjs a.json b.json` (local, read-only) reports item counts by kind, sessions count, and every item that differs by id/field, and which side is newer by field content. Exports stay outside the repo.\n\n[2026-11-25T14:50:19-05:00] Neon: project square-lab-67866008, main br-bold-tree-bddd5rw2; backup-pre-v2 br-ancient-heart-bdf2u1lx; workspaces 0 rows. Preview export = seed defaults. Sites export broken (limitation).",
         "testStrategy": "Acceptance: both exports parse with stateSchema; Neon backup branch exists; comparison report recorded in the task log (counts and ids only, no note text); owner confirms which copy is authoritative per differing item.",
         "complexity": 3,
         "subtasks": []
@@ -36,7 +36,7 @@
         "dependencies": [
           2
         ],
-        "details": "Owner: Neon branch `preview` from main; in Vercel set DATABASE_URL Production-only (existing) and a new Preview-scoped DATABASE_URL for the preview branch (Claude never sees the value). Claude: add DB_ENV (production/preview) and GET /api/health → {ok, dbEnv, schemaVersion} with no data or secrets.\n\n[2026-11-25T14:50:19-05:00] Neon branch preview br-bold-thunder-bdiare1u created.",
+        "details": "Owner: Neon branch `preview` from main; in Vercel set DATABASE_URL Production-only (existing) and a new Preview-scoped DATABASE_URL for the preview branch (Claude never sees the value). Claude: add DB_ENV (production/preview) and GET /api/health \u2192 {ok, dbEnv, schemaVersion} with no data or secrets.\n\n[2026-11-25T14:50:19-05:00] Neon branch preview br-bold-thunder-bdiare1u created.",
         "testStrategy": "Acceptance: a new preview reports dbEnv=preview; editing data on the preview leaves the production md5 from task 2 unchanged.",
         "complexity": 3,
         "subtasks": []
@@ -103,8 +103,8 @@
         "dependencies": [
           1
         ],
-        "details": "In jenozu/playground: review the 26-file diff (tasks 37–42, 65) for regressions and security; run its gate (task 43): lint, typecheck, vitest, build, Playwright incl. new autosave/dashboard/notes/progress specs; confirm phase 1–5 e2e still pass; open PR phase-6 → main with results; merge; record SHA. Requires push access to playground.\n\n[2026-11-25T17:16:51-05:00] playground PR #5 merged 4d5f263 after gate: lint, tsc, vitest 106/106, build, Playwright 26/26; review clean (minor: no size cap on local import).",
-        "testStrategy": "Acceptance: PR shows all checks green (106+ unit tests, all e2e) and a written review; merged SHA logged; playground TASKS.md shows tasks 37–43 done.",
+        "details": "In jenozu/playground: review the 26-file diff (tasks 37\u201342, 65) for regressions and security; run its gate (task 43): lint, typecheck, vitest, build, Playwright incl. new autosave/dashboard/notes/progress specs; confirm phase 1\u20135 e2e still pass; open PR phase-6 \u2192 main with results; merge; record SHA. Requires push access to playground.\n\n[2026-11-25T17:16:51-05:00] playground PR #5 merged 4d5f263 after gate: lint, tsc, vitest 106/106, build, Playwright 26/26; review clean (minor: no size cap on local import).",
+        "testStrategy": "Acceptance: PR shows all checks green (106+ unit tests, all e2e) and a written review; merged SHA logged; playground TASKS.md shows tasks 37\u201343 done.",
         "complexity": 4,
         "subtasks": []
       },
@@ -118,7 +118,7 @@
           3
         ],
         "details": "lib/server/owner.ts resolveOwner() = process.env.OWNER_ID or 503 'Server not configured'. Production OWNER_ID = existing Neon workspaces.user_id (from task 2 output); preview gets its own. Shared request guard: same-origin, JSON content-type, size cap. Remove next-auth dependency; remove stale AUTH_* env vars (owner OK given in decision 2). Fix pre-existing lint error page.tsx:19 without behaviour change. Update README and docs/vercel-migration.md.\n\n[2026-11-25T15:46:35-05:00] 368bafb on feat/v2-p1-platform: owner.ts, guard.ts, health; next-auth removed; lint 0 errors; next build ok.",
-        "testStrategy": "Acceptance: lint/typecheck/build green; route tests: OWNER_ID unset → 503, foreign Origin → 403, non-JSON → 415, stale version → 409, valid → 200; a second workspaces row no longer breaks loading.",
+        "testStrategy": "Acceptance: lint/typecheck/build green; route tests: OWNER_ID unset \u2192 503, foreign Origin \u2192 403, non-JSON \u2192 415, stale version \u2192 409, valid \u2192 200; a second workspaces row no longer breaks loading.",
         "complexity": 5,
         "subtasks": []
       },
@@ -132,7 +132,7 @@
           6
         ],
         "details": "Read settings via Vercel API (ssoProtection.deploymentType must be 'all'; already set). Unauthenticated HTTP checks of /, /api/health, /api/workspace on: a preview URL, the branch alias, and the production domain career-roadmap-jenozus-projects.vercel.app. Production is checked on the first production deploy made with OWNER_ID unset, so even an unprotected domain could return only 503 and no data; OWNER_ID is set only after the checks pass. scripts/check-protection.mjs runs the settings check in CI. If any target is reachable without Vercel login, stop and discuss alternatives (e.g. Pro 'all deployments' scope, password protection, app-level secret).\n\n[2026-11-25T17:11:58-05:00] Settings: ssoProtection=all. Preview /api/workspace 302->login (earlier). CI check script 00974c3 (needs VERCEL_TOKEN secret). Pending: unauthenticated checks of new preview routes (WebFetch approval) and production domain at Release 0.",
-        "testStrategy": "Acceptance: every target returns a redirect to vercel.com/login (or 401) when unauthenticated; result table logged. Already verified 2026-11-25: preview /api/workspace → 302 vercel.com/login.",
+        "testStrategy": "Acceptance: every target returns a redirect to vercel.com/login (or 401) when unauthenticated; result table logged. Already verified 2026-11-25: preview /api/workspace \u2192 302 vercel.com/login.",
         "complexity": 3,
         "subtasks": []
       },
@@ -192,7 +192,7 @@
           9,
           10
         ],
-        "details": "Merge main's doc commits into the Vercel branch; PR with CI green; owner approves; merge. First production deploy with OWNER_ID unset → run task 7 production checks → set OWNER_ID → redeploy. Fresh Neon backup branch, then apply the reconciliation import on production if task 2 found newer Sites data.",
+        "details": "Merge main's doc commits into the Vercel branch; PR with CI green; owner approves; merge. First production deploy with OWNER_ID unset \u2192 run task 7 production checks \u2192 set OWNER_ID \u2192 redeploy. Fresh Neon backup branch, then apply the reconciliation import on production if task 2 found newer Sites data.",
         "testStrategy": "Acceptance: production READY and protected (task 7 table); regression suite read-only subset green on production; production data matches the agreed reconciliation; CHANGELOG records test results.",
         "complexity": 3,
         "subtasks": []
@@ -220,8 +220,8 @@
         "dependencies": [
           11
         ],
-        "details": "Upstream PR to playground: sql worker accepts wasmUrl in init (fallback to Vite ?url), single zod import module; merge; then copy the listed modules to workspace/vendor/playground with UPSTREAM.json (sha, files, sha256), scripts/sync-playground.mjs, tests/vendor-integrity.test.ts, prebuild copy of sql-wasm.wasm. Delete the spike route.",
-        "testStrategy": "Acceptance: integrity test fails if a vendored file is edited; ported vendored unit tests pass; build green; playground CI green.",
+        "details": "Upstream PR to playground: sql worker accepts wasmUrl in init (fallback to Vite ?url), single zod import module; merge; then copy the listed modules to workspace/vendor/playground with UPSTREAM.json (sha, files, sha256), scripts/sync-playground.mjs, tests/vendor-integrity.test.ts, prebuild copy of sql-wasm.wasm. Delete the spike route. Vendor behind a LanguageAdapter registry (lib/practice/adapters/: id, label, dialect note, createEngine, evaluate, editor language); SQL is the first registered adapter. Adding a language = new adapter + packs, no changes to practice UI, storage or mastery.",
+        "testStrategy": "Acceptance: integrity test fails if a vendored file is edited; ported vendored unit tests pass; build green; playground CI green. Unit: registry resolves 'sql'; unknown language returns a clear 'not supported yet' result; adding a fake adapter in a test needs no other code changes.",
         "complexity": 4,
         "subtasks": []
       },
@@ -234,21 +234,21 @@
         "dependencies": [
           11
         ],
-        "details": "Tables: skills (owner-scoped: id slug, language, name, aliases text[], state default 'introduced', source, notes), exercise_attempts (insert-only, client id = idempotency key; exercise_id, exercise_version, content_hash, pack_id, code, passed, construct_ok, results jsonb, hints_used, solution_viewed, independent, mode, practice_session_id, duration_ms, started_at, submitted_at), saved_code (exercise_id, code, rev), practice_sessions (id, config jsonb, started_at, ended_at). Repository helpers always filter owner_id; rev-checked updates; ON CONFLICT DO NOTHING inserts; zod schemas shared with client; body caps. Routes under /api/v2.",
-        "testStrategy": "Acceptance: PGlite tests: owner isolation, duplicate attempt id → one row, stale rev → 409, oversize → 413; migration applies on top of the production schema; workspaces table untouched.",
+        "details": "Tables: skills (owner-scoped: id slug, language, name, aliases text[], state default 'introduced', source, notes), exercise_attempts (insert-only, client id = idempotency key; exercise_id, exercise_version, content_hash, pack_id, code, passed, construct_ok, results jsonb, hints_used, solution_viewed, independent, mode, practice_session_id, duration_ms, started_at, submitted_at), saved_code (exercise_id, code, rev), practice_sessions (id, config jsonb, started_at, ended_at). Repository helpers always filter owner_id; rev-checked updates; ON CONFLICT DO NOTHING inserts; zod schemas shared with client; body caps. Routes under /api/v2. Every practice table carries `language` (text, not an enum). skills = dynamic per-owner concept library (language, name, aliases, tags[], notes, source); no hardcoded topics or categories.",
+        "testStrategy": "Acceptance: PGlite tests: owner isolation, duplicate attempt id \u2192 one row, stale rev \u2192 409, oversize \u2192 413; migration applies on top of the production schema; workspaces table untouched.",
         "complexity": 6,
         "subtasks": []
       },
       {
         "id": 15,
-        "title": "[P2] Evaluator extensions: fixtures, constructs, equivalence, caps",
+        "title": "[P2] Evaluator extensions: fixtures, constructs, equivalence, caps (SQL adapter)",
         "description": "Robust, fair grading.",
         "status": "pending",
         "priority": "high",
         "dependencies": [
           13
         ],
-        "details": "lib/practice/evaluate.ts wraps vendored evaluateSql: per-fixture runs with expected results from the reference solution; ignoreColumnNames default true; numericTolerance; requiredConstructs checked on comment/string-stripped tokens and reported separately; caps 1,000 rows shown / 2 MB / 50 result sets. Old test files behave exactly as before.",
+        "details": "lib/practice/evaluate.ts wraps vendored evaluateSql: per-fixture runs with expected results from the reference solution; ignoreColumnNames default true; numericTolerance; requiredConstructs checked on comment/string-stripped tokens and reported separately; caps 1,000 rows shown / 2 MB / 50 result sets. Old test files behave exactly as before. Evaluator lives behind the adapter's evaluate(); shared result shape {passed, checks[], constructOk, output} used by all languages.",
         "testStrategy": "Acceptance: vitest: hard-coded rows pass fixture A but fail B; alias-renamed correct query passes; missing LEFT JOIN or UNION ALL flagged by construct check; 1 vs 1.0 within tolerance passes; playground sample course tests unchanged.",
         "complexity": 6,
         "subtasks": []
@@ -262,7 +262,7 @@
         "dependencies": [
           15
         ],
-        "details": "ADR-009 optional fields on course.json v1 (exerciseId, skills, difficulty, kind, businessPurpose, exerciseVersion; tests: fixtures, requiredConstructs, numericTolerance, ignoreColumnNames). lib/practice/pack-validator.ts (strict rules, size/path/ID checks). Bundled packs under content/packs/* built into a manifest at build time. `npm run content:verify` runs every reference solution on every fixture in Node sql.js.",
+        "details": "ADR-009 optional fields on course.json v1 (exerciseId, skills, difficulty, kind, businessPurpose, exerciseVersion; tests: fixtures, requiredConstructs, numericTolerance, ignoreColumnNames). lib/practice/pack-validator.ts (strict rules, size/path/ID checks). Bundled packs under content/packs/* built into a manifest at build time. `npm run content:verify` runs every reference solution on every fixture in Node sql.js. Pack manifest declares `language`; validator dispatches language-specific checks to the adapter (SQL: fixtures). Generic rules (ids, paths, sizes, versions, skills) are shared.",
         "testStrategy": "Acceptance: validator unit test per rejection rule (bad JSON, traversal, absolute path, oversize, duplicate id, missing solution, <2 fixtures); a valid pack loads; content:verify runs in CI.",
         "complexity": 5,
         "subtasks": []
@@ -290,7 +290,7 @@
         "dependencies": [
           17
         ],
-        "details": "Pack sql-erp-core v1.0.0: 5 LEFT JOIN (missing orders, unsold products…), 5 CROSS JOIN (warehouse/product matrix…), 5 UNION/UNION ALL (at least 2 require UNION ALL and 2 UNION, incl. duplicate-handling contrast; branch shipments), 5 WITH/CTE (supplier spend, outstanding receipts…), 5 mixed. Each: business purpose, instructions, starter, ≥2 hints, tests with fixtures + requiredConstructs, verified solution.",
+        "details": "Pack sql-erp-core v1.0.0: 5 LEFT JOIN (missing orders, unsold products\u2026), 5 CROSS JOIN (warehouse/product matrix\u2026), 5 UNION/UNION ALL (at least 2 require UNION ALL and 2 UNION, incl. duplicate-handling contrast; branch shipments), 5 WITH/CTE (supplier spend, outstanding receipts\u2026), 5 mixed. Each: business purpose, instructions, starter, \u22652 hints, tests with fixtures + requiredConstructs, verified solution.",
         "testStrategy": "Acceptance: content:verify passes all 25 on all fixtures; a hard-coded answer fails every graded exercise; owner reviews 5 samples before release.",
         "complexity": 7,
         "subtasks": []
@@ -305,8 +305,8 @@
           14,
           16
         ],
-        "details": "/practice/[exerciseId]: instructions, schema browser, editor, output, progressive hints, solution (confirm), Run (free), Submit (evaluate + POST attempt with hints_used, solution_viewed, independent flag, version, duration), Reset sandbox (fixture re-init, keeps draft), Restore starter (separate). Drafts: debounced cloud save + IndexedDB offline queue for drafts and unsent attempts. SQLite dialect label. Existing visual design tokens (globals.css). Desktop panels, mobile tabs.",
-        "testStrategy": "Acceptance: e2e: run; pass and fail submits each create one attempt row; double-click submit → one row; offline submit appears after reconnect; reset keeps draft; reload restores draft; 390px usable; axe clean.",
+        "details": "/practice/[exerciseId]: instructions, schema browser, editor, output, progressive hints, solution (confirm), Run (free), Submit (evaluate + POST attempt with hints_used, solution_viewed, independent flag, version, duration), Reset sandbox (fixture re-init, keeps draft), Restore starter (separate). Drafts: debounced cloud save + IndexedDB offline queue for drafts and unsent attempts. SQLite dialect label. Existing visual design tokens (globals.css). Desktop panels, mobile tabs. Focus view is language-agnostic: editor language, schema/context panel and dialect label come from the adapter.",
+        "testStrategy": "Acceptance: e2e: run; pass and fail submits each create one attempt row; double-click submit \u2192 one row; offline submit appears after reconnect; reset keeps draft; reload restores draft; 390px usable; axe clean.",
         "complexity": 7,
         "subtasks": [
           {
@@ -375,7 +375,7 @@
           18,
           19
         ],
-        "details": "/skills: list with state; 'Add learned material' form (language, concept names, notes/source, difficulty, wanted count 5/10/20/30). Normalise case/punctuation/plurals + alias table seeded from the SQL foundation checklist (e.g. 'with clause'/'common table expression' → sql-cte); dedupe; new concepts start 'introduced'. Result page lists matching exercises first; if too few, shows 'import a pack' and 'copy AI prompt' (prompt text template, implemented fully in task 'author'). Simple practice launcher: choose concept(s), count, hints on/off → session of matching exercises.",
+        "details": "/skills: list with state; 'Add learned material' form (language, concept names, notes/source, difficulty, wanted count 5/10/20/30). Normalise case/punctuation/plurals + alias table seeded from the SQL foundation checklist (e.g. 'with clause'/'common table expression' \u2192 sql-cte); dedupe; new concepts start 'introduced'. Result page lists matching exercises first; if too few, shows 'import a pack' and 'copy AI prompt' (prompt text template, implemented fully in task 'author'). Simple practice launcher: choose concept(s), count, hints on/off \u2192 session of matching exercises. Concept registration accepts any language string; concepts can carry source (course/platform), notes and tags. Skill list supports search and filter by language, tag, state.",
         "testStrategy": "Acceptance: entering 'with clause, Left Join, cross joins, UNION, union all' yields 5 skills, no duplicates, linked to the 25 exercises; an unknown concept is created as introduced with zero exercises and clear next steps; e2e at 390px.",
         "complexity": 5,
         "subtasks": []
@@ -391,7 +391,7 @@
           14
         ],
         "details": "Extend Export to {format:'pathway-export', version:2, workspace, skills, attempts, drafts, sessions}; import accepts v1 and v2 with dry run; attempts imported by id (idempotent).",
-        "testStrategy": "Acceptance: export → import into an empty owner reproduces everything; second import changes nothing; v1 files still import.",
+        "testStrategy": "Acceptance: export \u2192 import into an empty owner reproduces everything; second import changes nothing; v1 files still import.",
         "complexity": 4,
         "subtasks": []
       },
@@ -437,7 +437,7 @@
         "dependencies": [
           23
         ],
-        "details": "Tables packs, pack_versions (status staged/validated/published/rejected, manifest, files jsonb ≤2 MB, report). Upload ZIP (fflate, path checks) or JSON; server + client validation; client worker runs each reference solution on each fixture and stores expected results; review screen; publish creates an immutable version; same exerciseId keeps identity; attempts keep their version. Bundled and imported packs appear in one registry.",
+        "details": "Tables packs, pack_versions (status staged/validated/published/rejected, manifest, files jsonb \u22642 MB, report). Upload ZIP (fflate, path checks) or JSON; server + client validation; client worker runs each reference solution on each fixture and stores expected results; review screen; publish creates an immutable version; same exerciseId keeps identity; attempts keep their version. Bundled and imported packs appear in one registry.",
         "testStrategy": "Acceptance: malformed JSON, ../ path, absolute path, oversized file, duplicate id, version downgrade, failing reference solution each rejected with an actionable message and retry; a valid pack is practisable immediately after publish; attempts recorded before a republish still show the original version.",
         "complexity": 9,
         "subtasks": [
@@ -505,7 +505,7 @@
         "dependencies": [
           24
         ],
-        "details": "Authoring form writes a staged pack (same pipeline). 'Copy AI prompt' embeds the pack schema, dataset schema, selected skills and rules (business purpose, fixtures, required constructs, synthetic data only). No server-side AI provider.",
+        "details": "Authoring form writes a staged pack (same pipeline). 'Copy AI prompt' embeds the pack schema, dataset schema, selected skills and rules (business purpose, fixtures, required constructs, synthetic data only). No server-side AI provider. The AI prompt can include selected learning materials (course notes, lesson text, code examples) as context.",
         "testStrategy": "Acceptance: authored exercise passes the pipeline and is practisable; prompt snapshot test contains schema and selected skills; a pack produced from the prompt by an AI chat imports successfully (manual check).",
         "complexity": 4,
         "subtasks": []
@@ -519,7 +519,7 @@
         "dependencies": [
           23
         ],
-        "details": "Session setup adds difficulty, duration timer and mode; selection prefers unattempted then failed; predict-output (type expected output, then reveal); debugging from buggy starter; free sandbox with fixture picker and no grading; session summary.",
+        "details": "Session setup adds difficulty, duration timer and mode; selection prefers unattempted then failed; predict-output (type expected output, then reveal); debugging from buggy starter; free sandbox with fixture picker and no grading; session summary. Session setup supports multiple concepts across one language, difficulty, quantity; filters by language.",
         "testStrategy": "Acceptance: unit tests for selection; e2e per mode at 1440 and 390; timer ends session with summary; sandbox never records graded attempts.",
         "complexity": 6,
         "subtasks": []
@@ -533,10 +533,11 @@
         "dependencies": [
           24,
           25,
-          26
+          26,
+          48
         ],
         "details": "",
-        "testStrategy": "Acceptance: register unknown concept → import/author pack → validate → publish → practise, with no code change; all rejection rules tested; ids and attempts preserved; suites green.",
+        "testStrategy": "Acceptance: register unknown concept \u2192 import/author pack \u2192 validate \u2192 publish \u2192 practise, with no code change; all rejection rules tested; ids and attempts preserved; suites green. Learning materials searchable and usable as generation context.",
         "complexity": 2,
         "subtasks": []
       },
@@ -549,7 +550,7 @@
         "dependencies": [
           14
         ],
-        "details": "Tables job_applications, application_events. /jobs list + status board: title, company, URL, remote type, Canada eligibility, posted salary, requirements, fit notes/suitability, gaps, status (saved/applied/interviewing/offer/rejected/withdrawn/closed), applied date, follow-up date, source, external_ref; events timeline; follow-up due list; optional link to an existing role-target item (j1–j5). Existing visual style.",
+        "details": "Tables job_applications, application_events. /jobs list + status board: title, company, URL, remote type, Canada eligibility, posted salary, requirements, fit notes/suitability, gaps, status (saved/applied/interviewing/offer/rejected/withdrawn/closed), applied date, follow-up date, source, external_ref; events timeline; follow-up due list; optional link to an existing role-target item (j1\u2013j5). Existing visual style.",
         "testStrategy": "Acceptance: e2e: add an application with no practice evidence; status change logs an event; follow-up due today is listed; 390px; owner isolation tested.",
         "complexity": 5,
         "subtasks": []
@@ -563,7 +564,7 @@
         "dependencies": [
           28
         ],
-        "details": "Versioned contract pathway.jobs.v1 (JSON array or CSV with header mapping): required title, company, url; optional remote, canada_eligible, salary_text, requirements, suitability, posted_at, source, external_ref. Dry run → new / duplicate (canonical URL or source+external_ref) / invalid; apply is idempotent; imported rows start 'saved'. Spec published at docs/pathway-v2/job-import-contract.md with a ready-to-paste ChatGPT instruction so the daily automation outputs this format. Future: same handler behind a token-authenticated endpoint.",
+        "details": "Versioned contract pathway.jobs.v1 (JSON array or CSV with header mapping): required title, company, url; optional remote, canada_eligible, salary_text, requirements, suitability, posted_at, source, external_ref. Dry run \u2192 new / duplicate (canonical URL or source+external_ref) / invalid; apply is idempotent; imported rows start 'saved'. Spec published at docs/pathway-v2/job-import-contract.md with a ready-to-paste ChatGPT instruction so the daily automation outputs this format. Future: same handler behind a token-authenticated endpoint.",
         "testStrategy": "Acceptance: sample JSON and CSV import; re-import creates no duplicates; invalid rows reported with line numbers; contract doc includes JSON schema and CSV columns.",
         "complexity": 4,
         "subtasks": []
@@ -593,7 +594,7 @@
           27
         ],
         "details": "lib/domain/mastery.ts with injectable clock; recompute skills.state after each submit and once over history at release.",
-        "testStrategy": "Acceptance: 3 distinct independent passes → understood; same exercise 3× → not; hint/solution-assisted passes ignored; 2 mixed → proficient; 2 delayed ≥7 days → mastered; 6 days → not; historical attempts produce the expected states.",
+        "testStrategy": "Acceptance: 3 distinct independent passes \u2192 understood; same exercise 3\u00d7 \u2192 not; hint/solution-assisted passes ignored; 2 mixed \u2192 proficient; 2 delayed \u22657 days \u2192 mastered; 6 days \u2192 not; historical attempts produce the expected states.",
         "complexity": 6,
         "subtasks": []
       },
@@ -650,13 +651,13 @@
           23
         ],
         "details": "Optional new item fields (provider, progressSource, skills[], milestones[], evidence[], impact[], publishable, simulated, roleTargetId) and kinds ('stage'); old documents stay valid. Seed by id only when missing: Stage 0 'now', 'ts-node', 'integration'; 14 curriculum courses; Learn SQL at 78% marked last-reported only if no item has the Learn SQL URL; role targets per master-plan table; 6 roadmap projects. Never modify an existing item; 'update available' suggestions for unedited seed items; 'suggested re-mapping' list (ADR-007).",
-        "testStrategy": "Acceptance: seeding twice adds nothing; edited items untouched; user Learn SQL value wins; c1–c6, p1–p5, f1–f3, j1–j5, o1–o3 unchanged; snapshot taken before first seed.",
+        "testStrategy": "Acceptance: seeding twice adds nothing; edited items untouched; user Learn SQL value wins; c1\u2013c6, p1\u2013p5, f1\u2013f3, j1\u2013j5, o1\u2013o3 unchanged; snapshot taken before first seed.",
         "complexity": 6,
         "subtasks": []
       },
       {
         "id": 36,
-        "title": "[P6] Roadmap stages 0–6 and current-phase next action",
+        "title": "[P6] Roadmap stages 0\u20136 and current-phase next action",
         "description": "Stage cards with courses, skills, assessments, projects, evidence, job targets.",
         "status": "pending",
         "priority": "medium",
@@ -769,7 +770,7 @@
         "dependencies": [
           42
         ],
-        "details": "e2e/acceptance.spec.ts: register WITH/LEFT JOIN/CROSS JOIN/UNION → import validated pack → practise, attempts recorded → skill/review update → assessment → link SQL project + portfolio evidence → job targets → track application → reload → persistence and older records verified. Preview automated; production manual.",
+        "details": "e2e/acceptance.spec.ts: register WITH/LEFT JOIN/CROSS JOIN/UNION \u2192 import validated pack \u2192 practise, attempts recorded \u2192 skill/review update \u2192 assessment \u2192 link SQL project + portfolio evidence \u2192 job targets \u2192 track application \u2192 reload \u2192 persistence and older records verified. Preview automated; production manual.",
         "testStrategy": "Acceptance: automated green on preview; owner signs off production checklist.",
         "complexity": 6,
         "subtasks": []
@@ -790,14 +791,14 @@
       },
       {
         "id": 45,
-        "title": "[P8] JavaScript/TypeScript/Node practice sandbox ADR",
+        "title": "[P8] JavaScript/TypeScript/Node.js language adapters ADR (start when JS study begins)",
         "description": "Next roadmap stage; precedes Python.",
         "status": "pending",
         "priority": "low",
         "dependencies": [
-          27
+          23
         ],
-        "details": "Design: JS in a sandboxed iframe (no same-origin, per playground decision), TS compiled in the sandbox, Node-style exercises against simulated ERP/carrier APIs (no real network), evaluator for asserts/stdout, packs through the same pipeline.",
+        "details": "Design: JS in a sandboxed iframe (no same-origin, per playground decision), TS compiled in the sandbox, Node-style exercises against simulated ERP/carrier APIs (no real network), evaluator for asserts/stdout, packs through the same pipeline. Scheduled alongside the owner's learning progression: may start any time after Release 1 (does not wait for Releases 2\u20136).",
         "testStrategy": "Acceptance: ADR approved by owner.",
         "complexity": 4,
         "subtasks": []
@@ -811,7 +812,7 @@
         "dependencies": [
           45
         ],
-        "details": "Implement per ADR (reuse playground task-50 design if built there); JS fundamentals pack aligned with courses/javascript.",
+        "details": "Implement per ADR (reuse playground task-50 design if built there); JS fundamentals pack aligned with courses/javascript. Uses the shared pack format, attempts, mastery and review; isolation: sandboxed iframe (no same-origin) + timeouts.",
         "testStrategy": "Acceptance: JS exercise runs isolated, times out, records attempts; pack verified.",
         "complexity": 7,
         "subtasks": []
@@ -827,6 +828,20 @@
         ],
         "details": "Reuse vendored python adapter and evaluator.",
         "testStrategy": "Acceptance (when scheduled): Python exercise runs, times out, records attempts.",
+        "complexity": 5,
+        "subtasks": []
+      },
+      {
+        "id": 48,
+        "title": "[P3] Learning material library (notes, lesson text, code examples)",
+        "description": "Store and revisit what was learned anywhere; use it as context for generating exercises.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [
+          23
+        ],
+        "details": "Table learning_materials (owner_id, id, language, title, kind note|lesson|example|link, source, body text \u2264100 KB, url, concept ids[], tags[], created/updated, rev). /library/materials: add, edit, search (title/body/tags), filter by language/concept/kind, link to concepts. Selected materials feed the copyable AI prompt (task 25). Included in export/import.",
+        "testStrategy": "Acceptance: add a note with a code example linked to sql-cte; search finds it by text and tag; filter by language; it appears in the AI prompt when selected; export/import round-trips; owner isolation tested.",
         "complexity": 5,
         "subtasks": []
       }
