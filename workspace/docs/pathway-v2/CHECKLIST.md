@@ -65,7 +65,7 @@ _Last updated: 2026-11-26 18:05 (America/Toronto)_
 | A16 | Review 5 sample exercises on the preview (task 18 acceptance) | requested |
 | A18 | Approve the adaptive-learning plan amendment (tasks 49–51 and expanded tasks) | **done** 2026-11-26 18:03 |
 | A19 | Approve ADR-016 numbers (task 49) before task 31 | pending (not yet drafted) |
-| A20 | Merge docs PR `docs/adaptive-learning-plan` (gh token invalid; open via compare link) | requested |
+| A20 | Merge docs PR #4 (`docs/adaptive-learning-plan`): https://github.com/jenozu/sap-certs/pull/4 | requested |
 | A13 | Optional: delete leftover branch `probe/prod-r0` (proxy cannot delete) | optional |
 
 ## Backup limitations
