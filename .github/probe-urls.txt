@@ -1,0 +1,11 @@
+# probed unauthenticated by protection-probe.yml
+https://career-roadmap-at6dn2n0x-jenozus-projects.vercel.app/
+https://career-roadmap-at6dn2n0x-jenozus-projects.vercel.app/api/health
+https://career-roadmap-at6dn2n0x-jenozus-projects.vercel.app/api/workspace
+https://career-roadmap-at6dn2n0x-jenozus-projects.vercel.app/api/workspace/import
+https://career-roadmap-at6dn2n0x-jenozus-projects.vercel.app/lab-spike
+https://career-roadmap-at6dn2n0x-jenozus-projects.vercel.app/sqljs/sql-wasm.wasm
+https://career-roadmap-git-feat-v2-p1-platform-jenozus-projects.vercel.app/
+https://career-roadmap-git-feat-v2-p1-platform-jenozus-projects.vercel.app/api/workspace
+https://career-roadmap-jenozus-projects.vercel.app/
+https://career-roadmap-jenozus-projects.vercel.app/api/health

@@ -2,19 +2,17 @@ name: protection-probe
 # Unauthenticated requests to deployment URLs. Every URL must answer with a redirect
 # to Vercel login (or 401/403). Any 2xx = data could be exposed -> job fails.
 on:
+  push:
+    paths: ['.github/probe-urls.txt']
   workflow_dispatch:
-    inputs:
-      urls:
-        description: Space-separated URLs to probe
-        required: true
 jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Probe without credentials
-        env:
-          URLS: ${{ inputs.urls }}
         run: |
+          URLS=$(grep -v '^#' .github/probe-urls.txt)
           fail=0
           for u in $URLS; do
             out=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 20 "$u")
