@@ -18,7 +18,9 @@ export const practiceCsp = [
 const nextConfig: NextConfig = {
   async headers() {
     return [
-      { source: '/lab-spike', headers: [{ key: 'Content-Security-Policy', value: practiceCsp }] },
+      { source: '/practice/:path*', headers: [{ key: 'Content-Security-Policy', value: practiceCsp }] },
+      { source: '/practice', headers: [{ key: 'Content-Security-Policy', value: practiceCsp }] },
+      { source: '/skills/:path*', headers: [{ key: 'Content-Security-Policy', value: practiceCsp }] },
       { source: '/:path*', headers: [
         { key: 'X-Content-Type-Options', value: 'nosniff' },
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },

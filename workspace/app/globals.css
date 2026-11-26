@@ -13,3 +13,35 @@
 .phase-card{min-height:320px}.phase-meta{letter-spacing:.6px}.phase-top{margin-bottom:16px}.phase-card p{font-size:14px;line-height:1.7}.phase-card h3{font-size:16px}.hero-content{max-width:72%}.focus-hero p{font-size:16px}.hero-bottom span{max-width:125px}.focus-hero{min-height:250px}.weekly-summary p{font-size:14px}.weekly-summary .text-button{font-size:14px}.hero-bottom{flex-wrap:wrap;gap:13px}.goal-banner{display:flex;align-items:center;gap:14px;padding:18px 23px;margin-bottom:25px;background:#fff;border:1px solid #e0e8db;border-radius:8px;color:#7c956e}.goal-banner p{font-size:16px}.goal-banner svg{flex-shrink:0}.card-actions{margin-top:auto;padding-top:18px}.item-card .notes-preview{margin-bottom:22px}.course-row>.badge{font-size:12px}.modal-body .muted{font-size:13px}.order-list>.row,.order-list .text-button{font-size:13px}.today-label{font-size:10px}.day-number{font-size:30px}.topbar .search input{width:145px}
 @media(min-width:1201px) and (max-width:1450px){.phase-card{padding:17px 13px}.phase-card h3{font-size:15px}.phase-meta{font-size:10px}.phase-card p{font-size:13px}.hero-content{max-width:75%}.hero-bottom span{display:none}.saved{display:none}}
 @media(max-width:680px){.page-heading p,.item-card p,.detail-hero p,.padded p,.portfolio-guide p,.info-strip p,.study-rhythm p,.experience-panel>p{font-size:15px}.hero-content{max-width:95%}.focus-hero p{font-size:15px}.phase-card{min-height:330px}.phase-card:last-child{min-height:230px}.phase-card p{font-size:14px}.phase-meta{font-size:10px}.page-heading .eyebrow{font-size:10px}.hero-kicker{font-size:11px}.stats-row>div>span:last-child{margin-left:0;font-size:12px;margin-top:2px}.course-row .badge{font-size:10px}.topbar .search input{width:110px}.breadcrumb{font-size:12px}.section-title .text-button{font-size:13px}.filters button{font-size:13px}.day-card h3{font-size:15px}.day-card{min-height:290px}.experience-footer{align-items:flex-start}.goal-banner p{font-size:15px}.pace-card{min-height:170px}}
+
+/* ---- Practice Lab & Skill library (Pathway v2, task 19-22). Uses the workspace palette. ---- */
+.practice-builder{margin-bottom:24px}.practice-builder fieldset{border:0;padding:0;margin:14px 0 0}.practice-builder legend{font-size:12px;color:#788381;margin-bottom:6px}
+.practice-builder select,.skill-form input,.skill-form select,.skill-form textarea,.practice-list-head select{border:1px solid #dce3dd;border-radius:6px;padding:7px 9px;background:#fff;font:inherit;font-size:14px;color:#2f3a33}
+.practice-builder-row{gap:18px;align-items:center;margin-top:16px}.practice-builder-row .primary,.skill-form .primary,.skill-result .primary{margin-top:0}
+.practice-builder label,.skill-form label{font-size:14px;color:#55645a;display:flex;gap:8px;align-items:center}
+.skill-form{display:flex;flex-direction:column;gap:14px}.skill-form label{flex-direction:column;align-items:stretch;gap:5px;flex:1;min-width:180px}.skill-form h2,.skill-result h2{display:flex;gap:8px;align-items:center;font-size:18px;margin:0}
+.skill-form .row{gap:14px}.skill-result{margin-top:18px}.skill-result ul{margin:12px 0;padding-left:18px;font-size:14px;line-height:1.7}.skill-result .row{gap:10px}
+.practice-list-head{margin:28px 0 12px;gap:12px}.practice-list-head h2{font-size:18px;margin:0}.practice-list-head .row{gap:10px}
+.practice-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}.practice-card{color:inherit;text-decoration:none}.practice-card:hover{border-color:#b9cdbd}
+.practice-card .item-footer,.practice-cards .item-footer{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:auto;padding-top:10px}
+.wrap{flex-wrap:wrap}
+.practice-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:16px}.practice-head h1{font-size:26px;margin:4px 0 0}.practice-save{font-size:12px;color:#788381;min-height:16px}
+.practice-grid{display:grid;grid-template-columns:minmax(260px,0.9fr) minmax(340px,1.3fr);grid-template-rows:auto auto;gap:14px}
+.practice-task{grid-row:span 2;max-height:calc(100vh - 190px);overflow:auto}.practice-task .padded{font-size:15px;line-height:1.6}
+.practice-code{display:flex;flex-direction:column}.practice-editor{min-height:260px;border-bottom:1px solid #e2e7e3}.practice-editor .cm-editor{min-height:260px}
+.practice-editor-loading{padding:16px;color:#788381;font-size:13px}
+.practice-actions{display:flex;flex-wrap:wrap;gap:8px;padding:12px}.practice-actions .primary,.practice-actions .secondary{margin:0;display:inline-flex;gap:6px;align-items:center;padding:8px 13px;border-radius:6px;cursor:pointer}
+.practice-actions button:disabled{opacity:.55;cursor:wait}
+.practice-output{display:flex;flex-direction:column;gap:8px;min-height:240px}.practice-output>section{min-height:200px;border-radius:9px;overflow:hidden}
+.practice-verdict{display:flex;gap:6px;align-items:center;font-weight:600;font-size:14px;padding:10px 12px;border-radius:7px}.practice-verdict.pass{background:#e8f2e9;color:#3f6845}.practice-verdict.fail{background:#fff1eb;color:#a1472b}
+.practice-nav{display:flex;justify-content:space-between;align-items:center;gap:10px}.practice-nav .primary{margin:0;display:inline-flex;gap:6px;align-items:center;padding:8px 13px;border-radius:6px;text-decoration:none}
+.practice-hints{margin-top:18px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}.practice-hint{display:flex;gap:6px;background:#f6f8f5;border:1px solid #e2e7e3;border-radius:6px;padding:9px 11px;margin:0;font-size:14px}
+.practice-solution{background:#f6f8f5;border:1px solid #e2e7e3;border-radius:6px;padding:10px;font-size:13px;white-space:pre-wrap;width:100%;box-sizing:border-box}
+.practice-schema{margin-top:16px;border-top:1px solid #e2e7e3;padding-top:12px}.practice-schema h2{font-size:14px;margin:0 0 6px}.practice-schema details{font-size:13px;margin:3px 0}.practice-schema summary{cursor:pointer}
+.practice-schema p{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 8px 14px}.practice-schema code{background:#f1f3f1;border-radius:4px;padding:1px 5px;font-size:12px}
+.practice-tabs{display:none;gap:4px;margin-bottom:10px}.practice-tabs button{flex:1;padding:9px;border:1px solid #dce3dd;background:#fff;border-radius:6px;font-size:14px}.practice-tabs button.selected{background:#e6eee3;color:#3f6845;font-weight:600}
+@media(max-width:900px){
+  .practice-grid{grid-template-columns:1fr}.practice-task{grid-row:auto;max-height:none}
+  .practice-tabs{display:flex}.practice-task,.practice-code,.practice-output{display:none}.practice-task.show,.practice-code.show{display:block}.practice-output.show{display:flex}
+  .practice-head{flex-direction:column;align-items:flex-start}
+}

@@ -1,0 +1,15 @@
+{
+  "repo": "jenozu/playground",
+  "sha": "eebbfc34758d8a87149d3584f159dff3167ed7b2",
+  "syncedAt": "2026-11-26",
+  "files": {
+    "execution/adapters/sql/core.ts": "2e0d453c893ead841e17fa7bbe4a52b8316d27cc8bbf1e8eeb583588fa000022",
+    "execution/adapters/sql/engine.ts": "38697f9f5eb48a9c448c15d22eca3369a95abc989d18516f28ad27fd17ceee26",
+    "types/execution.ts": "61061f060cd1c84425346dd03b4db74d8e97201d7d7ce35acde29fa2cad72d49",
+    "components/editor/CodeEditor.tsx": "651b04397d6941177a2f29e775b656ba6d376e046993cd0c098fb5ae168febd9",
+    "components/terminal/OutputPanel.tsx": "f7f4f49e4da89cfcd0a1e00c8fee5f57f98f1c37e150212274e0942fa671eed1",
+    "features/exercise-evaluation/sql.ts": "12229f9654e1fa27c2eef05ad0531b656092abe53b6f68fa0f7da30d1f88ef56",
+    "features/lesson-viewer/LessonMarkdown.tsx": "0f8587bd0002f0eb699e02f0342b8c2ab347e803dad3c7c51d797970ddc3f12b",
+    "course-system/schema/index.ts": "9916dfebd1758969294390ce30ec9573cfa9871dd512375c1702a75e2d92163b"
+  }
+}

@@ -6,6 +6,8 @@ import { resolveOwner, OwnerNotConfigured } from '@/lib/server/owner';
 import { guardMutation } from '@/lib/server/guard';
 import { applyImport, parseImportFile, planImport, type Choice } from '@/lib/workspace/import';
 import { z } from 'zod';
+import { practiceExportSchema } from '@/lib/practice/export';
+import { importPractice } from '@/lib/server/practice-repo';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const res = (b: unknown, status = 200) => Response.json(b, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -15,10 +17,10 @@ const bodySchema = z.object({ file: z.unknown(), version: z.number().int().min(0
 export async function POST(req: Request) {
   let owner: string;
   try { owner = resolveOwner(); } catch (e) { if (e instanceof OwnerNotConfigured) return res({ error: 'Server not configured.' }, 503); throw e; }
-  const blocked = guardMutation(req, 600000);
+  const blocked = guardMutation(req, 4_000_000);
   if (blocked) return blocked;
   const raw = await req.text();
-  if (raw.length > 600000) return res({ error: 'File is too large.' }, 413);
+  if (raw.length > 4_000_000) return res({ error: "File is too large (max 4 MB). Export again or split older attempts." }, 413);
   let json: unknown;
   try { json = JSON.parse(raw); } catch { return res({ error: 'Invalid JSON.' }, 400); }
   const body = bodySchema.safeParse(json);
@@ -33,11 +35,17 @@ export async function POST(req: Request) {
     const version = row?.version ?? 0;
     if (version !== body.data.version) return res({ error: 'This workspace changed in another tab. Reload and try again.' }, 409);
     const plan = planImport(current, parsed.workspace);
-    if (new URL(req.url).searchParams.get('dryRun') === '1') return res({ plan });
+    const rawPractice = (body.data.file as { practice?: unknown })?.practice;
+    const practice = rawPractice === undefined ? null : practiceExportSchema.safeParse(rawPractice);
+    if (practice && !practice.success) { const i = practice.error.issues[0]; return res({ error: `Invalid file at practice.${i.path.join('.')}: ${i.message}` }, 400); }
+    const dry = new URL(req.url).searchParams.get('dryRun') === '1';
+    const practicePlan = practice?.success ? await importPractice(db, owner, practice.data, true) : null;
+    if (dry) return res({ plan, practice: practicePlan });
     const merged = applyImport(current, parsed.workspace, (body.data.choices ?? {}) as Record<string, Choice>);
     await db.insert(workspaceSnapshots).values({ ownerId: owner, source: 'pre-import', data: current, version });
     const newVersion = await repo.save(owner, merged, version);
     if (newVersion === null) return res({ error: 'This workspace changed in another tab. Reload and try again.' }, 409);
-    return res({ plan, version: newVersion, data: merged });
+    if (practice?.success) await importPractice(db, owner, practice.data, false);
+    return res({ plan, practice: practicePlan, version: newVersion, data: merged });
   } catch { return res({ error: 'Import failed. Your saved data is unchanged.' }, 503); }
 }
