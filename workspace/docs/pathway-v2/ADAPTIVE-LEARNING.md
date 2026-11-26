@@ -1,6 +1,6 @@
 # Pathway — Adaptive learning and personalized mastery
 
-Status: proposed requirements for owner review; not implemented. Integrate with the existing academy roadmap rather than replacing it.
+Status: proposed requirements for owner review; not implemented. Integration into the plan is proposed in ADR-016 and tasks 49–51 (awaiting approval); see `04-TRACEABILITY.md`. Integrate with the existing academy roadmap rather than replacing it.
 
 ## Objective
 Make Pathway actively recommend what to learn, reinforce and review across all supported languages. Share evidence across Learn, Practice and Skill Library; sandbox activity alone is not graded mastery evidence.

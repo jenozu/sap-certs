@@ -53,6 +53,16 @@ Content (datasets, exercise packs, skill aliases, career seeds) is versioned in 
 
 **ADR-015 Dynamic concepts and learning material.** Concepts (`skills`) are per-owner rows with free-text `language`, `aliases`, `tags`, `source`; there are no topic enums or category tables. Aliases seeded from content are suggestions only. `learning_materials` (Release 2) store notes, lesson text, code examples and links linked to concepts; full-text search via Postgres `to_tsvector` over title/body/tags. Materials can be passed into the generation prompt.
 
+**ADR-016 Adaptive learning (PROPOSED 2026-11-26, awaiting approval; details come from task 49).** Requirements: `ADAPTIVE-LEARNING.md`. Decisions proposed here, numbers deferred to task 49:
+- *Three pure, language-neutral domain modules* over attempts: `mastery.ts` (discrete states, ADR-011), `proficiency.ts` (0–100% per concept plus a separate evidence-sufficiency verdict), `review.ts` (adaptive intervals). `recommend.ts` composes them with the Release 2 selector (`lib/practice/select.ts`). None contains SQL logic; they see only the shared attempt shape.
+- *No new Release 1 data.* Attempts already store skills, mode, hints, solution views, independent flag, version, duration and per-check results, so recurring error kinds, independent first attempts and repeat detection are derived. Mastery and proficiency stay recomputable from history, so nothing needs backfilling.
+- *Evidence rules:* only graded modes count; sandbox never does; assisted and repeated identical passes do not raise independent proficiency; insufficient evidence is a distinct state, never a percentage band and never mastery; course completion is not mastery.
+- *Settings* live in one owner-scoped `learning_settings` row with `rev` (threshold default 80% inclusive, review budget 15/30/45/60, adaptive difficulty, spaced repetition, weekly assessment frequency, mastery requirements, new-learning/review balance). Changing a setting changes recommendations without code or content changes.
+- *Aggregation:* concept → pack module → language in Release 4; course in Release 5 through item `skills[]` (ADR-005), reusing the same aggregator.
+- *Content gaps:* the recommender returns a gap (concept, error kinds, target difficulty and count) that opens pack import (task 24) or the pre-filled AI prompt (task 25); no AI provider.
+- *Scheduling never gates:* the daily queue fits inside the weekly plan and never blocks new learning (consistent with ADR-012).
+- The formula, minimum evidence counts, delayed-retention rule, interval adjustments and selection weights are proposed in task 49 with numeric test vectors and need owner approval before task 31 starts.
+
 **ADR-012 Readiness and fit explain, never gate.** Apply/track actions are always enabled.
 
 **ADR-013 Job import contract `pathway.jobs.v1`.** JSON array or CSV with a header.
@@ -69,7 +79,7 @@ Content (datasets, exercise packs, skill aliases, career seeds) is versioned in 
 | 1 | `skills` (owner_id, id, language, name, aliases text[], tags text[], state, source, notes, rev), `exercise_attempts` (insert-only; see PRD C4), `saved_code` (exercise_id, code, rev), `practice_sessions` (config jsonb, times) | Bundled packs are read from `content/` and not stored |
 | 2 | `packs`, `pack_versions` (language, status, manifest, files jsonb, validation report, published_at), `learning_materials` (language, kind, title, body, url, concept ids, tags, source) | Imported/authored packs for any language; searchable learning material |
 | 3 | `job_applications`, `application_events` | ADR-013 |
-| 4 | `review_queue`, `assessment_attempts` | Assessments defined in content |
+| 4 | `review_queue`, `assessment_attempts`, `learning_settings` | Assessments defined in content; settings are one row per owner; proficiency and recommendations are computed, not stored |
 | 5 | none (document extended) | ADR-005/007/008 |
 
 Every table has `owner_id`, `created_at` and `updated_at`; every practice table (skills, attempts, drafts, sessions, packs, materials) has a free-text `language`. Attempts reference `(exercise_id, exercise_version, content_hash)`.
@@ -80,7 +90,7 @@ Every table has `owner_id`, `created_at` and `updated_at`; every practice table 
 - **Release 1:** `GET/POST /api/v2/skills`, `POST /api/v2/skills/register`, `POST /api/v2/attempts`, `GET/PUT /api/v2/drafts/:id`, `POST /api/v2/practice-sessions`, `GET /api/v2/export`, `POST /api/v2/import`.
 - **Release 2:** `POST /api/v2/packs` → `/:id/validate` → `/:id/publish`.
 - **Release 3:** CRUD `/api/v2/applications`, `POST /api/v2/applications/:id/events`, `POST /api/v2/applications/import?dryRun=1`.
-- **Release 4:** `GET /api/v2/review-queue`, `POST /api/v2/assessment-attempts`.
+- **Release 4:** `GET /api/v2/review-queue`, `POST /api/v2/assessment-attempts`, `GET /api/v2/recommendations`, `GET/PUT /api/v2/settings`.
 
 ## 5. Deployment, backup, rollback
 

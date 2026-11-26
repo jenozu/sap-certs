@@ -9,7 +9,7 @@ No dates: order and gates matter. Each phase runs on a feature branch with small
 | 2 → **Release 1** SQL Practice Lab | Register WITH/CTE, LEFT JOIN, CROSS JOIN, UNION, UNION ALL; practise 25 verified ERP exercises; every Submit recorded | Practice Lab gates 1–2 (MVP scope); idempotent attempts; export includes attempts | 13–23 |
 | 3 → **Release 2** Expandable Skill Library | Import/author/AI-generate packs for any concept and language without code change; learning material library as generation context; more practice modes | Practice Lab gate 3 | 24–27, 48 |
 | 4 → **Release 3** Job tracker | Track applications; import job-watch CSV/JSON | Idempotent import, dedupe, contract documented | 28–30 |
-| 5 → **Release 4** Mastery & review | Mastery states (computed over all attempts since Release 1), review queue, assessments | Practice Lab gate 4 (minus career links) | 31–34 |
+| 5 → **Release 4** Mastery, review & adaptive practice | Mastery and proficiency (computed over all attempts since Release 1), adaptive review queue, assessments, daily recommended practice, dashboard and settings | Practice Lab gate 4 (minus career links) + ADAPTIVE-LEARNING.md acceptance criteria | 31–34, 49–51 |
 | 6 → **Release 5** Career layer | Stages 0–6, curriculum, project evidence, portfolio, checkpoints, weekly plan v2 | Prior records unchanged (export diff = additions only) | 35–40 |
 | 7 → **Release 6** Acceptance | 100 exercises, SQL graduation assessment | Master-plan acceptance scenario | 41–44 |
 | 8 JS/TS/Node practice | JavaScript adapter and first pack — **starts when JS study begins, any time after Release 1** | ADR approved; isolated execution tested | 45–46 |
@@ -17,6 +17,13 @@ No dates: order and gates matter. Each phase runs on a feature branch with small
 
 ## Multi-language vision (2026-11-26)
 The Practice Lab is a permanent multi-language academy. Release 1 builds SQL content only, but on language-neutral foundations (adapter registry, `language` everywhere, language-declared packs). Languages are added alongside the owner's learning: the JS/TS/Node adapter (tasks 45–46) can start as soon as JS study begins, in parallel with Releases 2–6.
+
+## Adaptive learning amendment (2026-11-26, proposed)
+`ADAPTIVE-LEARNING.md` fits the existing releases; nothing is re-ordered.
+- **Release 2:** small foundations only: `estimatedMinutes` in packs (24), gap-aware AI prompt (25), one pure shared exercise selector (26). Task 49 (ADR-016 scoring and scheduling proposal) can be done during Release 2 so approval is ready before Release 4 starts.
+- **Release 4:** proficiency and evidence rules (31), adaptive intervals (32), retention and weekly assessments (33), daily recommendation engine (50), dashboard and settings (51).
+- **Release 5:** course aggregation (37), next action and readiness (36, 38), daily queue and weekly assessment in the weekly plan (39), graduation threshold (42), acceptance scenario (43).
+- **Why not earlier:** mastery needs stable pack versions (Release 2) and attempts already hold everything required, so no earlier migration is needed.
 
 ## What changed from revision 1
 

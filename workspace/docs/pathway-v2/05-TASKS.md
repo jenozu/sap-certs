@@ -251,9 +251,9 @@ Status **pending** · priority high · complexity 9
 
 New exercises without code changes, never trusted blindly.
 
-**How:** Tables packs, pack_versions (status staged/validated/published/rejected, manifest, files jsonb ≤2 MB, report). Upload ZIP (fflate, path checks) or JSON; server + client validation; client worker runs each reference solution on each fixture and stores expected results; review screen; publish creates an immutable version; same exerciseId keeps identity; attempts keep their version. Bundled and imported packs appear in one registry.
+**How:** Tables packs, pack_versions (status staged/validated/published/rejected, manifest, files jsonb ≤2 MB, report). Upload ZIP (fflate, path checks) or JSON; server + client validation; client worker runs each reference solution on each fixture and stores expected results; review screen; publish creates an immutable version; same exerciseId keeps identity; attempts keep their version. Bundled and imported packs appear in one registry. Manifests accept an optional `estimatedMinutes` per exercise (1–60; default derived from difficulty) so session length and the Release 4 daily queue can respect a time budget without pack changes.
 
-**Acceptance: malformed JSON, ../ path, absolute path, oversized file, duplicate id, version downgrade, failing reference solution each rejected with an actionable message and retry; a valid pack is practisable immediately after publish; attempts recorded before a republish still show the original version.**
+**Acceptance: malformed JSON, ../ path, absolute path, oversized file, duplicate id, version downgrade, failing reference solution each rejected with an actionable message and retry; a valid pack is practisable immediately after publish; attempts recorded before a republish still show the original version; validator rejects `estimatedMinutes` outside 1–60 and accepts packs without it**
 - [ ] **24.1** Upload + staging tables — test: staged row created
 - [ ] **24.2** Validation server + client — test: one test per rule
 - [ ] **24.3** Reference-solution verification in worker — test: wrong solution flagged; expected stored
@@ -265,18 +265,18 @@ Status **pending** · priority high · complexity 4
 
 Generate exercises with any AI chat or by hand.
 
-**How:** Authoring form writes a staged pack (same pipeline). 'Copy AI prompt' embeds the pack schema, dataset schema, selected skills and rules (business purpose, fixtures, required constructs, synthetic data only). No server-side AI provider. The AI prompt can include selected learning materials (course notes, lesson text, code examples) as context.
+**How:** Authoring form writes a staged pack (same pipeline). 'Copy AI prompt' embeds the pack schema, dataset schema, selected skills and rules (business purpose, fixtures, required constructs, synthetic data only). No server-side AI provider. The AI prompt can include selected learning materials (course notes, lesson text, code examples) as context. The prompt template also accepts an optional gap request (concept ids, recurring error kinds, target difficulty and count) so a content-gap suggestion from task 50 can open it pre-filled.
 
-**Acceptance: authored exercise passes the pipeline and is practisable; prompt snapshot test contains schema and selected skills; a pack produced from the prompt by an AI chat imports successfully (manual check).**
+**Acceptance: authored exercise passes the pipeline and is practisable; prompt snapshot test contains schema and selected skills; a pack produced from the prompt by an AI chat imports successfully (manual check); prompt snapshot with a gap request contains the concept, error kinds and requested count**
 
 ### 26. Practice modes and session setup _(after 23)_
 Status **pending** · priority medium · complexity 6
 
 Mixed, debugging, predict-output, business challenge, free sandbox; 15/30/45/60 min.
 
-**How:** Session setup adds difficulty, duration timer and mode; selection prefers unattempted then failed; predict-output (type expected output, then reveal); debugging from buggy starter; free sandbox with fixture picker and no grading; session summary. Session setup supports multiple concepts across one language, difficulty, quantity; filters by language.
+**How:** Session setup adds difficulty, duration timer and mode; selection prefers unattempted then failed; predict-output (type expected output, then reveal); debugging from buggy starter; free sandbox with fixture picker and no grading; session summary. Session setup supports multiple concepts across one language, difficulty, quantity; filters by language. Selection lives in one pure module (lib/practice/select.ts) taking attempt history, optional per-concept weights (weak/overdue), familiarity, difficulty, estimatedMinutes and a time budget, with injectable clock and seeded randomness. Release 4 recommendations (task 50) reuse it; no second selector is built. Only graded modes count as evidence; sandbox attempts are never graded (`mode` is already stored).
 
-**Acceptance: unit tests for selection; e2e per mode at 1440 and 390; timer ends session with summary; sandbox never records graded attempts.**
+**Acceptance: unit tests for selection; e2e per mode at 1440 and 390; timer ends session with summary; sandbox never records graded attempts; selector unit tests: unseen before failed before passed, time budget filled without exceeding it, weights reorder results, deterministic with a seeded clock and random source**
 
 ### 27. Release 2: expandable Skill Library _(after 24, 25, 26, 48)_
 Status **pending** · priority high · complexity 2
@@ -325,39 +325,66 @@ Can be released before Release 2 if wanted; depends only on Release 1 infrastruc
 
 ## Phase 5 — Mastery, review, assessments → Release 4
 
-### 31. Mastery engine over recorded attempts _(after 27)_
-Status **pending** · priority high · complexity 6
+### 31. Mastery and proficiency engine over recorded attempts _(after 27, 49)_
+Status **pending** · priority high · complexity 8
 
-ADR-011; works retroactively on attempts stored since Release 1.
+ADR-011 mastery states plus the ADR-016 proficiency score (approved in task 49); works retroactively on attempts stored since Release 1.
 
-**How:** lib/domain/mastery.ts with injectable clock; recompute skills.state after each submit and once over history at release.
+**How:** lib/domain/mastery.ts and lib/domain/proficiency.ts, pure, with injectable clock, language-neutral (no SQL logic). Mastery states as in ADR-011. Proficiency (0–100%) per concept from graded attempts only, using the ADR-016 formula; separate evidence sufficiency (minimum distinct exercises, independent first attempts, delayed retention) so 'insufficient evidence' is never shown as low proficiency or as mastery. Recurring error kinds per concept derived from stored attempt `results` (no schema change). Aggregation by concept, pack module and language (course aggregation arrives with task 37). Recompute skills.state after each submit and once over history at release.
 
-**Acceptance: 3 distinct independent passes → understood; same exercise 3× → not; hint/solution-assisted passes ignored; 2 mixed → proficient; 2 delayed ≥7 days → mastered; 6 days → not; historical attempts produce the expected states.**
+**Acceptance: 3 distinct independent passes → understood; same exercise 3× → not; hint/solution-assisted passes ignored; 2 mixed → proficient; 2 delayed ≥7 days → mastered; 6 days → not; historical attempts produce the expected states; proficiency test vectors from ADR-016 pass, including the 80% boundary (inclusive); repeated identical and assisted passes do not raise independent proficiency; sandbox attempts ignored; too little evidence reports 'insufficient evidence', not a percentage band; module and language aggregates match per-concept sums; the same code scores a non-SQL attempt fixture**
 
 ### 32. Review queue (1/3/7/14/30) _(after 31)_
-Status **pending** · priority high · complexity 5
+Status **pending** · priority high · complexity 6
 
-Spaced repetition prioritising overdue and weak concepts.
+Spaced repetition prioritising overdue and weak concepts, with intervals that adapt to demonstrated retention.
 
-**How:** review_queue table; lib/domain/review.ts; /practice/review mode.
+**How:** review_queue table (concept, step, due_at, last_result, streak); lib/domain/review.ts; /practice/review mode. Base steps 1/3/7/14/30 days. Adaptive rules from ADR-016: independent pass advances (a strong delayed pass may skip a step), assisted pass holds, weak or failed performance shortens (step 1–2) and marks the concept for reinforcement. Spaced repetition can be switched off in settings (task 51); the threshold comes from settings (default 80%).
 
-**Acceptance: step changes on pass/assisted/fail unit-tested; queue order tested; e2e item due after clock advance.**
+**Acceptance: step changes on pass/assisted/fail unit-tested; strong delayed retention extends and weak performance shortens the interval; queue order tested (overdue and weak first); changing the threshold changes which concepts are flagged; e2e item due after clock advance**
 
 ### 33. Assessments _(after 31)_
 Status **pending** · priority medium · complexity 5
 
-Independent evidence: timed, no hints or solutions.
+Independent evidence: timed, no hints or solutions; includes the weekly cumulative assessment and unassisted retention checks.
 
-**How:** assessments (content-defined), assessment_attempts; runner; SQL practice assessment (10 of the priority exercises).
+**How:** assessments (content-defined), assessment_attempts; runner; SQL practice assessment (10 of the priority exercises). Assessment kinds: practice, retention check (unfamiliar, unassisted items for one concept, scheduled from the review queue) and weekly cumulative (draws across the week's concepts, cadence from settings). Results are stored as independent evidence and exposed to task 50 and to weekly plan v2 (task 39); they never block new learning.
 
-**Acceptance: hint/solution controls absent; timeout ends attempt; result stored and visible on the skill pages; retakes stored separately.**
+**Acceptance: hint/solution controls absent; timeout ends attempt; result stored and visible on the skill pages; retakes stored separately; a retention check selects only exercises not seen before for that concept when enough exist; weekly assessment result is queryable by week for tasks 50 and 39**
 
-### 34. Release 4: mastery, review, assessments _(after 32, 33)_
+### 34. Release 4: mastery, review, assessments, adaptive recommendations _(after 32, 33, 50, 51)_
 Status **pending** · priority high · complexity 2
 
-Practice Lab gate 4 (minus career links, which come in Phase 6).
+Practice Lab gate 4 (minus career links, which come in Phase 6) plus the adaptive-learning acceptance criteria.
 
-**Acceptance: assisted, duplicate and delayed rules; cross-device persistence (two browser contexts); unauthorized/missing owner; export/import round-trip incl. reviews; suites green.**
+**Acceptance: assisted, duplicate and delayed rules; cross-device persistence (two browser contexts); unauthorized/missing owner; export/import round-trip incl. reviews and learning settings; every acceptance criterion in ADAPTIVE-LEARNING.md covered by a named test; suites green**
+
+### 49. ADR-016 adaptive scoring and scheduling model  [HUMAN approval] _(after 23)_
+Status **pending** · priority high · complexity 3
+
+Propose the proficiency formula, evidence rules, bands, adaptive intervals and selection scoring for owner approval before any implementation.
+
+**How:** Written as ADR-016 in 02-ARCHITECTURE.md; can be done any time after Release 1, ideally during Release 2 so approval is ready before task 31. Covers: proficiency formula (weights for independent first attempts, hints, solution views, repeats, recency); minimum distinct exercises and independent evidence; delayed-retention criterion; default threshold 80% (inclusive, configurable) and the 0–49 / 50–80 / 81–89 / 90–100 reinforcement bands; adaptive interval rules; daily selection scoring (weak, overdue, unfamiliar, mixed, difficulty, estimated time); content-gap rule; worked numeric examples (the illustrative week in ADAPTIVE-LEARNING.md) used as unit-test vectors. All numbers are proposed defaults, not measured results.
+
+**Acceptance: owner approves ADR-016 in writing; every rule has at least one numeric test vector; vectors are reused verbatim by tasks 31, 32 and 50.**
+
+### 50. Daily recommendation engine and content-gap detection _(after 32, 26, 25)_
+Status **pending** · priority high · complexity 6
+
+Daily queue of recommended exercises per concept within a time budget, preferring weak, overdue and unfamiliar items.
+
+**How:** lib/domain/recommend.ts (pure, injectable clock) reusing the task 26 selector and the task 31/32 outputs. Inputs: concept proficiency and evidence, due reviews, settings (budget 15/30/45/60 min, threshold, new-learning/review balance, adaptive difficulty), exercise difficulty and estimatedMinutes. Output: per concept the recommended count and difficulty (e.g. below-threshold concepts get more, harder-after-90% concepts get challenges), mixed practice slots, estimated time. When the library has too few unfamiliar exercises for a concept, return a content gap with an actionable link to pack import (task 24) or the pre-filled AI prompt (task 25). /api/v2/recommendations (GET, owner-scoped).
+
+**Acceptance: below-threshold concepts are recommended and changing the threshold changes the result; queue never exceeds the time budget; weak and overdue concepts come first and unfamiliar exercises are preferred; insufficient evidence yields a 'build evidence' recommendation; missing coverage returns an import/generate suggestion; works for a non-SQL fixture language; unit tests cover threshold boundaries, duplicate and assisted attempts, review dates, settings and content gaps**
+
+### 51. Learning dashboard and adaptive settings _(after 31, 32, 50)_
+Status **pending** · priority medium · complexity 5
+
+Show proficiency, evidence, weak topics, due reviews and the daily recommendation; let the owner tune the rules.
+
+**How:** Table learning_settings (owner_id, rev, threshold default 80, review budget minutes, adaptive difficulty on/off, spaced repetition on/off, weekly assessment frequency, mastery requirements, new-learning/review balance); GET/PUT /api/v2/settings with rev conflicts; included in export/import. /practice/progress: per concept proficiency, evidence count, mastery state, weak topics, due reviews, today's recommended exercises with difficulty and estimated time, next lesson, weekly assessment summary; filter by language. Uses existing design tokens; reachable from navigation without redesigning the existing views.
+
+**Acceptance: settings persist across devices and survive export/import; changing the threshold or budget changes the dashboard and queue; dashboard distinguishes insufficient evidence from low proficiency; e2e at 1440 and 390; axe clean; owner isolation tested**
 
 
 ## Phase 6 — Career layer → Release 5
@@ -367,7 +394,7 @@ Status **pending** · priority medium · complexity 6
 
 Extend the existing JSON document instead of replacing it (ADR-005 v2).
 
-**How:** Optional new item fields (provider, progressSource, skills[], milestones[], evidence[], impact[], publishable, simulated, roleTargetId) and kinds ('stage'); old documents stay valid. Seed by id only when missing: Stage 0 'now', 'ts-node', 'integration'; 14 curriculum courses; Learn SQL at 78% marked last-reported only if no item has the Learn SQL URL; role targets per master-plan table; 6 roadmap projects. Never modify an existing item; 'update available' suggestions for unedited seed items; 'suggested re-mapping' list (ADR-007).
+**How:** Optional new item fields (provider, progressSource, skills[], milestones[], evidence[], impact[], publishable, simulated, roleTargetId) and kinds ('stage'); old documents stay valid. Seed by id only when missing: Stage 0 'now', 'ts-node', 'integration'; 14 curriculum courses; Learn SQL at 78% marked last-reported only if no item has the Learn SQL URL; role targets per master-plan table; 6 roadmap projects. Never modify an existing item; 'update available' suggestions for unedited seed items; 'suggested re-mapping' list (ADR-007). Course/module/concept links use the existing item `skills[]` field; no separate link table.
 
 **Acceptance: seeding twice adds nothing; edited items untouched; user Learn SQL value wins; c1–c6, p1–p5, f1–f3, j1–j5, o1–o3 unchanged; snapshot taken before first seed.**
 
@@ -376,36 +403,36 @@ Status **pending** · priority medium · complexity 5
 
 Stage cards with courses, skills, assessments, projects, evidence, job targets.
 
-**How:** Existing Roadmap/Current phase views extended in place; lib/domain/nextAction.ts (overdue review > follow-up due > in-progress course > unmet exit criterion > next milestone); unmet exit criteria; Apply panel always visible.
+**How:** Existing Roadmap/Current phase views extended in place; lib/domain/nextAction.ts (overdue review > follow-up due > in-progress course > unmet exit criterion > next milestone); unmet exit criteria; Apply panel always visible. 'Overdue review' in the next-action order is the top item of the daily queue (task 50); 'next lesson' comes from the stage curriculum order.
 
-**Acceptance: 7 stages in roadmap order + deferred section; exactly one next action; unit tests per branch; visual baselines updated deliberately.**
+**Acceptance: 7 stages in roadmap order + deferred section; exactly one next action; unit tests per branch; visual baselines updated deliberately; next action uses the daily queue's top item when reviews are due**
 
 ### 37. Library, projects and portfolio evidence _(after 35)_
 Status **pending** · priority medium · complexity 6
 
 Course provenance and skills; project milestones, evidence, honest impact; portfolio of publishable evidence.
 
-**How:** Library: provenance badge, related skills, completion prompt (practise/assess/project). Projects: milestones with acceptance criteria, evidence types, impact measured vs estimate, simulated flag, limitations; RF scanner and batch shipping kept verbatim. Portfolio: publishable only + 10-point checklist + demo outline.
+**How:** Library: provenance badge, related skills, completion prompt (practise/assess/project). Projects: milestones with acceptance criteria, evidence types, impact measured vs estimate, simulated flag, limitations; RF scanner and batch shipping kept verbatim. Portfolio: publishable only + 10-point checklist + demo outline. Add course-level proficiency, aggregated through each item's `skills[]` (reuses the task 31 aggregator); course completion stays separate from proficiency.
 
-**Acceptance: course completion does not change skill state; impact cannot be saved without kind; unpublishable evidence never shown; existing portfolio items unchanged.**
+**Acceptance: course completion does not change skill state; impact cannot be saved without kind; unpublishable evidence never shown; existing portfolio items unchanged; course aggregate equals the aggregate of its linked concepts; completing a course changes no proficiency**
 
 ### 38. Career checkpoints with evidence and gaps _(after 37, 36)_
 Status **pending** · priority medium · complexity 4
 
 Readiness explanations from skills, assessments and projects; never a gate.
 
-**How:** lib/domain/readiness.ts; per-stage met/missing; suggested titles; link to jobs.
+**How:** lib/domain/readiness.ts; per-stage met/missing; suggested titles; link to jobs. Readiness statements use proficiency with evidence sufficiency and the configured threshold; insufficient evidence is reported as a gap, not as failure.
 
-**Acceptance: unit tests; tracking an application is never disabled; titles match the master-plan table.**
+**Acceptance: unit tests; tracking an application is never disabled; titles match the master-plan table; insufficient evidence yields a 'needs evidence' gap, not 'not ready'**
 
 ### 39. Weekly plan v2 _(after 35, 34)_
 Status **pending** · priority medium · complexity 5
 
 Template from the schedule doc; sessions linked to course/practice/project; history preserved.
 
-**How:** Template stored in the document with effectiveFrom; planned sessions per week; links; editable duration/done/notes/next action; launching practice from a session records minutes; Sunday review form (5 questions). Existing date sessions untouched.
+**How:** Template stored in the document with effectiveFrom; planned sessions per week; links; editable duration/done/notes/next action; launching practice from a session records minutes; Sunday review form (5 questions). Existing date sessions untouched. The daily queue (task 50) is shown inside the existing weekly schedule within each day's time budget. The weekly cumulative assessment (task 33) is scheduled on Sunday and its summary pre-fills the Sunday review; its results propose, never force, next week's session mix. New learning is never blocked.
 
-**Acceptance: template change never alters past sessions; legacy sessions display unchanged; default week totals 15 h; practice session from Tuesday marks it done.**
+**Acceptance: template change never alters past sessions; legacy sessions display unchanged; default week totals 15 h; practice session from Tuesday marks it done; weekly assessment result changes the proposed next-week mix; new-learning sessions are always available**
 
 ### 40. Release 5: career layer expansion _(after 36, 37, 38, 39)_
 Status **pending** · priority medium · complexity 2
@@ -431,7 +458,7 @@ Status **pending** · priority medium · complexity 4
 
 Stage 1 exit evidence.
 
-**How:** Graduation assessment from the 15 assessment items; graduation checklist linked to skills, assessment and Distribution Operations Database evidence.
+**How:** Graduation assessment from the 15 assessment items; graduation checklist linked to skills, assessment and Distribution Operations Database evidence. Passing requires the concept proficiency at or above the configured threshold with sufficient evidence, plus the existing assessment criteria.
 
 **Acceptance: passing marks the criterion met; remaining gaps (e.g. walkthrough video) shown honestly.**
 
@@ -440,9 +467,9 @@ Status **pending** · priority high · complexity 6
 
 End-to-end proof.
 
-**How:** e2e/acceptance.spec.ts: register WITH/LEFT JOIN/CROSS JOIN/UNION → import validated pack → practise, attempts recorded → skill/review update → assessment → link SQL project + portfolio evidence → job targets → track application → reload → persistence and older records verified. Preview automated; production manual.
+**How:** e2e/acceptance.spec.ts: register WITH/LEFT JOIN/CROSS JOIN/UNION → import validated pack → practise, attempts recorded → skill/review update → assessment → link SQL project + portfolio evidence → job targets → track application → reload → persistence and older records verified. Preview automated; production manual. Add an adaptive-week scenario: learn concept → practise at 60% → targeted reinforcement queued → unfamiliar set at 80% stays in review → mixed 90% extends the interval → retention check → weekly assessment adjusts next week's plan.
 
-**Acceptance: automated green on preview; owner signs off production checklist.**
+**Acceptance: automated green on preview; owner signs off production checklist; adaptive-week scenario green on preview with an injected clock**
 
 ### 44. Hardening, docs, release _(after 43)_
 Status **pending** · priority medium · complexity 4

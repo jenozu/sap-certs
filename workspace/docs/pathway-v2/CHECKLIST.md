@@ -39,6 +39,7 @@ _Last updated: 2026-11-26 13:00 (America/Toronto)_
 | 2 Verify and back up data | 2026-11-25 | this commit | Neon backup branch `backup-pre-v2` (br-ancient-heart-bdf2u1lx); Neon `workspaces` has **0 rows**; Sites not exportable (limitation) |
 
 ## Upcoming
+- **Proposed amendment (awaiting owner approval, A18):** adaptive learning folded into the plan: new tasks 49–51 (Release 4), expanded 24–26, 31–34, 36–39, 42–43. Branch `docs/adaptive-learning-plan`. Docs only; no code or data change.
 - Release 2 (Expandable Skill Library): 24 pack import pipeline · 25 authoring + AI prompt with saved material · 26 practice modes · 48 learning material library · 27 gate
 - Release 3: 28–30 job tracker (can start any time)
 - Follow-ups: 12 retire Sites files from main (approval) · playground PR #6 merge (owner)
@@ -62,6 +63,7 @@ _Last updated: 2026-11-26 13:00 (America/Toronto)_
 | A17 | Hands-on test of Release 1 on production, then confirm | **requested** |
 | A15 | Merge playground PR #6 (engine split; `src/execution` needs owner per harness.json) | requested |
 | A16 | Review 5 sample exercises on the preview (task 18 acceptance) | requested |
+| A18 | Approve (or amend) the adaptive-learning plan amendment: ADR-016 proposal, tasks 49–51 and the expanded tasks | **requested** |
 | A13 | Optional: delete leftover branch `probe/prod-r0` (proxy cannot delete) | optional |
 
 ## Backup limitations

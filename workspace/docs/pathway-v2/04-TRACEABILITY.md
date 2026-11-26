@@ -78,3 +78,24 @@ Every requirement maps to UI, data, migration/seed, tests and tasks (`05-TASKS.m
 | Equivalent results; construct check; varied fixtures | 15 |
 | Preserve RF scanner and batch shipping; add roadmap projects | 35, 37 |
 | Gates, feature branches, tests, changelog, preview first, backup and rollback | release tasks 11, 23, 27, 30, 34, 40, 44 |
+
+## ADAPTIVE-LEARNING.md (proposed amendment, 2026-11-26)
+
+| Requirement | Where it fits | Tasks |
+|---|---|---|
+| Shared evidence across Learn, Practice, Skill Library; sandbox is not evidence | Graded modes only; course completion stays separate | 26, 31, 37 |
+| Configurable proficiency threshold, default 80% inclusive; reinforcement bands | `learning_settings`; proficiency module; recommender | 31, 49, 50, 51 |
+| Concept-level evidence; aggregate by module, course, language | Concept → module → language (Release 4); course (Release 5) | 31, 37 |
+| Insufficient evidence ≠ low proficiency ≠ mastery | Separate verdict in proficiency | 31, 51 |
+| Recurring errors, independent first attempts, hints, solution views, exercise versions | Derived from stored attempts | 31 |
+| Repeated identical exercises do not inflate mastery | Unit-tested distinct and independent rules | 31 |
+| Scoring formula, minimum evidence, delayed retention proposed and approved | ADR-016 | 49 |
+| Review 1/3/7/14/30, extend on retention, shorten on weakness | Adaptive review queue | 32 |
+| Daily queue: time budget, weak/overdue first, unfamiliar preferred, mixed practice | Shared selector plus recommender | 26, 50 |
+| New learning alongside reinforcement, no gates | Balance setting; ADR-012 | 39, 50, 51 |
+| Content gap → import/generation suggestion | Gap result opens pack import or AI prompt | 24, 25, 50 |
+| Weekly assessment and retention checks influence next week | Assessment kinds; weekly plan v2 | 33, 39 |
+| Dashboard and settings | /practice/progress, GET/PUT /api/v2/settings | 51 |
+| Integrate daily queue into weekly study schedule | Weekly plan v2 | 39 |
+| Same rules for every language adapter; existing data intact | Pure language-neutral modules; no migration of old attempts | 31, 50 |
+| Automated tests: thresholds, duplicates, assisted, review dates, settings, content gaps, persistence | Named tests per task; gate 34 | 31, 32, 34, 50, 51 |
