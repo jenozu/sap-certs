@@ -1,11 +1,13 @@
-# probed unauthenticated by protection-probe.yml
-https://career-roadmap-at6dn2n0x-jenozus-projects.vercel.app/
-https://career-roadmap-at6dn2n0x-jenozus-projects.vercel.app/api/health
-https://career-roadmap-at6dn2n0x-jenozus-projects.vercel.app/api/workspace
-https://career-roadmap-at6dn2n0x-jenozus-projects.vercel.app/api/workspace/import
-https://career-roadmap-at6dn2n0x-jenozus-projects.vercel.app/lab-spike
-https://career-roadmap-at6dn2n0x-jenozus-projects.vercel.app/sqljs/sql-wasm.wasm
-https://career-roadmap-git-feat-v2-p1-platform-jenozus-projects.vercel.app/
-https://career-roadmap-git-feat-v2-p1-platform-jenozus-projects.vercel.app/api/workspace
-https://career-roadmap-jenozus-projects.vercel.app/
-https://career-roadmap-jenozus-projects.vercel.app/api/health
+# Release 1 preview probe
+https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/practice
+https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/practice/sql.left-join.customers-without-orders
+https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/skills
+https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/packs/index.json
+https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/packs/sql-erp-core.json
+https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/api/v2/export
+https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/api/v2/skills
+https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/api/v2/attempts
+https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/api/v2/drafts/sql.cte.supplier-spend
+https://career-roadmap-85b27x4ng-jenozus-projects.vercel.app/api/v2/practice-sessions
+https://career-roadmap-git-feat-v2-p2-practice-jenozus-projects.vercel.app/practice
+https://career-roadmap-git-feat-v2-p2-practice-jenozus-projects.vercel.app/api/v2/export
