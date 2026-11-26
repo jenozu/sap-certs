@@ -2,7 +2,7 @@
 
 Living status file. Update it at every task change. Source of truth for tasks: `.taskmaster/tasks/tasks.json` (rendered in `05-TASKS.md`).
 
-_Last updated: 2026-11-26 13:00 (America/Toronto)_
+_Last updated: 2026-11-26 18:05 (America/Toronto)_
 
 ## Standing conditions (owner, 2026-11-25)
 - Stop for approval before: any production database migration, any destructive operation, any production release.
@@ -39,6 +39,7 @@ _Last updated: 2026-11-26 13:00 (America/Toronto)_
 | 2 Verify and back up data | 2026-11-25 | this commit | Neon backup branch `backup-pre-v2` (br-ancient-heart-bdf2u1lx); Neon `workspaces` has **0 rows**; Sites not exportable (limitation) |
 
 ## Upcoming
+- **Adaptive-learning amendment approved (A18, 2026-11-26 18:03):** new tasks 49–51 (Release 4), expanded 24–26, 31–34, 36–39, 42–43. Branch `docs/adaptive-learning-plan`, docs only. **Task 49 (ADR-016 scoring/mastery/interval/recommendation numbers) is a separate owner approval checkpoint; no adaptive implementation before it.** Roadmap is the approved baseline; new features are targeted amendments.
 - Release 2 (Expandable Skill Library): 24 pack import pipeline · 25 authoring + AI prompt with saved material · 26 practice modes · 48 learning material library · 27 gate
 - Release 3: 28–30 job tracker (can start any time)
 - Follow-ups: 12 retire Sites files from main (approval) · playground PR #6 merge (owner)
@@ -62,6 +63,9 @@ _Last updated: 2026-11-26 13:00 (America/Toronto)_
 | A17 | Hands-on test of Release 1 on production, then confirm | **requested** |
 | A15 | Merge playground PR #6 (engine split; `src/execution` needs owner per harness.json) | requested |
 | A16 | Review 5 sample exercises on the preview (task 18 acceptance) | requested |
+| A18 | Approve the adaptive-learning plan amendment (tasks 49–51 and expanded tasks) | **done** 2026-11-26 18:03 |
+| A19 | Approve ADR-016 numbers (task 49) before task 31 | pending (not yet drafted) |
+| A20 | Merge docs PR #4 (`docs/adaptive-learning-plan`): https://github.com/jenozu/sap-certs/pull/4 | requested |
 | A13 | Optional: delete leftover branch `probe/prod-r0` (proxy cannot delete) | optional |
 
 ## Backup limitations
