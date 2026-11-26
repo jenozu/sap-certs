@@ -1,0 +1,15 @@
+{
+  "language": "sql",
+  "grading": {
+    "fixtures": [
+      "base",
+      "variant-b",
+      "variant-c"
+    ],
+    "requiredConstructs": [
+      "UNION ALL",
+      "UNION"
+    ],
+    "orderMatters": false
+  }
+}

@@ -1,0 +1,715 @@
+{
+  "schemaVersion": 1,
+  "id": "sql-erp-core",
+  "title": "SQL for ERP data: core joins, unions and CTEs",
+  "version": "1.0.0",
+  "language": "sql",
+  "description": "Seed practice pack on a synthetic distributor database: LEFT JOIN, CROSS JOIN, UNION / UNION ALL, WITH (CTE) and mixed business queries.",
+  "difficulty": "beginner",
+  "estimatedHours": 4,
+  "author": "Pathway",
+  "source": "Pathway seed content",
+  "fixtures": {
+    "base": "datasets/base.sql",
+    "variant-b": "datasets/variant-b.sql",
+    "variant-c": "datasets/variant-c.sql"
+  },
+  "modules": [
+    {
+      "id": "left-join",
+      "title": "LEFT JOIN",
+      "lessons": [
+        {
+          "id": "sql-left-join-customers-without-orders",
+          "title": "Customers who have never ordered",
+          "type": "coding",
+          "content": "lessons/sql-left-join-customers-without-orders/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-left-join-customers-without-orders/starter.sql",
+            "tests": "lessons/sql-left-join-customers-without-orders/tests.json",
+            "solution": "lessons/sql-left-join-customers-without-orders/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Keep every customer, even without a matching order: that's a LEFT JOIN from customers.",
+              "After the join, customers with no order have NULL in every sales_orders column. Filter on `s.so_id IS NULL`."
+            ],
+            "exerciseId": "sql.left-join.customers-without-orders",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-left-join"
+            ],
+            "difficulty": "intro",
+            "kind": "targeted",
+            "businessPurpose": "Sales wants to re-engage accounts that have never placed an order."
+          }
+        },
+        {
+          "id": "sql-left-join-unsold-products",
+          "title": "Products that have never sold",
+          "type": "coding",
+          "content": "lessons/sql-left-join-unsold-products/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-left-join-unsold-products/starter.sql",
+            "tests": "lessons/sql-left-join-unsold-products/tests.json",
+            "solution": "lessons/sql-left-join-unsold-products/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Start from products so none are lost.",
+              "LEFT JOIN so_lines and keep only rows where the so_lines side is NULL."
+            ],
+            "exerciseId": "sql.left-join.unsold-products",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-left-join"
+            ],
+            "difficulty": "intro",
+            "kind": "targeted",
+            "businessPurpose": "Purchasing reviews dead stock before the next reorder run."
+          }
+        },
+        {
+          "id": "sql-left-join-outstanding-pos",
+          "title": "Purchase orders with no receipt yet",
+          "type": "coding",
+          "content": "lessons/sql-left-join-outstanding-pos/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-left-join-outstanding-pos/starter.sql",
+            "tests": "lessons/sql-left-join-outstanding-pos/tests.json",
+            "solution": "lessons/sql-left-join-outstanding-pos/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "The supplier name needs an INNER join; the missing receipt needs a LEFT join.",
+              "Filter `r.receipt_id IS NULL`."
+            ],
+            "exerciseId": "sql.left-join.outstanding-pos",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-left-join"
+            ],
+            "difficulty": "core",
+            "kind": "business",
+            "businessPurpose": "The receiving team chases suppliers for POs that have not arrived."
+          }
+        },
+        {
+          "id": "sql-left-join-order-count-per-customer",
+          "title": "Order count per customer, including zero",
+          "type": "coding",
+          "content": "lessons/sql-left-join-order-count-per-customer/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-left-join-order-count-per-customer/starter.sql",
+            "tests": "lessons/sql-left-join-order-count-per-customer/tests.json",
+            "solution": "lessons/sql-left-join-order-count-per-customer/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Run the starter: customers with no orders show 1, not 0. Why?",
+              "COUNT(*) counts the row created by the LEFT JOIN. Count a column from the right-hand table instead: COUNT(s.so_id)."
+            ],
+            "exerciseId": "sql.left-join.order-count-per-customer",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-left-join",
+              "sql-aggregates"
+            ],
+            "difficulty": "core",
+            "kind": "targeted",
+            "businessPurpose": "Account managers want every customer listed with how many orders they placed, even none."
+          }
+        },
+        {
+          "id": "sql-left-join-debug-filter-in-where",
+          "title": "Debug: the LEFT JOIN that lost rows",
+          "type": "debugging",
+          "content": "lessons/sql-left-join-debug-filter-in-where/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-left-join-debug-filter-in-where/starter.sql",
+            "tests": "lessons/sql-left-join-debug-filter-in-where/tests.json",
+            "solution": "lessons/sql-left-join-debug-filter-in-where/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "A WHERE condition on the right-hand table removes the NULL rows the LEFT JOIN created.",
+              "Move the status condition into the ON clause."
+            ],
+            "exerciseId": "sql.left-join.debug-filter-in-where",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-left-join"
+            ],
+            "difficulty": "stretch",
+            "kind": "debugging",
+            "businessPurpose": "A report should list every warehouse with its count of open sales orders, but warehouses with none disappear."
+          }
+        }
+      ]
+    },
+    {
+      "id": "cross-join",
+      "title": "CROSS JOIN",
+      "lessons": [
+        {
+          "id": "sql-cross-join-warehouse-category-matrix",
+          "title": "Warehouse \u00d7 category planning grid",
+          "type": "coding",
+          "content": "lessons/sql-cross-join-warehouse-category-matrix/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-cross-join-warehouse-category-matrix/starter.sql",
+            "tests": "lessons/sql-cross-join-warehouse-category-matrix/tests.json",
+            "solution": "lessons/sql-cross-join-warehouse-category-matrix/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "A CROSS JOIN pairs every row on the left with every row on the right.",
+              "Use a subquery `SELECT DISTINCT category FROM products` as the right side."
+            ],
+            "exerciseId": "sql.cross-join.warehouse-category-matrix",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-cross-join"
+            ],
+            "difficulty": "intro",
+            "kind": "targeted",
+            "businessPurpose": "Planning wants an empty grid of every warehouse and product category to fill in targets."
+          }
+        },
+        {
+          "id": "sql-cross-join-missing-stock-records",
+          "title": "Find missing inventory records",
+          "type": "coding",
+          "content": "lessons/sql-cross-join-missing-stock-records/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-cross-join-missing-stock-records/starter.sql",
+            "tests": "lessons/sql-cross-join-missing-stock-records/tests.json",
+            "solution": "lessons/sql-cross-join-missing-stock-records/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "The CROSS JOIN gives every pair that *should* exist.",
+              "LEFT JOIN inventory on both keys and keep the NULL matches."
+            ],
+            "exerciseId": "sql.cross-join.missing-stock-records",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-cross-join",
+              "sql-left-join"
+            ],
+            "difficulty": "core",
+            "kind": "business",
+            "businessPurpose": "Every product should have an inventory row in every warehouse; missing rows break replenishment."
+          }
+        },
+        {
+          "id": "sql-cross-join-count-combinations",
+          "title": "How many combinations?",
+          "type": "coding",
+          "content": "lessons/sql-cross-join-count-combinations/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-cross-join-count-combinations/starter.sql",
+            "tests": "lessons/sql-cross-join-count-combinations/tests.json",
+            "solution": "lessons/sql-cross-join-count-combinations/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Predict first: rows in warehouses \u00d7 rows in suppliers.",
+              "Add `CROSS JOIN suppliers` and count."
+            ],
+            "exerciseId": "sql.cross-join.count-combinations",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-cross-join"
+            ],
+            "difficulty": "intro",
+            "kind": "predict-output",
+            "businessPurpose": "Before running a big CROSS JOIN, estimate its size."
+          }
+        },
+        {
+          "id": "sql-cross-join-carrier-warehouse-rates",
+          "title": "Carrier coverage sheet",
+          "type": "coding",
+          "content": "lessons/sql-cross-join-carrier-warehouse-rates/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-cross-join-carrier-warehouse-rates/starter.sql",
+            "tests": "lessons/sql-cross-join-carrier-warehouse-rates/tests.json",
+            "solution": "lessons/sql-cross-join-carrier-warehouse-rates/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Both sides should be distinct lists first.",
+              "CROSS JOIN the two subqueries."
+            ],
+            "exerciseId": "sql.cross-join.carrier-warehouse-rates",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-cross-join"
+            ],
+            "difficulty": "core",
+            "kind": "business",
+            "businessPurpose": "Logistics builds a rate sheet: every carrier used so far against every warehouse region."
+          }
+        },
+        {
+          "id": "sql-cross-join-debug-accidental",
+          "title": "Debug: the accidental CROSS JOIN",
+          "type": "debugging",
+          "content": "lessons/sql-cross-join-debug-accidental/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-cross-join-debug-accidental/starter.sql",
+            "tests": "lessons/sql-cross-join-debug-accidental/tests.json",
+            "solution": "lessons/sql-cross-join-debug-accidental/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "A comma between tables with no condition is an implicit CROSS JOIN.",
+              "Join on `c.customer_id = s.customer_id`."
+            ],
+            "exerciseId": "sql.cross-join.debug-accidental",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-cross-join",
+              "sql-inner-join"
+            ],
+            "difficulty": "stretch",
+            "kind": "debugging",
+            "businessPurpose": "An order report returns far too many rows: a join condition is missing."
+          }
+        }
+      ]
+    },
+    {
+      "id": "union",
+      "title": "UNION and UNION ALL",
+      "lessons": [
+        {
+          "id": "sql-union-all-cities",
+          "title": "Every city we deal with (no duplicates)",
+          "type": "coding",
+          "content": "lessons/sql-union-all-cities/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-union-all-cities/starter.sql",
+            "tests": "lessons/sql-union-all-cities/tests.json",
+            "solution": "lessons/sql-union-all-cities/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "UNION stacks two result sets with the same columns.",
+              "Plain UNION removes duplicates; UNION ALL keeps them."
+            ],
+            "exerciseId": "sql.union.all-cities",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-union"
+            ],
+            "difficulty": "intro",
+            "kind": "targeted",
+            "businessPurpose": "Marketing needs a de-duplicated list of cities where we have customers or warehouses."
+          }
+        },
+        {
+          "id": "sql-union-all-stock-movements",
+          "title": "One list of stock movements",
+          "type": "coding",
+          "content": "lessons/sql-union-all-stock-movements/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-union-all-stock-movements/starter.sql",
+            "tests": "lessons/sql-union-all-stock-movements/tests.json",
+            "solution": "lessons/sql-union-all-stock-movements/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Two identical movements are both real; don't let UNION remove them.",
+              "Use UNION ALL; column count and order must match."
+            ],
+            "exerciseId": "sql.union-all.stock-movements",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-union-all"
+            ],
+            "difficulty": "core",
+            "kind": "business",
+            "businessPurpose": "Inventory control wants receipts (in) and sales lines (out) in one movement list, keeping every movement."
+          }
+        },
+        {
+          "id": "sql-union-contact-directory",
+          "title": "Supplier and customer contact directory",
+          "type": "coding",
+          "content": "lessons/sql-union-contact-directory/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-union-contact-directory/starter.sql",
+            "tests": "lessons/sql-union-contact-directory/tests.json",
+            "solution": "lessons/sql-union-contact-directory/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Add a literal column so each row says where it came from.",
+              "ORDER BY goes once, after the last SELECT."
+            ],
+            "exerciseId": "sql.union.contact-directory",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-union"
+            ],
+            "difficulty": "core",
+            "kind": "business",
+            "businessPurpose": "Reception keeps one directory of organisations with their type."
+          }
+        },
+        {
+          "id": "sql-union-all-count-difference",
+          "title": "UNION vs UNION ALL: count the difference",
+          "type": "coding",
+          "content": "lessons/sql-union-all-count-difference/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-union-all-count-difference/starter.sql",
+            "tests": "lessons/sql-union-all-count-difference/tests.json",
+            "solution": "lessons/sql-union-all-count-difference/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Predict both numbers before running.",
+              "Replace the 0 with a second scalar subquery using UNION."
+            ],
+            "exerciseId": "sql.union-all.count-difference",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-union",
+              "sql-union-all"
+            ],
+            "difficulty": "stretch",
+            "kind": "predict-output",
+            "businessPurpose": "Understand exactly how many duplicates UNION removes."
+          }
+        },
+        {
+          "id": "sql-union-all-open-items-report",
+          "title": "Open items across purchasing and sales",
+          "type": "coding",
+          "content": "lessons/sql-union-all-open-items-report/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-union-all-open-items-report/starter.sql",
+            "tests": "lessons/sql-union-all-open-items-report/tests.json",
+            "solution": "lessons/sql-union-all-open-items-report/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Both halves filter on status = 'Open'.",
+              "UNION ALL is right here: a PO and an SO are never duplicates of each other."
+            ],
+            "exerciseId": "sql.union-all.open-items-report",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-union-all"
+            ],
+            "difficulty": "core",
+            "kind": "business",
+            "businessPurpose": "The operations lead reviews all open documents in one list."
+          }
+        }
+      ]
+    },
+    {
+      "id": "cte",
+      "title": "WITH / CTE",
+      "lessons": [
+        {
+          "id": "sql-cte-supplier-spend",
+          "title": "Supplier spend with a CTE",
+          "type": "coding",
+          "content": "lessons/sql-cte-supplier-spend/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-cte-supplier-spend/starter.sql",
+            "tests": "lessons/sql-cte-supplier-spend/tests.json",
+            "solution": "lessons/sql-cte-supplier-spend/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Inside the CTE, join purchase_orders to po_lines and GROUP BY supplier_id.",
+              "The outer query reads the CTE like a table."
+            ],
+            "exerciseId": "sql.cte.supplier-spend",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-cte",
+              "sql-aggregates"
+            ],
+            "difficulty": "intro",
+            "kind": "targeted",
+            "businessPurpose": "Finance ranks suppliers by total ordered value."
+          }
+        },
+        {
+          "id": "sql-cte-outstanding-qty",
+          "title": "Outstanding quantity per PO line",
+          "type": "coding",
+          "content": "lessons/sql-cte-outstanding-qty/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-cte-outstanding-qty/starter.sql",
+            "tests": "lessons/sql-cte-outstanding-qty/tests.json",
+            "solution": "lessons/sql-cte-outstanding-qty/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "LEFT JOIN the CTE so lines with no receipt stay.",
+              "COALESCE(r.qty, 0) turns 'nothing received' into 0."
+            ],
+            "exerciseId": "sql.cte.outstanding-qty",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-cte",
+              "sql-left-join"
+            ],
+            "difficulty": "core",
+            "kind": "business",
+            "businessPurpose": "Receiving needs remaining quantities, including partially received lines."
+          }
+        },
+        {
+          "id": "sql-cte-price-discrepancies",
+          "title": "Invoice price discrepancies",
+          "type": "coding",
+          "content": "lessons/sql-cte-price-discrepancies/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-cte-price-discrepancies/starter.sql",
+            "tests": "lessons/sql-cte-price-discrepancies/tests.json",
+            "solution": "lessons/sql-cte-price-discrepancies/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "The CTE is already written; finish the outer query.",
+              "Filter where the two costs differ and compute the difference."
+            ],
+            "exerciseId": "sql.cte.price-discrepancies",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-cte",
+              "sql-inner-join"
+            ],
+            "difficulty": "core",
+            "kind": "business",
+            "businessPurpose": "Accounts payable holds invoices whose unit cost differs from the PO."
+          }
+        },
+        {
+          "id": "sql-cte-below-reorder",
+          "title": "Stock below reorder point, by warehouse",
+          "type": "coding",
+          "content": "lessons/sql-cte-below-reorder/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-cte-below-reorder/starter.sql",
+            "tests": "lessons/sql-cte-below-reorder/tests.json",
+            "solution": "lessons/sql-cte-below-reorder/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Join the CTE to warehouses.",
+              "GROUP BY warehouse and COUNT(*)."
+            ],
+            "exerciseId": "sql.cte.below-reorder",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-cte",
+              "sql-aggregates"
+            ],
+            "difficulty": "intro",
+            "kind": "targeted",
+            "businessPurpose": "Replenishment planners start with the count of low-stock items per warehouse."
+          }
+        },
+        {
+          "id": "sql-cte-two-step-top-customers",
+          "title": "Two CTEs: top customers by revenue",
+          "type": "coding",
+          "content": "lessons/sql-cte-two-step-top-customers/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-cte-two-step-top-customers/starter.sql",
+            "tests": "lessons/sql-cte-two-step-top-customers/tests.json",
+            "solution": "lessons/sql-cte-two-step-top-customers/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Separate CTEs with a comma; the second can read the first.",
+              "Combine the one-row CTE with CROSS JOIN (or a scalar subquery) to compare."
+            ],
+            "exerciseId": "sql.cte.two-step-top-customers",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-cte",
+              "sql-aggregates"
+            ],
+            "difficulty": "stretch",
+            "kind": "targeted",
+            "businessPurpose": "Sales leadership wants customers whose revenue is above the average customer revenue."
+          }
+        }
+      ]
+    },
+    {
+      "id": "mixed",
+      "title": "Mixed practice",
+      "lessons": [
+        {
+          "id": "sql-mixed-customer-activity-status",
+          "title": "Customer activity status",
+          "type": "coding",
+          "content": "lessons/sql-mixed-customer-activity-status/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-mixed-customer-activity-status/starter.sql",
+            "tests": "lessons/sql-mixed-customer-activity-status/tests.json",
+            "solution": "lessons/sql-mixed-customer-activity-status/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "LEFT JOIN the CTE to customers.",
+              "CASE WHEN b.customer_id IS NULL THEN 'Prospect' ELSE 'Active' END."
+            ],
+            "exerciseId": "sql.mixed.customer-activity-status",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-cte",
+              "sql-left-join",
+              "sql-union"
+            ],
+            "difficulty": "core",
+            "kind": "business",
+            "businessPurpose": "CRM tags customers as 'Active' (has orders) or 'Prospect' (none)."
+          }
+        },
+        {
+          "id": "sql-mixed-unshipped-by-carrier-gap",
+          "title": "Orders with no shipment or no ship date",
+          "type": "coding",
+          "content": "lessons/sql-mixed-unshipped-by-carrier-gap/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-mixed-unshipped-by-carrier-gap/starter.sql",
+            "tests": "lessons/sql-mixed-unshipped-by-carrier-gap/tests.json",
+            "solution": "lessons/sql-mixed-unshipped-by-carrier-gap/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "First half is written. Add the second half from shipments.",
+              "NULL checks use IS NULL, never = NULL."
+            ],
+            "exerciseId": "sql.mixed.unshipped-by-carrier-gap",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-left-join",
+              "sql-union-all"
+            ],
+            "difficulty": "core",
+            "kind": "business",
+            "businessPurpose": "Customer service follows up on orders that have not physically left."
+          }
+        },
+        {
+          "id": "sql-mixed-coverage-by-region",
+          "title": "Category coverage by region",
+          "type": "coding",
+          "content": "lessons/sql-mixed-coverage-by-region/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-mixed-coverage-by-region/starter.sql",
+            "tests": "lessons/sql-mixed-coverage-by-region/tests.json",
+            "solution": "lessons/sql-mixed-coverage-by-region/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "All region \u00d7 category pairs come from a CROSS JOIN of two DISTINCT lists.",
+              "LEFT JOIN the CTE and keep pairs where COALESCE(qty, 0) = 0."
+            ],
+            "exerciseId": "sql.mixed.coverage-by-region",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-cross-join",
+              "sql-cte",
+              "sql-left-join"
+            ],
+            "difficulty": "stretch",
+            "kind": "business",
+            "businessPurpose": "Find which product categories have zero stock anywhere in each region."
+          }
+        },
+        {
+          "id": "sql-mixed-supplier-activity",
+          "title": "Supplier activity summary",
+          "type": "coding",
+          "content": "lessons/sql-mixed-supplier-activity/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-mixed-supplier-activity/starter.sql",
+            "tests": "lessons/sql-mixed-supplier-activity/tests.json",
+            "solution": "lessons/sql-mixed-supplier-activity/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "LEFT JOIN the CTE so inactive suppliers remain.",
+              "COALESCE for the count, CASE for the label."
+            ],
+            "exerciseId": "sql.mixed.supplier-activity",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-left-join",
+              "sql-aggregates",
+              "sql-cte"
+            ],
+            "difficulty": "core",
+            "kind": "business",
+            "businessPurpose": "Vendor management reviews suppliers by PO count, including inactive ones."
+          }
+        },
+        {
+          "id": "sql-mixed-debug-union-columns",
+          "title": "Debug: UNION with mismatched columns",
+          "type": "debugging",
+          "content": "lessons/sql-mixed-debug-union-columns/lesson.md",
+          "estimatedMinutes": 8,
+          "exercise": {
+            "type": "sql",
+            "starter": "lessons/sql-mixed-debug-union-columns/starter.sql",
+            "tests": "lessons/sql-mixed-debug-union-columns/tests.json",
+            "solution": "lessons/sql-mixed-debug-union-columns/solution.sql",
+            "dataset": "datasets/base.sql",
+            "hints": [
+              "Read the error: each SELECT in a UNION must return the same number of columns.",
+              "Drop the extra column so both halves have name, city."
+            ],
+            "exerciseId": "sql.mixed.debug-union-columns",
+            "exerciseVersion": "1.0.0",
+            "skills": [
+              "sql-union-all"
+            ],
+            "difficulty": "intro",
+            "kind": "debugging",
+            "businessPurpose": "A contact export fails because the two halves don't line up."
+          }
+        }
+      ]
+    }
+  ]
+}
