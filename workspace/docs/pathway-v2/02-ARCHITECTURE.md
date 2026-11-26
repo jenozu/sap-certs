@@ -53,7 +53,7 @@ Content (datasets, exercise packs, skill aliases, career seeds) is versioned in 
 
 **ADR-015 Dynamic concepts and learning material.** Concepts (`skills`) are per-owner rows with free-text `language`, `aliases`, `tags`, `source`; there are no topic enums or category tables. Aliases seeded from content are suggestions only. `learning_materials` (Release 2) store notes, lesson text, code examples and links linked to concepts; full-text search via Postgres `to_tsvector` over title/body/tags. Materials can be passed into the generation prompt.
 
-**ADR-016 Adaptive learning (PROPOSED 2026-11-26, awaiting approval; details come from task 49).** Requirements: `ADAPTIVE-LEARNING.md`. Decisions proposed here, numbers deferred to task 49:
+**ADR-016 Adaptive learning (2026-11-26). Amendment approved by owner (A18); the scoring, mastery, interval and recommendation numbers remain a separate approval checkpoint in task 49 and are not implemented until approved.** Requirements: `ADAPTIVE-LEARNING.md`. Decisions proposed here, numbers deferred to task 49:
 - *Three pure, language-neutral domain modules* over attempts: `mastery.ts` (discrete states, ADR-011), `proficiency.ts` (0–100% per concept plus a separate evidence-sufficiency verdict), `review.ts` (adaptive intervals). `recommend.ts` composes them with the Release 2 selector (`lib/practice/select.ts`). None contains SQL logic; they see only the shared attempt shape.
 - *No new Release 1 data.* Attempts already store skills, mode, hints, solution views, independent flag, version, duration and per-check results, so recurring error kinds, independent first attempts and repeat detection are derived. Mastery and proficiency stay recomputable from history, so nothing needs backfilling.
 - *Evidence rules:* only graded modes count; sandbox never does; assisted and repeated identical passes do not raise independent proficiency; insufficient evidence is a distinct state, never a percentage band and never mastery; course completion is not mastery.
@@ -61,7 +61,7 @@ Content (datasets, exercise packs, skill aliases, career seeds) is versioned in 
 - *Aggregation:* concept → pack module → language in Release 4; course in Release 5 through item `skills[]` (ADR-005), reusing the same aggregator.
 - *Content gaps:* the recommender returns a gap (concept, error kinds, target difficulty and count) that opens pack import (task 24) or the pre-filled AI prompt (task 25); no AI provider.
 - *Scheduling never gates:* the daily queue fits inside the weekly plan and never blocks new learning (consistent with ADR-012).
-- The formula, minimum evidence counts, delayed-retention rule, interval adjustments and selection weights are proposed in task 49 with numeric test vectors and need owner approval before task 31 starts.
+- The formula, minimum evidence counts, delayed-retention rule, interval adjustments and selection weights are proposed in task 49 with numeric test vectors and need explicit owner approval (task 49) before task 31 or any adaptive implementation starts.
 
 **ADR-012 Readiness and fit explain, never gate.** Apply/track actions are always enabled.
 

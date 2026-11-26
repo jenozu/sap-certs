@@ -79,7 +79,7 @@ Every requirement maps to UI, data, migration/seed, tests and tasks (`05-TASKS.m
 | Preserve RF scanner and batch shipping; add roadmap projects | 35, 37 |
 | Gates, feature branches, tests, changelog, preview first, backup and rollback | release tasks 11, 23, 27, 30, 34, 40, 44 |
 
-## ADAPTIVE-LEARNING.md (proposed amendment, 2026-11-26)
+## ADAPTIVE-LEARNING.md (approved amendment, 2026-11-26; ADR-016 numbers pending task 49)
 
 | Requirement | Where it fits | Tasks |
 |---|---|---|

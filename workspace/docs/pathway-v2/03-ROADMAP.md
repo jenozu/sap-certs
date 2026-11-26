@@ -18,7 +18,7 @@ No dates: order and gates matter. Each phase runs on a feature branch with small
 ## Multi-language vision (2026-11-26)
 The Practice Lab is a permanent multi-language academy. Release 1 builds SQL content only, but on language-neutral foundations (adapter registry, `language` everywhere, language-declared packs). Languages are added alongside the owner's learning: the JS/TS/Node adapter (tasks 45–46) can start as soon as JS study begins, in parallel with Releases 2–6.
 
-## Adaptive learning amendment (2026-11-26, proposed)
+## Adaptive learning amendment (2026-11-26, approved by owner; ADR-016 numbers pending task 49 approval)
 `ADAPTIVE-LEARNING.md` fits the existing releases; nothing is re-ordered.
 - **Release 2:** small foundations only: `estimatedMinutes` in packs (24), gap-aware AI prompt (25), one pure shared exercise selector (26). Task 49 (ADR-016 scoring and scheduling proposal) can be done during Release 2 so approval is ready before Release 4 starts.
 - **Release 4:** proficiency and evidence rules (31), adaptive intervals (32), retention and weekly assessments (33), daily recommendation engine (50), dashboard and settings (51).
