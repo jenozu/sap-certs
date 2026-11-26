@@ -13,7 +13,7 @@ _Last updated: 2026-11-26 13:12 (America/Toronto)_
 
 ## Current
 - **Release 1 LIVE (2026-11-26 12:55).** Owner hands-on test in progress (A17). Release 2 starts after the owner confirms.
-- PR #2 (plan docs) merged by owner 13:05 → main 4fcf938; production redeployed READY. Next owner merge: playground PR #6.
+- PR #2 (plan docs) merged by owner 13:05 → main 4fcf938; production redeployed READY. Playground PR #6 merged by owner 13:10 (playground main e990238); vendored files 8/8 identical to playground main.
 
 ## Completed
 | Task | Date | Commit | Notes |
@@ -60,7 +60,7 @@ _Last updated: 2026-11-26 13:12 (America/Toronto)_
 | A12 | Merge PR #2 (plan docs → main) | **done** by owner 13:05 |
 | A14 | Approve Release 1 | **done** 12:49 |
 | A17 | Hands-on test of Release 1 on production, then confirm | **requested** |
-| A15 | Merge playground PR #6 (engine split; `src/execution` needs owner per harness.json) | requested |
+| A15 | Merge playground PR #6 | **done** 13:10 → playground e990238; Pathway vendor 8/8 identical |
 | A16 | Review 5 sample exercises on the preview (task 18 acceptance) | requested |
 | A13 | Optional: delete leftover branch `probe/prod-r0` (proxy cannot delete) | optional |
 
