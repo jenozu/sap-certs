@@ -183,7 +183,7 @@
         "id": 11,
         "title": "[P1] Release 0: merge to main, production live, data reconciled  [HUMAN approval]",
         "description": "Production on Vercel/Neon, protected and backed up.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           4,
@@ -192,7 +192,7 @@
           9,
           10
         ],
-        "details": "Merge main's doc commits into the Vercel branch; PR with CI green; owner approves; merge. First production deploy with OWNER_ID unset → run task 7 production checks → set OWNER_ID → redeploy. Fresh Neon backup branch, then apply the reconciliation import on production if task 2 found newer Sites data.",
+        "details": "Merge main's doc commits into the Vercel branch; PR with CI green; owner approves; merge. First production deploy with OWNER_ID unset → run task 7 production checks → set OWNER_ID → redeploy. Fresh Neon backup branch, then apply the reconciliation import on production if task 2 found newer Sites data.\n\n[2026-11-26T11:33:27-05:00] 2026-11-26: Neon backup backup-pre-release0 (br-damp-salad-bd1ezsf1); prod migration workspace_snapshots; PR #1 merged f75c153; prod deploy with OWNER_ID unset -> 10 prod URLs 302 to Vercel login, /api/workspace 503; then OWNER_ID=owner:andel, redeploy dpl_9nVMSvrjabyktyTo6PodYFj48vvn; /api/health ownerConfigured true; /api/workspace 200 v0.",
         "testStrategy": "Acceptance: production READY and protected (task 7 table); regression suite read-only subset green on production; production data matches the agreed reconciliation; CHANGELOG records test results.",
         "complexity": 3,
         "subtasks": []
@@ -215,7 +215,7 @@
         "id": 13,
         "title": "[P2] Vendor the playground engine (pinned snapshot)",
         "description": "ADR-004 using the spike's findings.",
-        "status": "pending",
+        "status": "in-progress",
         "priority": "high",
         "dependencies": [
           11
@@ -848,7 +848,7 @@
     ],
     "metadata": {
       "created": "2026-11-25T13:00:00",
-      "updated": "2026-11-26T11:25:02-05:00",
+      "updated": "2026-11-26T11:33:27-05:00",
       "description": "Pathway v2 upgrade plan, revision 2 (awaiting owner approval)"
     }
   }
