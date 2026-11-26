@@ -2,7 +2,7 @@
 
 Living status file. Update it at every task change. Source of truth for tasks: `.taskmaster/tasks/tasks.json` (rendered in `05-TASKS.md`).
 
-_Last updated: 2026-11-26 13:00 (America/Toronto)_
+_Last updated: 2026-11-26 13:12 (America/Toronto)_
 
 ## Standing conditions (owner, 2026-11-25)
 - Stop for approval before: any production database migration, any destructive operation, any production release.
@@ -13,7 +13,7 @@ _Last updated: 2026-11-26 13:00 (America/Toronto)_
 
 ## Current
 - **Release 1 LIVE (2026-11-26 12:55).** Owner hands-on test in progress (A17). Release 2 starts after the owner confirms.
-- Owner merges in progress: PR #2 (plan docs), playground PR #6.
+- PR #2 (plan docs) merged by owner 13:05 → main 4fcf938; production redeployed READY. Next owner merge: playground PR #6.
 
 ## Completed
 | Task | Date | Commit | Notes |
@@ -57,12 +57,15 @@ _Last updated: 2026-11-26 13:00 (America/Toronto)_
 | A9 (deferred by owner) | Vercel protection-bypass secret → GitHub secret `VERCEL_AUTOMATION_BYPASS_SECRET` (e2e on previews) | pending |
 | A10 (deferred by owner) | Vercel read token → GitHub secret `VERCEL_TOKEN` (protection check in CI) | pending |
 | A11 | Unauthenticated protection checks | **done** via GitHub Actions probe (no approval needed) |
-| A12 | Merge PR #2 (plan docs → main); auto-merge blocked by safety classifier | **requested** |
+| A12 | Merge PR #2 (plan docs → main) | **done** by owner 13:05 |
 | A14 | Approve Release 1 | **done** 12:49 |
 | A17 | Hands-on test of Release 1 on production, then confirm | **requested** |
 | A15 | Merge playground PR #6 (engine split; `src/execution` needs owner per harness.json) | requested |
 | A16 | Review 5 sample exercises on the preview (task 18 acceptance) | requested |
 | A13 | Optional: delete leftover branch `probe/prod-r0` (proxy cannot delete) | optional |
+
+## Incident notes
+- 2026-11-26 13:05: owner saw a Vercel "deployment error" after merging PR #2. Investigated: the failing deployments were **previews of the `docs/pathway-v2-plan` branch** (built from the old Sites/vinext base → `NEXT_NO_ROUTES_MANIFEST`), not production. Production deployment for 4fcf938 is READY; 4fcf938 differs from Release 1 (2cbe6ef) only in plan docs; health/auth/DB/practice verified. Fix: docs branch fast-forwarded to main so its previews build normally. Also removed two build artifacts accidentally committed to the docs branch before merge (7b84def).
 
 ## Backup limitations
 - **Sites (ChatGPT-hosted, D1) data cannot be exported** (2026-11-25): the footer "Export workspace" button downloads nothing; this happened before and was never resolved. Any data only in Sites is therefore not backed up.
@@ -85,7 +88,7 @@ _Last updated: 2026-11-26 13:00 (America/Toronto)_
 | playground (PR #6 branch) | lint, tsc, vitest 106/106, build; e2e sql-lesson pass |
 
 ## Deployment status
-- **Production: LIVE** — https://career-roadmap-jenozus-projects.vercel.app (deployment dpl_C1ZMyvaS1wcDRzB7PauEsqZE6tsy, main @ 2cbe6ef, Release 1). Vercel Authentication on all routes (18 probed). OWNER_ID=owner:andel. Neon main tables: workspaces, workspace_snapshots, skills, practice_sessions, exercise_attempts, saved_code.
+- **Production: LIVE** — https://career-roadmap-jenozus-projects.vercel.app (deployment dpl_7jPvk95BKE9EyX4zuxMDMV3qwer6, main @ 4fcf938 = Release 1 code + plan docs). Vercel Authentication on all routes (18 probed). OWNER_ID=owner:andel. Neon main tables: workspaces, workspace_snapshots, skills, practice_sessions, exercise_attempts, saved_code.
 - Preview: isolated Neon `preview` branch (has 0002 practice tables); OWNER_ID=owner:andel-preview. Release 1 preview: career-roadmap-85b27x4ng (061b92d).
 - Backups: Neon `backup-pre-v2` (2026-11-25), `backup-pre-release0`, `backup-pre-release1` (2026-11-26).
 - Rollback: Vercel instant rollback (Hobby: previous production deployment) + Neon branch restore.
