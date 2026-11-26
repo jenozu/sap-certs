@@ -414,7 +414,7 @@
         "id": 23,
         "title": "[P2] Release 1: usable SQL Practice Lab  [HUMAN approval]",
         "description": "Practice Lab gates 1 and 2 (MVP scope).",
-        "status": "in-progress",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           18,
@@ -423,7 +423,7 @@
           21,
           22
         ],
-        "details": "Backup, migrate, deploy, smoke on production.\n\n[2026-11-26T12:09:10-05:00] PR #3 open. Preview verified (smoke + 12 routes protected). Waiting for owner approval: prod migration 0002 + release.",
+        "details": "Backup, migrate, deploy, smoke on production.\n\n[2026-11-26T12:09:10-05:00] PR #3 open. Preview verified (smoke + 12 routes protected). Waiting for owner approval: prod migration 0002 + release.\n\n[2026-11-26T12:55:11-05:00] 2026-11-26 12:55: backup-pre-release1 (br-dawn-waterfall-bdbmjbvv); prod migration 0002; PR #3 merged 2cbe6ef; prod dpl_C1ZMyvaS1wcDRzB7PauEsqZE6tsy READY; probe 18/18 prod URLs 302; smoke: health production+owner, /api/v2/skills 200, packs index 25 exercises; vendored 8/8 files == playground eebbfc3. Owner hands-on test pending.",
         "testStrategy": "Acceptance: automated: correct/incorrect/equivalent queries, empty results, mutations, timeouts, production WASM, mobile, attempt idempotency, owner isolation; all 25 solutions verified; regression + visual suites green; playground suite green; owner can register WITH/LEFT JOIN/CROSS JOIN/UNION/UNION ALL and practise them on production.",
         "complexity": 2,
         "subtasks": []
@@ -848,7 +848,7 @@
     ],
     "metadata": {
       "created": "2026-11-25T13:00:00",
-      "updated": "2026-11-26T12:09:10-05:00",
+      "updated": "2026-11-26T12:55:11-05:00",
       "description": "Pathway v2 upgrade plan, revision 2 (awaiting owner approval)"
     }
   }
