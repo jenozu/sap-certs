@@ -215,12 +215,12 @@
         "id": 13,
         "title": "[P2] Vendor the playground engine (pinned snapshot)",
         "description": "ADR-004 using the spike's findings.",
-        "status": "in-progress",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           11
         ],
-        "details": "Upstream PR to playground: sql worker accepts wasmUrl in init (fallback to Vite ?url), single zod import module; merge; then copy the listed modules to workspace/vendor/playground with UPSTREAM.json (sha, files, sha256), scripts/sync-playground.mjs, tests/vendor-integrity.test.ts, prebuild copy of sql-wasm.wasm. Delete the spike route. Vendor behind a LanguageAdapter registry (lib/practice/adapters/: id, label, dialect note, createEngine, evaluate, editor language); SQL is the first registered adapter. Adding a language = new adapter + packs, no changes to practice UI, storage or mastery.",
+        "details": "Upstream PR to playground: sql worker accepts wasmUrl in init (fallback to Vite ?url), single zod import module; merge; then copy the listed modules to workspace/vendor/playground with UPSTREAM.json (sha, files, sha256), scripts/sync-playground.mjs, tests/vendor-integrity.test.ts, prebuild copy of sql-wasm.wasm. Delete the spike route. Vendor behind a LanguageAdapter registry (lib/practice/adapters/: id, label, dialect note, createEngine, evaluate, editor language); SQL is the first registered adapter. Adding a language = new adapter + packs, no changes to practice UI, storage or mastery.\n\n[2026-11-26T12:09:10-05:00] 9987cf2: vendored at playground eebbfc3 (PR #6 pending owner merge); adapter registry; zod 4.",
         "testStrategy": "Acceptance: integrity test fails if a vendored file is edited; ported vendored unit tests pass; build green; playground CI green. Unit: registry resolves 'sql'; unknown language returns a clear 'not supported yet' result; adding a fake adapter in a test needs no other code changes.",
         "complexity": 4,
         "subtasks": []
@@ -229,7 +229,7 @@
         "id": 14,
         "title": "[P2] Practice tables and owner-scoped API",
         "description": "Only the tables Release 1 needs; additive migration.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           11
@@ -243,7 +243,7 @@
         "id": 15,
         "title": "[P2] Evaluator extensions: fixtures, constructs, equivalence, caps (SQL adapter)",
         "description": "Robust, fair grading.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           13
@@ -257,7 +257,7 @@
         "id": 16,
         "title": "[P2] Pack format, validator and bundled-pack loader",
         "description": "One content path for bundled and (later) imported packs; no code change per concept.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           15
@@ -271,7 +271,7 @@
         "id": 17,
         "title": "[P2] Synthetic distributor dataset and fixtures",
         "description": "Deterministic ERP data with deliberate edge cases.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           16
@@ -285,12 +285,12 @@
         "id": 18,
         "title": "[P2] Priority exercises: WITH/CTE, LEFT JOIN, CROSS JOIN, UNION, UNION ALL",
         "description": "The owner's immediate learning priorities, 25 verified exercises.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           17
         ],
-        "details": "Pack sql-erp-core v1.0.0: 5 LEFT JOIN (missing orders, unsold products…), 5 CROSS JOIN (warehouse/product matrix…), 5 UNION/UNION ALL (at least 2 require UNION ALL and 2 UNION, incl. duplicate-handling contrast; branch shipments), 5 WITH/CTE (supplier spend, outstanding receipts…), 5 mixed. Each: business purpose, instructions, starter, ≥2 hints, tests with fixtures + requiredConstructs, verified solution.",
+        "details": "Pack sql-erp-core v1.0.0: 5 LEFT JOIN (missing orders, unsold products…), 5 CROSS JOIN (warehouse/product matrix…), 5 UNION/UNION ALL (at least 2 require UNION ALL and 2 UNION, incl. duplicate-handling contrast; branch shipments), 5 WITH/CTE (supplier spend, outstanding receipts…), 5 mixed. Each: business purpose, instructions, starter, ≥2 hints, tests with fixtures + requiredConstructs, verified solution.\n\n[2026-11-26T12:09:10-05:00] 8d5c962: 25 exercises; content:verify: reference passes, starters fail, hard-coded fails on all 25. Owner review of 5 samples pending (A12).",
         "testStrategy": "Acceptance: content:verify passes all 25 on all fixtures; a hard-coded answer fails every graded exercise; owner reviews 5 samples before release.",
         "complexity": 7,
         "subtasks": []
@@ -299,7 +299,7 @@
         "id": 19,
         "title": "[P2] Practice focus view with attempt recording from day one",
         "description": "Run/Submit/reset/hints/solution/drafts; every Submit is stored.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           14,
@@ -313,7 +313,7 @@
             "id": 1,
             "title": "Layout + schema browser",
             "description": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": "e2e desktop/mobile render"
@@ -322,7 +322,7 @@
             "id": 2,
             "title": "Run/Submit/reset via manager",
             "description": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               1
             ],
@@ -333,7 +333,7 @@
             "id": 3,
             "title": "Attempt recording + offline queue",
             "description": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               2
             ],
@@ -344,7 +344,7 @@
             "id": 4,
             "title": "Drafts",
             "description": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               2
             ],
@@ -355,7 +355,7 @@
             "id": 5,
             "title": "Accessibility + Ctrl+Enter",
             "description": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               2
             ],
@@ -368,7 +368,7 @@
         "id": 20,
         "title": "[P2] Skill Library v1: register concepts right after learning them",
         "description": "Owner priority: register a concept the moment it is learned externally.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           14,
@@ -384,7 +384,7 @@
         "id": 21,
         "title": "[P2] Export/import includes practice data",
         "description": "Data preservation applies to attempts from the first release.",
-        "status": "pending",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           10,
@@ -399,7 +399,7 @@
         "id": 22,
         "title": "[P2] Add Practice and Skills to the existing navigation",
         "description": "Integrate without redesigning the workspace.",
-        "status": "pending",
+        "status": "done",
         "priority": "medium",
         "dependencies": [
           9,
@@ -414,7 +414,7 @@
         "id": 23,
         "title": "[P2] Release 1: usable SQL Practice Lab  [HUMAN approval]",
         "description": "Practice Lab gates 1 and 2 (MVP scope).",
-        "status": "pending",
+        "status": "in-progress",
         "priority": "high",
         "dependencies": [
           18,
@@ -423,7 +423,7 @@
           21,
           22
         ],
-        "details": "Backup, migrate, deploy, smoke on production.",
+        "details": "Backup, migrate, deploy, smoke on production.\n\n[2026-11-26T12:09:10-05:00] PR #3 open. Preview verified (smoke + 12 routes protected). Waiting for owner approval: prod migration 0002 + release.",
         "testStrategy": "Acceptance: automated: correct/incorrect/equivalent queries, empty results, mutations, timeouts, production WASM, mobile, attempt idempotency, owner isolation; all 25 solutions verified; regression + visual suites green; playground suite green; owner can register WITH/LEFT JOIN/CROSS JOIN/UNION/UNION ALL and practise them on production.",
         "complexity": 2,
         "subtasks": []
@@ -848,7 +848,7 @@
     ],
     "metadata": {
       "created": "2026-11-25T13:00:00",
-      "updated": "2026-11-26T11:33:27-05:00",
+      "updated": "2026-11-26T12:09:10-05:00",
       "description": "Pathway v2 upgrade plan, revision 2 (awaiting owner approval)"
     }
   }
