@@ -53,6 +53,14 @@ Content (datasets, exercise packs, skill aliases, career seeds) is versioned in 
 
 **ADR-015 Dynamic concepts and learning material.** Concepts (`skills`) are per-owner rows with free-text `language`, `aliases`, `tags`, `source`; there are no topic enums or category tables. Aliases seeded from content are suggestions only. `learning_materials` (Release 2) store notes, lesson text, code examples and links linked to concepts; full-text search via Postgres `to_tsvector` over title/body/tags. Materials can be passed into the generation prompt.
 
+**ADR-017 Curriculum and lessons as data (APPROVED by owner 2026-11-27, A21).** The pack is the course: the manifest already models course → modules → lessons with lesson types and minutes, so no second format is introduced.
+- *Additive optional fields* (non-strict, playground-compatible): lesson `skills[]` (concept ids), advisory `prerequisites[]` (lesson ids), `quiz` file for multiple-choice, exercise `role` guided|independent. Lessons without exercises become valid.
+- *No curriculum content table.* The catalogue is derived from bundled and published pack manifests (task 24) in one registry; only user state is new: `lesson_progress` (Release 2).
+- *Hierarchy:* language → course → module → lesson → concept, where concepts are the existing dynamic `skills` (ADR-015). Order and concept links are data, so new languages, courses and lessons need no code changes.
+- *Lesson blocks are content:* runnable examples, syntax callouts, guided checkpoints and quizzes are declared in lesson files and rendered by one viewer through the adapter registry (ADR-014), reusing the vendored lesson Markdown renderer (no raw HTML) and the focus-view editor.
+- *Progress is not mastery.* Lesson completion tracks progression only; guided-exercise attempts use mode `lesson-guided` and are never independent evidence (owner-confirmed 2026-11-27); weights for everything else belong to ADR-016 (task 49), which remains a separate approval checkpoint. Prerequisites advise, never gate (ADR-012).
+- *Fit:* external courses in the workspace document link via optional `curriculumCourseId` (task 35); learning materials stay personal notes and search also covers lesson text (task 48); the adaptive recommender and dashboard use lesson links and progress (tasks 50, 51).
+
 **ADR-016 Adaptive learning (2026-11-26). Amendment approved by owner (A18); the scoring, mastery, interval and recommendation numbers remain a separate approval checkpoint in task 49 and are not implemented until approved.** Requirements: `ADAPTIVE-LEARNING.md`. Decisions proposed here, numbers deferred to task 49:
 - *Three pure, language-neutral domain modules* over attempts: `mastery.ts` (discrete states, ADR-011), `proficiency.ts` (0–100% per concept plus a separate evidence-sufficiency verdict), `review.ts` (adaptive intervals). `recommend.ts` composes them with the Release 2 selector (`lib/practice/select.ts`). None contains SQL logic; they see only the shared attempt shape.
 - *No new Release 1 data.* Attempts already store skills, mode, hints, solution views, independent flag, version, duration and per-check results, so recurring error kinds, independent first attempts and repeat detection are derived. Mastery and proficiency stay recomputable from history, so nothing needs backfilling.
@@ -77,7 +85,7 @@ Content (datasets, exercise packs, skill aliases, career seeds) is versioned in 
 |---|---|---|
 | 0 | `workspaces` (existing, unchanged), `workspace_snapshots` (id, source, data jsonb, created_at) | Snapshots before imports/seeds |
 | 1 | `skills` (owner_id, id, language, name, aliases text[], tags text[], state, source, notes, rev), `exercise_attempts` (insert-only; see PRD C4), `saved_code` (exercise_id, code, rev), `practice_sessions` (config jsonb, times) | Bundled packs are read from `content/` and not stored |
-| 2 | `packs`, `pack_versions` (language, status, manifest, files jsonb, validation report, published_at), `learning_materials` (language, kind, title, body, url, concept ids, tags, source) | Imported/authored packs for any language; searchable learning material |
+| 2 | `packs`, `pack_versions` (language, status, manifest, files jsonb, validation report, published_at), `learning_materials` (language, kind, title, body, url, concept ids, tags, source), `lesson_progress` (course, lesson, pack version, status, detail jsonb, completed_at, rev) | Imported/authored packs (whole courses) for any language; searchable learning material; curriculum derived from pack manifests |
 | 3 | `job_applications`, `application_events` | ADR-013 |
 | 4 | `review_queue`, `assessment_attempts`, `learning_settings` | Assessments defined in content; settings are one row per owner; proficiency and recommendations are computed, not stored |
 | 5 | none (document extended) | ADR-005/007/008 |
@@ -88,7 +96,7 @@ Every table has `owner_id`, `created_at` and `updated_at`; every practice table 
 
 - **Existing:** `GET/PUT /api/workspace`, plus `POST /api/workspace/import?dryRun=1` (Release 0) and `GET /api/health`.
 - **Release 1:** `GET/POST /api/v2/skills`, `POST /api/v2/skills/register`, `POST /api/v2/attempts`, `GET/PUT /api/v2/drafts/:id`, `POST /api/v2/practice-sessions`, `GET /api/v2/export`, `POST /api/v2/import`.
-- **Release 2:** `POST /api/v2/packs` → `/:id/validate` → `/:id/publish`.
+- **Release 2:** `POST /api/v2/packs` → `/:id/validate` → `/:id/publish`; `GET /api/v2/curriculum`, `PUT /api/v2/lesson-progress`.
 - **Release 3:** CRUD `/api/v2/applications`, `POST /api/v2/applications/:id/events`, `POST /api/v2/applications/import?dryRun=1`.
 - **Release 4:** `GET /api/v2/review-queue`, `POST /api/v2/assessment-attempts`, `GET /api/v2/recommendations`, `GET/PUT /api/v2/settings`.
 

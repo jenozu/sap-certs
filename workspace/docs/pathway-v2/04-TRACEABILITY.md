@@ -99,3 +99,17 @@ Every requirement maps to UI, data, migration/seed, tests and tasks (`05-TASKS.m
 | Integrate daily queue into weekly study schedule | Weekly plan v2 | 39 |
 | Same rules for every language adapter; existing data intact | Pure language-neutral modules; no migration of old attempts | 31, 50 |
 | Automated tests: thresholds, duplicates, assisted, review dates, settings, content gaps, persistence | Named tests per task; gate 34 | 31, 32, 34, 50, 51 |
+
+## Learn and curriculum (approved amendment, 2026-11-27)
+
+| Requirement | Where it fits | Tasks |
+|---|---|---|
+| Dedicated Learn section | /learn routes, navigation entry | 53 |
+| Curriculum by language, course, module, lesson, concept; data-driven | Pack manifests + registry; ADR-017 | 24, 52 |
+| Lesson viewer: explanations, syntax, runnable examples, guided and independent exercises | Viewer on adapter registry and focus view | 53 |
+| Complete course, module and lesson imports | Lesson-aware pack pipeline; course prompt | 24, 25 |
+| Lesson completion and progression | `lesson_progress`, next lesson | 52, 51 |
+| Link external courses to in-app lessons | `curriculumCourseId` on library items | 35, 37 |
+| Lessons searchable and usable as AI context | Shared search with materials | 48, 25 |
+| Lessons support adaptive reinforcement | Revisit-lesson recommendation, lesson gap | 50 |
+| Expandable without code changes; any language | Content only; adapter registry | 24, 52, 53 |
