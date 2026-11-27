@@ -100,7 +100,7 @@ Every requirement maps to UI, data, migration/seed, tests and tasks (`05-TASKS.m
 | Same rules for every language adapter; existing data intact | Pure language-neutral modules; no migration of old attempts | 31, 50 |
 | Automated tests: thresholds, duplicates, assisted, review dates, settings, content gaps, persistence | Named tests per task; gate 34 | 31, 32, 34, 50, 51 |
 
-## Learn and curriculum (proposed amendment, 2026-11-27)
+## Learn and curriculum (approved amendment, 2026-11-27)
 
 | Requirement | Where it fits | Tasks |
 |---|---|---|

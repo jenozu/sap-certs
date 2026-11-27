@@ -25,7 +25,7 @@ The Practice Lab is a permanent multi-language academy. Release 1 builds SQL con
 - **Release 5:** course aggregation (37), next action and readiness (36, 38), daily queue and weekly assessment in the weekly plan (39), graduation threshold (42), acceptance scenario (43).
 - **Why not earlier:** mastery needs stable pack versions (Release 2) and attempts already hold everything required, so no earlier migration is needed.
 
-## Learn and curriculum amendment (2026-11-27, proposed)
+## Learn and curriculum amendment (2026-11-27, approved by owner)
 Fits inside Release 2 with no reordering: the pack pipeline (24) and authoring/prompt (25) become course-aware; new tasks 52 (curriculum model, lesson progress) and 53 (Learn viewer) depend only on 24 and 52; gate 27 includes them. Tasks 35, 37, 48, 50, 51 get small hooks (course linking, lesson search, lesson-based reinforcement, next lesson). Release 4 adaptive foundations are unchanged.
 
 ## What changed from revision 1
