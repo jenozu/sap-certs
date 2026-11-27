@@ -251,9 +251,9 @@ Status **pending** · priority high · complexity 9
 
 New exercises without code changes, never trusted blindly.
 
-**How:** Tables packs, pack_versions (status staged/validated/published/rejected, manifest, files jsonb ≤2 MB, report). Upload ZIP (fflate, path checks) or JSON; server + client validation; client worker runs each reference solution on each fixture and stores expected results; review screen; publish creates an immutable version; same exerciseId keeps identity; attempts keep their version. Bundled and imported packs appear in one registry. Manifests accept an optional `estimatedMinutes` per exercise (1–60; default derived from difficulty) so session length and the Release 4 daily queue can respect a time budget without pack changes.
+**How:** Tables packs, pack_versions (status staged/validated/published/rejected, manifest, files jsonb ≤2 MB, report). Upload ZIP (fflate, path checks) or JSON; server + client validation; client worker runs each reference solution on each fixture and stores expected results; review screen; publish creates an immutable version; same exerciseId keeps identity; attempts keep their version. Bundled and imported packs appear in one registry. Manifests accept an optional `estimatedMinutes` per exercise (1–60; default derived from difficulty) so session length and the Release 4 daily queue can respect a time budget without pack changes. Lesson-aware (ADR-017): the validator accepts whole courses. Lessons without an exercise (reading, guided, multiple-choice, project, review) are valid and a pack needs at least one lesson or exercise. The course → module → lesson tree, with optional lesson `skills`, advisory `prerequisites`, `quiz` file and exercise `role` (guided|independent), is kept in the pack version manifest, so one ZIP or JSON imports a complete course, not only exercises. Lesson ids are stable across versions like exerciseIds. Optional fields only; playground-compatible.
 
-**Acceptance: malformed JSON, ../ path, absolute path, oversized file, duplicate id, version downgrade, failing reference solution each rejected with an actionable message and retry; a valid pack is practisable immediately after publish; attempts recorded before a republish still show the original version; validator rejects `estimatedMinutes` outside 1–60 and accepts packs without it**
+**Acceptance: malformed JSON, ../ path, absolute path, oversized file, duplicate id, version downgrade, failing reference solution each rejected with an actionable message and retry; a valid pack is practisable immediately after publish; attempts recorded before a republish still show the original version; validator rejects `estimatedMinutes` outside 1–60 and accepts packs without it; a lesson-only course imports and publishes; duplicate lesson id, unknown prerequisite lesson and missing quiz file are each rejected with an actionable message; the 'no exercises' error applies only when the pack also has no lessons**
 - [ ] **24.1** Upload + staging tables — test: staged row created
 - [ ] **24.2** Validation server + client — test: one test per rule
 - [ ] **24.3** Reference-solution verification in worker — test: wrong solution flagged; expected stored
@@ -265,9 +265,9 @@ Status **pending** · priority high · complexity 4
 
 Generate exercises with any AI chat or by hand.
 
-**How:** Authoring form writes a staged pack (same pipeline). 'Copy AI prompt' embeds the pack schema, dataset schema, selected skills and rules (business purpose, fixtures, required constructs, synthetic data only). No server-side AI provider. The AI prompt can include selected learning materials (course notes, lesson text, code examples) as context. The prompt template also accepts an optional gap request (concept ids, recurring error kinds, target difficulty and count) so a content-gap suggestion from task 50 can open it pre-filled.
+**How:** Authoring form writes a staged pack (same pipeline). 'Copy AI prompt' embeds the pack schema, dataset schema, selected skills and rules (business purpose, fixtures, required constructs, synthetic data only). No server-side AI provider. The AI prompt can include selected learning materials (course notes, lesson text, code examples) as context. The prompt template also accepts an optional gap request (concept ids, recurring error kinds, target difficulty and count) so a content-gap suggestion from task 50 can open it pre-filled. A second prompt template generates a whole course outline (modules, lessons with types and concept ids, exercises) from a topic plus selected learning materials, embedding the lesson schema and lesson block syntax; the authoring form can also add reading and guided lessons.
 
-**Acceptance: authored exercise passes the pipeline and is practisable; prompt snapshot test contains schema and selected skills; a pack produced from the prompt by an AI chat imports successfully (manual check); prompt snapshot with a gap request contains the concept, error kinds and requested count**
+**Acceptance: authored exercise passes the pipeline and is practisable; prompt snapshot test contains schema and selected skills; a pack produced from the prompt by an AI chat imports successfully (manual check); prompt snapshot with a gap request contains the concept, error kinds and requested count; course prompt snapshot contains the lesson schema, block syntax and selected materials; an authored reading lesson passes the pipeline**
 
 ### 26. Practice modes and session setup _(after 23)_
 Status **pending** · priority medium · complexity 6
@@ -278,21 +278,39 @@ Mixed, debugging, predict-output, business challenge, free sandbox; 15/30/45/60 
 
 **Acceptance: unit tests for selection; e2e per mode at 1440 and 390; timer ends session with summary; sandbox never records graded attempts; selector unit tests: unseen before failed before passed, time budget filled without exceeding it, weights reorder results, deterministic with a seeded clock and random source**
 
-### 27. Release 2: expandable Skill Library _(after 24, 25, 26, 48)_
+### 27. Release 2: expandable Skill Library _(after 24, 25, 26, 48, 52, 53)_
 Status **pending** · priority high · complexity 2
 
 Practice Lab gate 3.
 
-**Acceptance: register unknown concept → import/author pack → validate → publish → practise, with no code change; all rejection rules tested; ids and attempts preserved; suites green. Learning materials searchable and usable as generation context.**
+**Acceptance: register unknown concept → import/author pack → validate → publish → practise, with no code change; all rejection rules tested; ids and attempts preserved; suites green. Learning materials searchable and usable as generation context; register unknown concept → import a complete course (lessons and exercises) → publish → study it in /learn → practise, with no code change; lesson progress persists and round-trips through export/import**
 
 ### 48. Learning material library (notes, lesson text, code examples) _(after 23)_
 Status **pending** · priority high · complexity 5
 
 Store and revisit what was learned anywhere; use it as context for generating exercises.
 
-**How:** Table learning_materials (owner_id, id, language, title, kind note|lesson|example|link, source, body text ≤100 KB, url, concept ids[], tags[], created/updated, rev). /library/materials: add, edit, search (title/body/tags), filter by language/concept/kind, link to concepts. Selected materials feed the copyable AI prompt (task 25). Included in export/import.
+**How:** Table learning_materials (owner_id, id, language, title, kind note|lesson|example|link, source, body text ≤100 KB, url, concept ids[], tags[], created/updated, rev). /library/materials: add, edit, search (title/body/tags), filter by language/concept/kind, link to concepts. Selected materials feed the copyable AI prompt (task 25). Included in export/import. Search also indexes published lesson text, so one search covers personal notes and course lessons. Lessons stay read-only and come from packs; personal notes stay here (no duplicate storage). A lesson can be added to the AI prompt context like a material.
 
-**Acceptance: add a note with a code example linked to sql-cte; search finds it by text and tag; filter by language; it appears in the AI prompt when selected; export/import round-trips; owner isolation tested.**
+**Acceptance: add a note with a code example linked to sql-cte; search finds it by text and tag; filter by language; it appears in the AI prompt when selected; export/import round-trips; owner isolation tested; search finds a phrase in a published lesson and in a note**
+
+### 52. Curriculum model, catalogue API and lesson progress _(after 24)_
+Status **pending** · priority high · complexity 6
+
+Data-driven curriculum (language → course → module → lesson → concept) built from published packs, with lesson-level completion and progression.
+
+**How:** No curriculum content table: the catalogue is derived from bundled and published pack manifests (task 24), merged into one registry. New additive table lesson_progress (owner_id, course_id, lesson_id, pack_version, status not_started|in_progress|completed, detail jsonb for checkpoints and quiz answers, completed_at, time_spent, rev; migration 0003, preview first). Completion rule per lesson type: reading = marked done; guided = all checkpoints passed; multiple-choice = all questions answered (retries allowed, best score kept); coding/debugging = at least one passing submit of the lesson exercise (assisted counts for lesson completion, not for mastery); project/review = marked done. Prerequisites are advisory and never gate (ADR-012). Next lesson = first incomplete lesson in order, preferring unmet prerequisites. Lesson exercise attempts use mode lesson-guided (never independent evidence) or lesson-independent (counts as normal; weights set in ADR-016). GET /api/v2/curriculum (tree plus progress), PUT /api/v2/lesson-progress (idempotent, rev conflicts), both owner-scoped and zod-validated. Included in export/import. Completion is never mastery.
+
+**Acceptance: catalogue lists bundled and imported courses with no code change; progress persists across devices; completion rules unit-tested per lesson type; republished pack keeps lesson ids and existing progress; stale write returns 409; owner isolation; export/import round-trip; guided exercises never count as independent evidence**
+
+### 53. Learn section and interactive lesson viewer _(after 52)_
+Status **pending** · priority high · complexity 8
+
+A Learn section to browse the curriculum and study lessons with explanations, syntax, runnable examples, guided steps and independent exercises.
+
+**How:** Routes /learn (languages → courses → modules → lessons with progress and next lesson) and /learn/[course]/[lesson]; a Learn entry added to the shared navigation. Viewer reuses vendored LessonMarkdown (no raw HTML), the focus-view editor/output and the language adapter registry (ADR-014), so a new language adds no viewer code. Lesson blocks are defined in lesson files, not code: runnable example blocks (fenced code marked run; executed in the adapter, editable, output shown), syntax callouts, guided checkpoints that gate the next step inside the lesson, multiple-choice from a quiz file, then the independent exercise. Unknown lesson types render as reading. Mobile tabs at 390 px, keyboard accessible. Unsupported language shows 'not supported yet' with reading still available.
+
+**Acceptance: a lesson-only course renders in /learn with no code change; a run block executes in the sql adapter and shows output; guided checkpoint blocks progress until passed; multiple-choice records answers and best score; independent exercise submit records an attempt and can complete the lesson; progress shown in the course list; unsupported language degrades to reading; e2e at 1440 and 390; axe clean**
 
 
 ## Phase 4 — Job tracker → Release 3 (any time after Release 1)
@@ -373,18 +391,18 @@ Status **pending** · priority high · complexity 6
 
 Daily queue of recommended exercises per concept within a time budget, preferring weak, overdue and unfamiliar items.
 
-**How:** lib/domain/recommend.ts (pure, injectable clock) reusing the task 26 selector and the task 31/32 outputs. Inputs: concept proficiency and evidence, due reviews, settings (budget 15/30/45/60 min, threshold, new-learning/review balance, adaptive difficulty), exercise difficulty and estimatedMinutes. Output: per concept the recommended count and difficulty (e.g. below-threshold concepts get more, harder-after-90% concepts get challenges), mixed practice slots, estimated time. When the library has too few unfamiliar exercises for a concept, return a content gap with an actionable link to pack import (task 24) or the pre-filled AI prompt (task 25). /api/v2/recommendations (GET, owner-scoped).
+**How:** lib/domain/recommend.ts (pure, injectable clock) reusing the task 26 selector and the task 31/32 outputs. Inputs: concept proficiency and evidence, due reviews, settings (budget 15/30/45/60 min, threshold, new-learning/review balance, adaptive difficulty), exercise difficulty and estimatedMinutes. Output: per concept the recommended count and difficulty (e.g. below-threshold concepts get more, harder-after-90% concepts get challenges), mixed practice slots, estimated time. When the library has too few unfamiliar exercises for a concept, return a content gap with an actionable link to pack import (task 24) or the pre-filled AI prompt (task 25). /api/v2/recommendations (GET, owner-scoped). In the below-threshold band, recommend revisiting the linked lesson (when one exists for the concept) alongside easier exercises; when none exists, add 'no lesson yet' to the content-gap suggestion (course prompt, task 25).
 
-**Acceptance: below-threshold concepts are recommended and changing the threshold changes the result; queue never exceeds the time budget; weak and overdue concepts come first and unfamiliar exercises are preferred; insufficient evidence yields a 'build evidence' recommendation; missing coverage returns an import/generate suggestion; works for a non-SQL fixture language; unit tests cover threshold boundaries, duplicate and assisted attempts, review dates, settings and content gaps**
+**Acceptance: below-threshold concepts are recommended and changing the threshold changes the result; queue never exceeds the time budget; weak and overdue concepts come first and unfamiliar exercises are preferred; insufficient evidence yields a 'build evidence' recommendation; missing coverage returns an import/generate suggestion; works for a non-SQL fixture language; unit tests cover threshold boundaries, duplicate and assisted attempts, review dates, settings and content gaps; a below-threshold concept with a linked lesson recommends the lesson; without one it returns a lesson gap**
 
 ### 51. Learning dashboard and adaptive settings _(after 31, 32, 50)_
 Status **pending** · priority medium · complexity 5
 
 Show proficiency, evidence, weak topics, due reviews and the daily recommendation; let the owner tune the rules.
 
-**How:** Table learning_settings (owner_id, rev, threshold default 80, review budget minutes, adaptive difficulty on/off, spaced repetition on/off, weekly assessment frequency, mastery requirements, new-learning/review balance); GET/PUT /api/v2/settings with rev conflicts; included in export/import. /practice/progress: per concept proficiency, evidence count, mastery state, weak topics, due reviews, today's recommended exercises with difficulty and estimated time, next lesson, weekly assessment summary; filter by language. Uses existing design tokens; reachable from navigation without redesigning the existing views.
+**How:** Table learning_settings (owner_id, rev, threshold default 80, review budget minutes, adaptive difficulty on/off, spaced repetition on/off, weekly assessment frequency, mastery requirements, new-learning/review balance); GET/PUT /api/v2/settings with rev conflicts; included in export/import. /practice/progress: per concept proficiency, evidence count, mastery state, weak topics, due reviews, today's recommended exercises with difficulty and estimated time, next lesson, weekly assessment summary; filter by language. Uses existing design tokens; reachable from navigation without redesigning the existing views. 'Next lesson' comes from curriculum progress (task 52).
 
-**Acceptance: settings persist across devices and survive export/import; changing the threshold or budget changes the dashboard and queue; dashboard distinguishes insufficient evidence from low proficiency; e2e at 1440 and 390; axe clean; owner isolation tested**
+**Acceptance: settings persist across devices and survive export/import; changing the threshold or budget changes the dashboard and queue; dashboard distinguishes insufficient evidence from low proficiency; e2e at 1440 and 390; axe clean; owner isolation tested; next lesson reflects lesson completion**
 
 
 ## Phase 6 — Career layer → Release 5
@@ -394,7 +412,7 @@ Status **pending** · priority medium · complexity 6
 
 Extend the existing JSON document instead of replacing it (ADR-005 v2).
 
-**How:** Optional new item fields (provider, progressSource, skills[], milestones[], evidence[], impact[], publishable, simulated, roleTargetId) and kinds ('stage'); old documents stay valid. Seed by id only when missing: Stage 0 'now', 'ts-node', 'integration'; 14 curriculum courses; Learn SQL at 78% marked last-reported only if no item has the Learn SQL URL; role targets per master-plan table; 6 roadmap projects. Never modify an existing item; 'update available' suggestions for unedited seed items; 'suggested re-mapping' list (ADR-007). Course/module/concept links use the existing item `skills[]` field; no separate link table.
+**How:** Optional new item fields (provider, progressSource, skills[], milestones[], evidence[], impact[], publishable, simulated, roleTargetId) and kinds ('stage'); old documents stay valid. Seed by id only when missing: Stage 0 'now', 'ts-node', 'integration'; 14 curriculum courses; Learn SQL at 78% marked last-reported only if no item has the Learn SQL URL; role targets per master-plan table; 6 roadmap projects. Never modify an existing item; 'update available' suggestions for unedited seed items; 'suggested re-mapping' list (ADR-007). Course/module/concept links use the existing item `skills[]` field; no separate link table. Library course items may carry an optional `curriculumCourseId` (a Learn course id) linking an external course to in-app lessons; lesson progress may be shown on the item (progressSource 'pathway-lessons') but never overrides a user-entered value.
 
 **Acceptance: seeding twice adds nothing; edited items untouched; user Learn SQL value wins; c1–c6, p1–p5, f1–f3, j1–j5, o1–o3 unchanged; snapshot taken before first seed.**
 
@@ -412,9 +430,9 @@ Status **pending** · priority medium · complexity 6
 
 Course provenance and skills; project milestones, evidence, honest impact; portfolio of publishable evidence.
 
-**How:** Library: provenance badge, related skills, completion prompt (practise/assess/project). Projects: milestones with acceptance criteria, evidence types, impact measured vs estimate, simulated flag, limitations; RF scanner and batch shipping kept verbatim. Portfolio: publishable only + 10-point checklist + demo outline. Add course-level proficiency, aggregated through each item's `skills[]` (reuses the task 31 aggregator); course completion stays separate from proficiency.
+**How:** Library: provenance badge, related skills, completion prompt (practise/assess/project). Projects: milestones with acceptance criteria, evidence types, impact measured vs estimate, simulated flag, limitations; RF scanner and batch shipping kept verbatim. Portfolio: publishable only + 10-point checklist + demo outline. Add course-level proficiency, aggregated through each item's `skills[]` (reuses the task 31 aggregator); course completion stays separate from proficiency. 'Open in Learn' on linked items; lesson progress is shown beside external-course progress.
 
-**Acceptance: course completion does not change skill state; impact cannot be saved without kind; unpublishable evidence never shown; existing portfolio items unchanged; course aggregate equals the aggregate of its linked concepts; completing a course changes no proficiency**
+**Acceptance: course completion does not change skill state; impact cannot be saved without kind; unpublishable evidence never shown; existing portfolio items unchanged; course aggregate equals the aggregate of its linked concepts; completing a course changes no proficiency; lesson completion changes no skill state**
 
 ### 38. Career checkpoints with evidence and gaps _(after 37, 36)_
 Status **pending** · priority medium · complexity 4

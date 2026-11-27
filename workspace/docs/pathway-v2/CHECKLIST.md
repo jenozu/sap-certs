@@ -2,7 +2,7 @@
 
 Living status file. Update it at every task change. Source of truth for tasks: `.taskmaster/tasks/tasks.json` (rendered in `05-TASKS.md`).
 
-_Last updated: 2026-11-26 18:05 (America/Toronto)_
+_Last updated: 2026-11-27 09:35 (America/Toronto)_
 
 ## Standing conditions (owner, 2026-11-25)
 - Stop for approval before: any production database migration, any destructive operation, any production release.
@@ -12,7 +12,7 @@ _Last updated: 2026-11-26 18:05 (America/Toronto)_
 - Owner actions are given one at a time, with URLs, clicks, values and how to verify.
 
 ## Current
-- **Release 1 LIVE (2026-11-26 12:55).** Owner hands-on test in progress (A17). Release 2 starts after the owner confirms.
+- **Release 1 LIVE (2026-11-26 12:55).** Owner hands-on test in progress (A17); Part 1 not yet saved on production (read-only Neon check). Release 2 starts after the owner confirms.
 - Owner merges in progress: PR #2 (plan docs), playground PR #6.
 
 ## Completed
@@ -39,6 +39,7 @@ _Last updated: 2026-11-26 18:05 (America/Toronto)_
 | 2 Verify and back up data | 2026-11-25 | this commit | Neon backup branch `backup-pre-v2` (br-ancient-heart-bdf2u1lx); Neon `workspaces` has **0 rows**; Sites not exportable (limitation) |
 
 ## Upcoming
+- **Proposed amendment (awaiting owner approval, A21):** Learn section and curriculum foundations in Release 2: new tasks 52–53, expanded 24, 25, 27, 35, 37, 48, 50, 51, ADR-017. Branch `docs/learn-curriculum-plan`. Docs only.
 - **Adaptive-learning amendment approved (A18, 2026-11-26 18:03):** new tasks 49–51 (Release 4), expanded 24–26, 31–34, 36–39, 42–43. Branch `docs/adaptive-learning-plan`, docs only. **Task 49 (ADR-016 scoring/mastery/interval/recommendation numbers) is a separate owner approval checkpoint; no adaptive implementation before it.** Roadmap is the approved baseline; new features are targeted amendments.
 - Release 2 (Expandable Skill Library): 24 pack import pipeline · 25 authoring + AI prompt with saved material · 26 practice modes · 48 learning material library · 27 gate
 - Release 3: 28–30 job tracker (can start any time)
@@ -66,6 +67,8 @@ _Last updated: 2026-11-26 18:05 (America/Toronto)_
 | A18 | Approve the adaptive-learning plan amendment (tasks 49–51 and expanded tasks) | **done** 2026-11-26 18:03 |
 | A19 | Approve ADR-016 numbers (task 49) before task 31 | pending (not yet drafted) |
 | A20 | Merge docs PR #4 (`docs/adaptive-learning-plan`): https://github.com/jenozu/sap-certs/pull/4 | requested |
+| A21 | Approve (or amend) the Learn/curriculum amendment (tasks 52–53, ADR-017) | **requested** |
+| A22 | Release 1 walkthrough Part 1 (register concepts on /skills). Read-only prod check 2026-11-27 09:20: `skills` empty, 0 attempts | **waiting on owner** |
 | A13 | Optional: delete leftover branch `probe/prod-r0` (proxy cannot delete) | optional |
 
 ## Backup limitations
